@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 2.8.12)
-find_package(BISON 2.4.1)
-find_package(FLEX 2.5.35)
+PROJECT(comp)
 
-project(comp)
+cmake_minimum_required(VERSION 2.8.12)
+find_package(BISON 2.3)
+find_package(FLEX 2.5.35)
 
 set(CMAKE_CXX_STANDARD 11)
 
