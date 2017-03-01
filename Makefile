@@ -8,9 +8,16 @@ prepare:
 clean:
 	rm -rf ./build/
 
-build:
-	mkdir -p build/
-	cd build/ && cmake .. && make comp_main
+build: build/Makefile
+	cd build/ && make comp_main VERBOSE=1
+
+build/Makefile: CMakeLists.txt
+	mkdir -p build/ && cd build/ && cmake ..
+
+build/comp_main: build
+
+run: build/comp_main
+	build/comp_main
 
 test:
 	mkdir -p build/
