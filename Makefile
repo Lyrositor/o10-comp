@@ -1,6 +1,6 @@
 .PHONY: build clean default prepare test
 
-default: prepare build
+default: build
 
 prepare:
 	rm -rf vendor/googletest && git clone https://github.com/google/googletest.git vendor/googletest
