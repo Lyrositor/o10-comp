@@ -41,3 +41,8 @@ pids
 *.pid
 *.seed
 *.DS_Store
+
+
+src/lib/lexer.cpp
+src/lib/parser.tab.cpp
+src/lib/parser.tab.hpp

@@ -6,17 +6,16 @@ prepare:
 	rm -rf vendor/googletest && git clone https://github.com/google/googletest.git vendor/googletest
 
 clean:
+	cd build && make clean
 	rm -rf ./build/
 
 build: build/Makefile
-	cd build/ && make comp_main VERBOSE=1
+	cd build/ && make comp_main --no-print-directory
 
 build/Makefile: CMakeLists.txt
 	mkdir -p build/ && cd build/ && cmake ..
 
-build/comp_main: build
-
-run: build/comp_main
+run: build
 	build/comp_main
 
 test:
