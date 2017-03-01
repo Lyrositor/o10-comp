@@ -1,0 +1,21 @@
+# image: demurgos/cpp:14
+image: demurgos/cpp:insa
+
+before_script:
+ - git submodule update --init --recursive
+
+stages:
+  - build
+  - test
+
+build-all:
+  stage: build
+  script:
+    - make
+#  artifacts:
+#    untracked: true
+
+gl_test:
+  stage: test
+  script:
+    - make prepare && make test
