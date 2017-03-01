@@ -4,7 +4,6 @@ default: build
 
 prepare:
 	rm -rf vendor/googletest && git clone https://github.com/google/googletest.git vendor/googletest
-	rm -rf cmake_modules && git clone https://github.com/bilke/cmake-modules.git cmake_modules
 
 clean:
 	rm -rf ./build/

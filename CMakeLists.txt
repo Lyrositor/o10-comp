@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 project(comp)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g -O0 -fprofile-arcs -ftest-coverage")
+if (CMAKE_COMPILER_IS_GNUCXX )
+  add_compile_options(-Wall -Wextra -pedantic -g)
+endif ()
 
 set(CMAKE_SOURCE_DIR src)
-
-# include_directories("libs/simple_match/include/")
 
 include_directories("include/")
 set(
@@ -35,9 +35,7 @@ set(
 add_executable(comp_test ${TEST_SOURCES})
 target_link_libraries(comp_test comp gtest gtest_main)
 
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
-
-message(${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
   include(CodeCoverage)
