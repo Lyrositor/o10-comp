@@ -3,7 +3,7 @@
 default: prepare build
 
 prepare:
-	rm -rf libs/googletest && git clone https://github.com/google/googletest.git libs/googletest
+	rm -rf vendor/googletest && git clone https://github.com/google/googletest.git vendor/googletest
 	rm -rf cmake_modules && git clone https://github.com/bilke/cmake-modules.git cmake_modules
 
 clean:

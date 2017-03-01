@@ -40,3 +40,4 @@ logs/
 pids
 *.pid
 *.seed
+*.DS_Store
