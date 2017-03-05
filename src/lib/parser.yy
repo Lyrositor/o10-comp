@@ -5,7 +5,7 @@
 #include <iostream>
 
 extern int yylex(void);
-void yyerror(Expression ** e, const char * msg);
+void yyerror(int * res, const char * msg);
 
 %}
 
