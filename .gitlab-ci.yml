@@ -18,4 +18,6 @@ build-all:
 gl_test:
   stage: test
   script:
-    - make prepare && make test
+    - make prepare
+    - make test.unit
+#    - make test.memory

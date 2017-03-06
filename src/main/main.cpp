@@ -1,15 +1,10 @@
-//#include <iostream>
-//#include <comp/ast.h>
-//
-//int main() {
-//  std::cout << comp::ast::create_node() << "\n";
-//  return 0;
-//}
-
 #include <comp/parser.h>
 #include <iostream>
+#include <comp/eval.h>
 
 int main(void) {
-  std::cout << doParse() << "\n";
+  std::shared_ptr<comp::ast::Expression> expression = comp::parser::parse();
+  int32_t value = comp::eval::evalExpression(*expression);
+  std::cout << value << "\n";
   return 0;
 }

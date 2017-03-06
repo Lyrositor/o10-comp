@@ -1,4 +1,4 @@
-.PHONY: build clean default prepare test
+.PHONY: build clean default prepare test.unit test.memory coverage
 
 default: build
 
@@ -18,6 +18,16 @@ build/Makefile: CMakeLists.txt
 run: build
 	build/comp_main
 
-test:
+test: test.unit test.memory
+
+test.unit:
 	mkdir -p build/
-	cd build/ && cmake .. && make comp_test && ./comp_test && valgrind --leak-check=full --error-exitcode=1 ./comp_test && make comp_coverage
+	cd build/ && cmake .. && make comp_test && ./comp_test
+
+test.memory:
+	mkdir -p build/
+	cd build/ && cmake .. && make comp_test && valgrind --leak-check=full --error-exitcode=1 ./comp_test && make comp_coverage
+
+coverage:
+	mkdir -p build/
+	cd build/ && cmake .. && make comp_coverage

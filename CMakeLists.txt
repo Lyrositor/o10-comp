@@ -34,13 +34,13 @@ set(
 add_executable(comp_test ${TEST_SOURCES})
 target_link_libraries(comp_test comp gtest gtest_main)
 
-#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-#
-#if (CMAKE_COMPILER_IS_GNUCXX)
-#  include(CodeCoverage)
-#  if (LCOV_PATH AND GENHTML_PATH)
-#    set(LCOV_REMOVE_EXTRA "'vendor/*'")
-#    include(CodeCoverage)
-#    setup_target_for_coverage(${PROJECT_NAME}_coverage comp_test coverage)
-#  endif ()
-#endif ()
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+  include(CodeCoverage)
+  if (LCOV_PATH AND GENHTML_PATH)
+    set(LCOV_REMOVE_EXTRA "'vendor/*'")
+    include(CodeCoverage)
+    setup_target_for_coverage(${PROJECT_NAME}_coverage comp_test coverage)
+  endif ()
+endif ()
