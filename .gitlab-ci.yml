@@ -1,5 +1,4 @@
-# image: demurgos/cpp:14
-image: demurgos/cpp:insa
+image: demurgos/cpp:insa-gcc-5
 
 before_script:
  - git submodule update --init --recursive
