@@ -29,9 +29,9 @@ namespace comp {
 
     int32_t evalExpression(comp::ast::Expression &expression) {
       switch (expression.type) {
-        case comp::ast::LiteralType:
+        case comp::ast::NodeType::Literal:
           return evalLiteral(static_cast<comp::ast::Literal &>(expression));
-        case comp::ast::BinaryExpressionType:
+        case comp::ast::NodeType::BinaryExpression:
           return evalBinaryExpression(static_cast<comp::ast::BinaryExpression &>(expression));
         default:
           throw std::domain_error("Unexpected expression type");
