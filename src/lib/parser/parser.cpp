@@ -1,5 +1,5 @@
 #include <comp/ast.h>
-#include "parser.tab.h"
+#include "parser.tab.hpp"
 #include "lexer.yy.h"
 
 void yyerror(yyscan_t scanner, comp::ast::Expression *res, const char *msg) {
