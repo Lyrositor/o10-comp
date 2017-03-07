@@ -19,4 +19,4 @@ gl_test:
   script:
     - make prepare
     - make test.unit
-#    - make test.memory
+    - make test.memory
