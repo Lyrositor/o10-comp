@@ -26,7 +26,7 @@ test.unit:
 
 test.memory:
 	mkdir -p build/
-	cd build/ && cmake .. && make comp_test && valgrind --leak-check=full --error-exitcode=1 ./comp_test && make comp_coverage
+	cd build/ && cmake .. && make comp_test && valgrind --leak-check=full --error-exitcode=1 ./comp_test
 
 coverage:
 	mkdir -p build/

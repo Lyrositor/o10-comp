@@ -1,5 +1,7 @@
 #include <comp/ast.h>
+// Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
+// Generated with flex by CMake (lexer.yy.h is in the build directory)
 #include "lexer.yy.h"
 
 void yyerror(yyscan_t scanner, comp::ast::Expression *res, const char *msg) {

@@ -9,6 +9,7 @@ namespace comp {
     class Position {
       public:
         Position(size_t index, size_t line, size_t column);
+        virtual ~Position();
 
         const size_t index;
         const size_t line;
@@ -18,6 +19,7 @@ namespace comp {
     class SourceLocation {
       public:
         SourceLocation(const Position &start, const Position &end);
+        virtual ~SourceLocation();
 
         const Position start;
         const Position end;
@@ -32,6 +34,7 @@ namespace comp {
     class Node {
       public:
         Node(NodeType type, std::shared_ptr<SourceLocation> location);
+        virtual ~Node();
 
         const NodeType type;
         const std::shared_ptr<SourceLocation> location;
@@ -40,11 +43,13 @@ namespace comp {
     class Expression : public Node {
       public:
         Expression(NodeType type, std::shared_ptr<SourceLocation> location);
+        virtual ~Expression();
     };
 
     class Literal : public Expression {
       public:
         Literal(int32_t value, std::shared_ptr<SourceLocation> location);
+        virtual ~Literal();
 
         const int32_t value;
 
@@ -68,6 +73,7 @@ namespace comp {
       public:
         BinaryExpression(BinaryOperator operator_, std::shared_ptr<Expression> left,
                          std::shared_ptr<Expression> right, std::shared_ptr<SourceLocation> location);
+        virtual ~BinaryExpression();
 
         const BinaryOperator op;
         std::shared_ptr<Expression> left;

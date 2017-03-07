@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <comp/ast.h>
+// Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
 
 %}
