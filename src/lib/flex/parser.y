@@ -5,15 +5,27 @@
 #include <comp/ast.h>
 #include <memory>
 
-void yyerror(comp::ast::Expression *, const char *);
-int yylex(void);
+union YYSTYPE;
+
+void yyerror(void *scanner, comp::ast::Expression *, const char *);
+int yylex(YYSTYPE *lvalp, void *scanner);
 void yy_scan_string(const char *str);
 
 %}
+
+%define api.pure full
+%define parse.error verbose
+
+%lex-param {void *scanner}
+
+%parse-param {void *scanner}
+%parse-param {comp::ast::Expression *&root}
+
 %union {
  int32_t i;
  comp::ast::Expression *e;
 }
+
 %token ADDITION_OPERATOR SUBTRACTION_OPERATOR MULTIPLICATION_OPERATOR DIVISION_OPERATOR REMAINDER_OPERATOR
 %token <i> INTEGER_LITERAL
 %type <e> expression
@@ -22,8 +34,6 @@ void yy_scan_string(const char *str);
 %left SUBTRACTION_OPERATOR ADDITION_OPERATOR
 %left MULTIPLICATION_OPERATOR DIVISION_OPERATOR
 %left REMAINDER_OPERATOR
-
-%parse-param {comp::ast::Expression *&root}
 
 %%
 root:
@@ -37,19 +47,3 @@ expression:
   | expression DIVISION_OPERATOR expression {$$ = new comp::ast::BinaryExpression(comp::ast::DivisionOperator, std::shared_ptr<comp::ast::Expression>($1), std::shared_ptr<comp::ast::Expression>($3), nullptr);}
   | expression REMAINDER_OPERATOR expression {$$ = new comp::ast::BinaryExpression(comp::ast::RemainderOperator, std::shared_ptr<comp::ast::Expression>($1), std::shared_ptr<comp::ast::Expression>($3), nullptr);}
 %%
-
-
-void yyerror(comp::ast::Expression * res, const char * msg) {
-   printf("Syntax error : %s\n",msg);
-}
-
-namespace comp {
-  namespace parser {
-    std::shared_ptr<comp::ast::Expression> parse(){
-      comp::ast::Expression *root = nullptr;
-      yy_scan_string("123+456");
-      yyparse(root);
-      return std::shared_ptr<comp::ast::Expression>(root);
-    }
-  }
-}
