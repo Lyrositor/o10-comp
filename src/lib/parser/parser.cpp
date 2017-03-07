@@ -1,6 +1,6 @@
 #include <comp/ast.h>
 #include "parser.tab.h"
-#include "scanner.tab.h"
+#include "lexer.yy.h"
 
 void yyerror(yyscan_t scanner, comp::ast::Expression *res, const char *msg) {
   printf("Syntax error : %s\n", msg);
