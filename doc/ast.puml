@@ -68,7 +68,7 @@ class VariableDeclarator {
   +initialValue: nullptr | Expression *;
 }
 
-class FunctionDeclaration {
+class Function {
   +identifier: Identifier;
   +parameters: FunctionParameter[];
   +body: nullptr | BlockStatement *;
@@ -104,7 +104,7 @@ Program --> Node
 Expression --> Node
 Declaration --> Statement
 VariableDeclaration --> Declaration
-FunctionDeclaration --> Declaration
+Function --> Declaration
 VariableDeclarator --> Node
 Statement --> Node
 BlockStatement --> Statement

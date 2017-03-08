@@ -4,7 +4,8 @@
 namespace comp {
 namespace ast {
 struct Statement : public Node {
-  Statement();
+  Statement(Node::Type nodeType, std::shared_ptr<SourceLocation> location);
+
   virtual ~Statement() = 0;
 };
 }

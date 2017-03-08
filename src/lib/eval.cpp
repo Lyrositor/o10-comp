@@ -23,7 +23,7 @@ int32_t evalBinaryExpression(comp::ast::BinaryExpression &expression) {
 }
 
 int32_t eval_expression(comp::ast::Expression &expression) {
-  switch (expression.type) {
+  switch (expression.nodeType) {
     case comp::ast::Node::Type::Literal:return evalLiteral(static_cast<comp::ast::Literal &>(expression));
     case comp::ast::Node::Type::BinaryExpression:return evalBinaryExpression(static_cast<comp::ast::BinaryExpression &>(expression));
     default:throw std::domain_error("Unexpected expression type");

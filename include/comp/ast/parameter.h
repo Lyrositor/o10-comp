@@ -6,11 +6,11 @@
 
 namespace comp {
 namespace ast {
-struct Parameter : public Node {
-  Parameter(CType type, Identifier identifier);
+struct Parameter final : public Node {
+  Parameter(Type type, Identifier identifier);
   virtual ~Parameter();
 
-  const CType type;
+  const Type type;
   const std::shared_ptr<Identifier> identifier;
 };
 }

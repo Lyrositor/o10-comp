@@ -5,7 +5,7 @@
 namespace comp {
 namespace ast {
 struct Declaration : public Statement {
-  Declaration(Type type, std::shared_ptr<SourceLocation> location);
+  Declaration(Node::Type nodeType, std::shared_ptr<SourceLocation> location);
 
   virtual ~Declaration() = 0;
 };

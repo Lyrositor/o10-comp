@@ -13,10 +13,10 @@ struct Node {
     Literal
   };
 
-  Node(Type type, std::shared_ptr<SourceLocation> location);
+  Node(Type nodeType, std::shared_ptr<SourceLocation> location);
   virtual ~Node() = 0;
 
-  const Type type;
+  const Type nodeType;
   const std::shared_ptr<SourceLocation> location;
 };
 }

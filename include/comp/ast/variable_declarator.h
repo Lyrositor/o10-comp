@@ -6,11 +6,12 @@
 
 namespace comp {
 namespace ast {
-struct VariableDeclarator : public Node {
+struct VariableDeclarator final : public Node {
   VariableDeclarator(
     std::shared_ptr<Identifier> identifier,
     size_t array,
-    std::unique_ptr<Expression> initial_value
+    std::unique_ptr<Expression> initial_value,
+    std::shared_ptr<SourceLocation> location = nullptr
   );  // TODO Handle int a[], b
   ~VariableDeclarator();
 
@@ -20,4 +21,3 @@ struct VariableDeclarator : public Node {
 };
 }
 }
-

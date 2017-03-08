@@ -6,8 +6,8 @@
 
 namespace comp {
 namespace ast {
-struct ExpressionStatement : public Statement {
-  ExpressionStatement(std::unique_ptr<Expression> expression);
+struct ExpressionStatement final : public Statement {
+  ExpressionStatement(std::unique_ptr<Expression> expression, std::shared_ptr<SourceLocation> location = nullptr);
   ~ExpressionStatement();
 
   const std::unique_ptr<Expression> expression;

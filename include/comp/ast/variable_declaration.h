@@ -7,14 +7,15 @@
 
 namespace comp {
 namespace ast {
-struct VariableDeclaration : public Declaration {
+struct VariableDeclaration final : public Declaration {
   VariableDeclaration(
-    CType type,
-    std::vector<std::shared_ptr<VariableDeclarator>> declarators
+    Type type,
+    std::vector<std::shared_ptr<VariableDeclarator>> declarators,
+    std::shared_ptr<SourceLocation> location = nullptr
   );
   virtual ~VariableDeclaration();
 
-  const CType type;
+  const Type type;
   const std::vector<std::shared_ptr<VariableDeclarator>> declarators;
 };
 }

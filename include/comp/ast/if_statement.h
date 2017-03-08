@@ -6,11 +6,16 @@
 
 namespace comp {
 namespace ast {
-struct IfStatement : public Statement {
+/**
+ * Represents a conditional `if` statement.
+ * If there is no alternative ("else" branch), then `alternative` is the `nullptr`.
+ */
+struct IfStatement final : public Statement {
   IfStatement(
     std::shared_ptr<Expression> test,
     std::shared_ptr<Statement> consequence,
-    std::shared_ptr<Statement> alternative
+    std::shared_ptr<Statement> alternative,
+    std::shared_ptr<SourceLocation> location = nullptr
   );
   ~IfStatement();
 
