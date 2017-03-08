@@ -13,11 +13,11 @@ int32_t evalBinaryExpression(comp::ast::BinaryExpression &expression) {
   int32_t right = eval_expression(*expression.right);
 
   switch (expression.op) {
-    case comp::ast::BinaryExpression::Operator::Addition:return left + right;
-    case comp::ast::BinaryExpression::Operator::Subtraction:return left - right;
-    case comp::ast::BinaryExpression::Operator::Multiplication:return left * right;
-    case comp::ast::BinaryExpression::Operator::Division:return left / right;
-    case comp::ast::BinaryExpression::Operator::Remainder:return left % right;
+    case comp::ast::BinaryOperator::Addition:return left + right;
+    case comp::ast::BinaryOperator::Subtraction:return left - right;
+    case comp::ast::BinaryOperator::Multiplication:return left * right;
+    case comp::ast::BinaryOperator::Division:return left / right;
+    case comp::ast::BinaryOperator::Remainder:return left % right;
     default:throw std::domain_error("Unexpected binary operator");
   }
 }

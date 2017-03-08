@@ -3,7 +3,7 @@
 namespace comp {
 namespace ast {
 BinaryExpression::BinaryExpression(
-    Operator op,
+    BinaryOperator op,
     std::shared_ptr<Expression> left,
     std::shared_ptr<Expression> right,
     std::shared_ptr<SourceLocation> location
@@ -17,7 +17,7 @@ BinaryExpression::BinaryExpression(
 BinaryExpression::~BinaryExpression() {}
 
 std::shared_ptr<BinaryExpression> BinaryExpression::create(
-    Operator op,
+    BinaryOperator op,
     std::shared_ptr<Expression> left,
     std::shared_ptr<Expression> right,
     std::shared_ptr<SourceLocation> location
