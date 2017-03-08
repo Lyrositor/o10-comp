@@ -22,6 +22,9 @@ The project is continuously tested with [this docker image](https://raw.githubus
 
 ## Configure and build
 
+Note: if you are using Windows, you may have to manually specify the paths to the `bison` and `flex` executables on your system.
+To do so, specify the `BISON_EXECUTABLE` `FLEX_EXECUTABLE` variables when running CMake.
+
 ```shell
 # Run as a normal user
 make
