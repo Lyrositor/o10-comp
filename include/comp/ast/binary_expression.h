@@ -14,17 +14,17 @@ enum class BinaryOperator {
 
 struct BinaryExpression final : public Expression {
   static std::shared_ptr<BinaryExpression> create(
-      BinaryOperator op,
-      std::shared_ptr<Expression> left,
-      std::shared_ptr<Expression> right,
-      std::shared_ptr<SourceLocation> location = nullptr
+    BinaryOperator op,
+    std::shared_ptr<Expression> left,
+    std::shared_ptr<Expression> right,
+    std::shared_ptr<SourceLocation> location = nullptr
   );
 
   BinaryExpression(
-      BinaryOperator op,
-      std::shared_ptr<Expression> left,
-      std::shared_ptr<Expression> right,
-      std::shared_ptr<SourceLocation> location = nullptr
+    BinaryOperator op,
+    std::shared_ptr<Expression> left,
+    std::shared_ptr<Expression> right,
+    std::shared_ptr<SourceLocation> location = nullptr
   );
 
   virtual ~BinaryExpression();
