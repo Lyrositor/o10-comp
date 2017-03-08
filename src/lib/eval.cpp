@@ -1,4 +1,5 @@
 #include <comp/eval.h>
+#include <stdexcept>
 
 namespace comp {
 namespace eval {
