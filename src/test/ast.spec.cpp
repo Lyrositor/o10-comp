@@ -9,7 +9,6 @@ TEST(Ast, example) {
   EXPECT_EQ(23, lit1->value);
   EXPECT_EQ(33, lit2->value);
 
-
   std::shared_ptr<comp::ast::BinaryExpression> expr = comp::ast::BinaryExpression::create(comp::ast::AdditionOperator,
                                                                                           lit1, lit2,
                                                                                           nullptr);
