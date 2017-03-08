@@ -3,29 +3,35 @@
 #include "expression.h"
 
 namespace comp {
-  namespace ast {
-    enum BinaryOperator {
-      AdditionOperator,
-      SubtractionOperator,
-      DivisionOperator,
-      MultiplicationOperator,
-      RemainderOperator
-    };
+namespace ast {
+struct BinaryExpression : public Expression {
+  enum class Operator {
+    Addition,
+    Subtraction,
+    Division,
+    Multiplication,
+    Remainder,
+  };
 
-    class BinaryExpression : public Expression {
-      public:
-        BinaryExpression(BinaryOperator operator_, std::shared_ptr<Expression> left,
-                         std::shared_ptr<Expression> right, std::shared_ptr<SourceLocation> location);
+  static std::shared_ptr<BinaryExpression> create(
+    Operator op,
+    std::shared_ptr<Expression> left,
+    std::shared_ptr<Expression> right,
+    std::shared_ptr<SourceLocation> location
+  );
 
-        virtual ~BinaryExpression();
+  BinaryExpression(
+    Operator op,
+    std::shared_ptr<Expression> left,
+    std::shared_ptr<Expression> right,
+    std::shared_ptr<SourceLocation> location
+  );
 
-        const BinaryOperator op;
-        std::shared_ptr<Expression> left;
-        std::shared_ptr<Expression> right;
+  virtual ~BinaryExpression();
 
-        static std::shared_ptr<BinaryExpression> create(BinaryOperator operator_, std::shared_ptr<Expression> left,
-                                                        std::shared_ptr<Expression> right,
-                                                        std::shared_ptr<SourceLocation> location);
-    };
-  }
+  const Operator op;
+  const std::shared_ptr<Expression> left;
+  const std::shared_ptr<Expression> right;
+};
+}
 }

@@ -3,12 +3,11 @@
 #include "node.h"
 
 namespace comp {
-  namespace ast {
-    class Expression : public Node {
-      public:
-        Expression(NodeType type, std::shared_ptr<SourceLocation> location);
+namespace ast {
+struct Expression : public Node {
+  Expression(Type type, std::shared_ptr<SourceLocation> location);
 
-        virtual ~Expression();
-    };
-  }
+  virtual ~Expression() = 0;
+};
+}
 }

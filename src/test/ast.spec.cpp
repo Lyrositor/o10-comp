@@ -16,5 +16,5 @@ TEST(Ast, example) {
   EXPECT_EQ(lit1, expr->left);
   EXPECT_EQ(lit2, expr->right);
 
-  EXPECT_EQ(56, comp::eval::evalExpression(*expr));
+  EXPECT_EQ(56, comp::eval::eval_expression(*expr));
 }

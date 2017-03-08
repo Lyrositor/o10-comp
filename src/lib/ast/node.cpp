@@ -2,8 +2,11 @@
 
 namespace comp {
 namespace ast {
-Node::Node(NodeType type_, std::shared_ptr<SourceLocation> location_) :
-    type(type_), location(location_) {}
-Node::~Node() {}
+Node::Node(Type type, std::shared_ptr<SourceLocation> location) :
+  type(type), location(location) {
+}
+
+Node::~Node() {
+}
 }
 }

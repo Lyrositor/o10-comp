@@ -4,22 +4,20 @@
 #include <memory>
 #include "position.h"
 
-
 namespace comp {
-  namespace ast {
-    enum class NodeType {
-      BinaryExpression,
-      ArrayExpression,
-      Literal
-    };
+namespace ast {
+struct Node {
+  enum class Type {
+    BinaryExpression,
+    ArrayExpression,
+    Literal
+  };
 
-    class Node {
-      public:
-        Node(NodeType type, std::shared_ptr<SourceLocation> location);
-        virtual ~Node();
+  Node(Type type, std::shared_ptr<SourceLocation> location);
+  virtual ~Node() = 0;
 
-        const NodeType type;
-        const std::shared_ptr<SourceLocation> location;
-    };
-  }
+  const Type type;
+  const std::shared_ptr<SourceLocation> location;
+};
+}
 }

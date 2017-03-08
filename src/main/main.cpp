@@ -4,7 +4,7 @@
 
 int main(void) {
   std::shared_ptr<comp::ast::Expression> expression = comp::parser::parse();
-  int32_t value = comp::eval::evalExpression(*expression);
+  int32_t value = comp::eval::eval_expression(*expression);
   std::cout << value << "\n";
   return 0;
 }

@@ -4,5 +4,5 @@
 
 TEST(Parser, example) {
   std::shared_ptr<comp::ast::Expression> expr = comp::parser::parse();
-  EXPECT_EQ(579, comp::eval::evalExpression(*expr));
+  EXPECT_EQ(579, comp::eval::eval_expression(*expr));
 }
