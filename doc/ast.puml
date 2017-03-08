@@ -1,0 +1,117 @@
+@startuml
+
+class Position {
+  +index: usize_t
+  +line: usize_t
+  +column: usize_t
+}
+
+class SourceLocation {
+  +start: Position
+  +end: Position
+  +file_path: string
+}
+
+class Node {
+  +type: NodeType
+  +location: SourceLocation
+}
+
+class Program {
+  +body: Declaration[]
+}
+
+class Expression {
+
+}
+
+class Statement {
+
+}
+
+class BlockStatement {
+  +body: Statement[]
+}
+
+class Declaration {
+
+}
+
+enum CType {
+  +Char;
+  +Int32;
+  +Int64;
+}
+
+class Type {
+
+}
+
+class PrimitiveType {
+  type: CType
+}
+
+class ArrayType {
+  itemType: Type
+}
+
+PrimitiveType --> Type
+ArrayType --> Type
+
+class VariableDeclaration {
+  +type: Type;
+  +declarations: VariableDeclarator[];
+}
+
+class VariableDeclarator {
+  +identifier: Identifier | Array...;
+  +initialValue: nullptr | Expression *;
+}
+
+class FunctionDeclaration {
+  +identifier: Identifier;
+  +parameters: FunctionParameter[];
+  +body: nullptr | BlockStatement *;
+}
+
+class Parameter {
+  +type: Type;
+  +identifier: Identifier;
+}
+
+class ExpressionStatement {
+  +expression: Expression *
+}
+
+
+class IfStatement {
+  +test: Expression *
+  +consequence: Statement *;
+  +alternative: nullptr | Statement *;
+}
+
+class Identifier {
+  +name: string
+}
+
+class BinaryExpression {
+  +op
+  +left: Expression
+  +right: Expression
+}
+
+Program --> Node
+Expression --> Node
+Declaration --> Statement
+VariableDeclaration --> Declaration
+FunctionDeclaration --> Declaration
+VariableDeclarator --> Node
+Statement --> Node
+BlockStatement --> Statement
+ExpressionStatement --> Statement
+IfStatement --> Statement
+Identifier --> Expression
+Parameter --> Node
+BinaryExpression --> Expression
+
+@enduml
