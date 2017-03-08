@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace comp {
 namespace ast {
 struct Position {

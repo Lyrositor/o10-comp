@@ -46,26 +46,26 @@ expression:
   | expression ADDITION_OPERATOR expression {
     std::shared_ptr<comp::ast::Expression> left($1);
     std::shared_ptr<comp::ast::Expression> right($3);
-    $$ = new comp::ast::BinaryExpression(comp::ast::AdditionOperator, left, right, nullptr);
+    $$ = new comp::ast::BinaryExpression(comp::ast::BinaryExpression::Operator::Addition, left, right, nullptr);
   }
   | expression SUBTRACTION_OPERATOR expression {
     std::shared_ptr<comp::ast::Expression> left($1);
     std::shared_ptr<comp::ast::Expression> right($3);
-    $$ = new comp::ast::BinaryExpression(comp::ast::SubtractionOperator, left, right, nullptr);
+    $$ = new comp::ast::BinaryExpression(comp::ast::BinaryExpression::Operator::Subtraction, left, right, nullptr);
   }
   | expression MULTIPLICATION_OPERATOR expression {
     std::shared_ptr<comp::ast::Expression> left($1);
     std::shared_ptr<comp::ast::Expression> right($3);
-    $$ = new comp::ast::BinaryExpression(comp::ast::MultiplicationOperator, left, right, nullptr);
+    $$ = new comp::ast::BinaryExpression(comp::ast::BinaryExpression::Operator::Multiplication, left, right, nullptr);
   }
   | expression DIVISION_OPERATOR expression {
     std::shared_ptr<comp::ast::Expression> left($1);
     std::shared_ptr<comp::ast::Expression> right($3);
-    $$ = new comp::ast::BinaryExpression(comp::ast::DivisionOperator, left, right, nullptr);
+    $$ = new comp::ast::BinaryExpression(comp::ast::BinaryExpression::Operator::Division, left, right, nullptr);
   }
   | expression REMAINDER_OPERATOR expression {
     std::shared_ptr<comp::ast::Expression> left($1);
     std::shared_ptr<comp::ast::Expression> right($3);
-    $$ = new comp::ast::BinaryExpression(comp::ast::RemainderOperator, left, right, nullptr);
+    $$ = new comp::ast::BinaryExpression(comp::ast::BinaryExpression::Operator::Remainder, left, right, nullptr);
   }
 %%

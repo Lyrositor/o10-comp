@@ -2,16 +2,27 @@
 
 namespace comp {
 namespace ast {
-BinaryExpression::BinaryExpression(BinaryOperator op_, std::shared_ptr<Expression> left_,
-                                   std::shared_ptr<Expression> right_, std::shared_ptr<SourceLocation> location_) :
-    Expression(NodeType::BinaryExpression, location_), op(op_), left(left_), right(right_) {}
+BinaryExpression::BinaryExpression(
+    Operator op,
+    std::shared_ptr<Expression> left,
+    std::shared_ptr<Expression> right,
+    std::shared_ptr<SourceLocation> location
+) :
+    Expression(Type::BinaryExpression, location),
+    op(op),
+    left(left),
+    right(right) {
+}
+
 BinaryExpression::~BinaryExpression() {}
 
-std::shared_ptr<BinaryExpression> BinaryExpression::create(BinaryOperator operator_,
-                                                           std::shared_ptr<Expression> left,
-                                                           std::shared_ptr<Expression> right,
-                                                           std::shared_ptr<SourceLocation> location) {
-  return std::shared_ptr<BinaryExpression>(new BinaryExpression(operator_, left, right, location));
+std::shared_ptr<BinaryExpression> BinaryExpression::create(
+    Operator op,
+    std::shared_ptr<Expression> left,
+    std::shared_ptr<Expression> right,
+    std::shared_ptr<SourceLocation> location
+) {
+  return std::shared_ptr<BinaryExpression>(new BinaryExpression(op, left, right, location));
 }
 }
 }
