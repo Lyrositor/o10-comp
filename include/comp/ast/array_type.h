@@ -1,13 +1,14 @@
 #pragma once
 
 #include "node.h"
+#include "type.h"
 
 namespace comp {
 namespace ast {
 /**
  * Represents an array type such as `int ...[]`, `char ...[][]` or `int32_t ...[4]`.
  */
-struct ArrayType final : public Node {
+struct ArrayType final : public Type {
   ArrayType(std::shared_ptr<Type> itemType, std::shared_ptr<SourceLocation> location = nullptr);
 
   virtual ~ArrayType();

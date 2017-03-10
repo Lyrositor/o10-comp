@@ -8,9 +8,18 @@ namespace comp {
 namespace ast {
 struct Node {
   enum class Type {
+    ArrayType,
     BinaryExpression,
-    ArrayExpression,
-    Literal
+    BlockStatement,
+    ExpressionStatement,
+    Function,
+    Identifier,
+    IfStatement,
+    Literal,
+    LiteralType,
+    Program,
+    VariableDeclaration,
+    VariableDeclarator
   };
 
   Node(Type nodeType, std::shared_ptr<SourceLocation> location);

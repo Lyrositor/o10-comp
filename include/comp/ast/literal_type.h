@@ -11,13 +11,13 @@ namespace ast {
  */
 struct LiteralType final : public Type {
   LiteralType(
-    std::shared_ptr<Identifier> literal,
+    std::shared_ptr<Identifier> identifier,
     std::shared_ptr<SourceLocation> location = nullptr
   );
 
   virtual ~LiteralType();
 
-  const std::shared_ptr<Identifier> literal;
+  const std::shared_ptr<Identifier> identifier;
 };
 }
 }
