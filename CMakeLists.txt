@@ -28,6 +28,7 @@ include_directories("${gtest_SOURCE_DIR}/include/" "${gtest_SOURCE_DIR}/")
 
 set(
   TEST_SOURCES
+  src/test/ir/type.spec.cpp
   src/test/ast.spec.cpp
   src/test/parser.spec.cpp
 )
