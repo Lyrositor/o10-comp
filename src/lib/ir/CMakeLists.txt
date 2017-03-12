@@ -1,4 +1,4 @@
 add_library(
   ir STATIC
-  type.cpp
+  data_type.cpp
 )
