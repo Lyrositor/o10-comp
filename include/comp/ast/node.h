@@ -8,15 +8,15 @@ namespace comp {
 namespace ast {
 struct Node {
   enum class Type {
-    ArrayType,
+    ArrayDataType,
     BinaryExpression,
     BlockStatement,
     ExpressionStatement,
     Function,
     Identifier,
     IfStatement,
-    Literal,
-    LiteralType,
+    Int64Literal,
+    LiteralDataType,
     Program,
     VariableDeclaration,
     VariableDeclarator

@@ -4,6 +4,7 @@
 #include "ast/binary_expression.h"
 #include "ast/expression.h"
 #include "ast/literal.h"
+#include "ast/int64_literal.h"
 #include "comp/ast/literal_data_type.h"
 #include "ast/node.h"
 #include "ast/position.h"

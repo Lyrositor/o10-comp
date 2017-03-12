@@ -5,16 +5,9 @@
 namespace comp {
 namespace ast {
 struct Literal : public Expression {
-  static std::shared_ptr<Literal> create(
-    int32_t value,
-    std::shared_ptr<SourceLocation> location = nullptr
-  );
+  Literal(Node::Type nodeType, std::shared_ptr<SourceLocation> location);
 
-  Literal(int32_t value, std::shared_ptr<SourceLocation> location);
-
-  virtual ~Literal();
-
-  const int32_t value;
+  virtual ~Literal() = 0;
 };
 }
 }

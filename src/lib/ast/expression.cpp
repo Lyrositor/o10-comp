@@ -2,8 +2,8 @@
 
 namespace comp {
 namespace ast {
-Expression::Expression(Type type, std::shared_ptr<SourceLocation> location) :
-  Node(type, location) {}
+Expression::Expression(Node::Type nodeType, std::shared_ptr<SourceLocation> location) :
+  Node(nodeType, location) {}
 Expression::~Expression() {}
 }
 }

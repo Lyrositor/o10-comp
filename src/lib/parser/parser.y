@@ -41,7 +41,7 @@ root:
 
 expression:
   INTEGER_LITERAL {
-    $$ = new comp::ast::Literal($1, nullptr);
+    $$ = new comp::ast::Int64Literal($1, nullptr);
   }
   | expression ADDITION_OPERATOR expression {
     std::shared_ptr<comp::ast::Expression> left($1);
