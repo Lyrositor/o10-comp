@@ -37,26 +37,19 @@ class Declaration {
 
 }
 
-enum CType {
-  +Char;
-  +Int32;
-  +Int64;
-}
 
-class Type {
+class DataType {
 
 }
 
-class PrimitiveType {
-  type: CType
+class LiteralDataType {
+  identifier: Identifier
 }
 
-class ArrayType {
+class ArrayDataType {
   itemType: Type
 }
 
-PrimitiveType --> Type
-ArrayType --> Type
 
 class VariableDeclaration {
   +type: Type;
@@ -86,8 +79,8 @@ class ExpressionStatement {
 
 class IfStatement {
   +test: Expression *
-  +consequence: Statement *;
-  +alternative: nullptr | Statement *;
+  +consequence: Statement *
+  +alternative: nullptr | Statement *
 }
 
 class Identifier {
@@ -113,5 +106,8 @@ IfStatement --> Statement
 Identifier --> Expression
 Parameter --> Node
 BinaryExpression --> Expression
+DataType --> Node
+LiteralDataType --> DataType
+ArrayDataType --> DataType
 
 @enduml
