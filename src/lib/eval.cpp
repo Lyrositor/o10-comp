@@ -8,9 +8,9 @@ int64_t evalInt64Literal(comp::ast::Int64Literal &expression) {
   return expression.value;
 }
 
-int32_t evalBinaryExpression(comp::ast::BinaryExpression &expression) {
-  int32_t left = eval_expression(*expression.left);
-  int32_t right = eval_expression(*expression.right);
+int64_t evalBinaryExpression(comp::ast::BinaryExpression &expression) {
+  int64_t left = eval_expression(*expression.left);
+  int64_t right = eval_expression(*expression.right);
 
   switch (expression.op) {
     case comp::ast::BinaryOperator::Addition:return left + right;
@@ -22,11 +22,17 @@ int32_t evalBinaryExpression(comp::ast::BinaryExpression &expression) {
   }
 }
 
-int32_t eval_expression(comp::ast::Expression &expression) {
+int64_t eval_expression(comp::ast::Expression &expression) {
   switch (expression.nodeType) {
-    case comp::ast::Node::Type::Int64Literal:return evalInt64Literal(static_cast<comp::ast::Int64Literal &>(expression));
-    case comp::ast::Node::Type::BinaryExpression:return evalBinaryExpression(static_cast<comp::ast::BinaryExpression &>(expression));
-    default:throw std::domain_error("Unexpected expression type");
+    case comp::ast::Node::Type::Int64Literal: {
+      return evalInt64Literal(static_cast<comp::ast::Int64Literal &>(expression));
+    }
+    case comp::ast::Node::Type::BinaryExpression: {
+      return evalBinaryExpression(static_cast<comp::ast::BinaryExpression &>(expression));
+    }
+    default: {
+      throw std::domain_error("Unexpected expression type");
+    }
   }
 }
 }
