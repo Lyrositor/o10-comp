@@ -7,10 +7,10 @@
 namespace comp {
 namespace ast {
 struct ExpressionStatement final : public Statement {
-  ExpressionStatement(std::unique_ptr<Expression> expression, std::shared_ptr<SourceLocation> location = nullptr);
+  ExpressionStatement(std::shared_ptr<Expression> expression, std::shared_ptr<SourceLocation> location = nullptr);
   ~ExpressionStatement();
 
-  const std::unique_ptr<Expression> expression;
+  const std::shared_ptr<Expression> expression;
 };
 }
 }

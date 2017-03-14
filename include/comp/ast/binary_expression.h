@@ -12,6 +12,19 @@ enum class BinaryOperator {
   Remainder,
 };
 
+/**
+ * Represents an expression obtained by applying a binary operator.
+ *
+ * Examples:
+ *
+ * ```
+ * a + b
+ * ```
+ *
+ * ```
+ * c / 4
+ * ```
+ */
 struct BinaryExpression final : public Expression {
   static std::shared_ptr<BinaryExpression> create(
     BinaryOperator op,

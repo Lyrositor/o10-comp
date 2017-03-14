@@ -18,6 +18,5 @@
 #include "ast/position.h"
 #include "ast/program.h"
 #include "ast/statement.h"
-#include "ast/traverse.h"
 #include "ast/variable_declaration.h"
 #include "ast/variable_declarator.h"

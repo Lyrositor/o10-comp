@@ -1,6 +1,7 @@
 #pragma once
 
 #include "expression.h"
+
 namespace comp {
 namespace ast {
 struct Identifier final : public Expression {
