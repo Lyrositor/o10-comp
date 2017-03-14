@@ -14,6 +14,8 @@ class DataType {
 
 class PrimitiveDataType final : public DataType {
  public:
+  static std::unique_ptr<PrimitiveDataType> create(size_t size);
+
   PrimitiveDataType(size_t size);
   size_t getSize() const;
   virtual ~PrimitiveDataType();
@@ -23,6 +25,8 @@ class PrimitiveDataType final : public DataType {
 
 class ArrayDataType final : public DataType {
  public:
+  static std::unique_ptr<ArrayDataType> create(std::shared_ptr<const DataType> itemType, size_t arrayLength);
+
   ArrayDataType(std::shared_ptr<const DataType> itemType, size_t arrayLength);
   size_t getSize() const;
   virtual ~ArrayDataType();
