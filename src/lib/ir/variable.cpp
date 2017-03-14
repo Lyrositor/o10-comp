@@ -13,5 +13,9 @@ std::shared_ptr<const DataType> Variable::getDataType() const {
 }
 
 Variable::~Variable() {}
+
+std::shared_ptr<Variable> Variable::create(std::shared_ptr<const DataType> dataType) {
+  return std::shared_ptr<Variable>(new Variable(dataType));
+}
 }
 }

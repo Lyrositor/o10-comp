@@ -12,6 +12,8 @@ namespace ir {
  */
 class Variable {
  public:
+  static std::shared_ptr<Variable> create(std::shared_ptr<const DataType> dataType);
+
   Variable(std::shared_ptr<const DataType> dataType);
   std::shared_ptr<const DataType> getDataType() const;
   virtual ~Variable();
