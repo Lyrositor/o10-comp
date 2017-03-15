@@ -17,6 +17,14 @@ namespace ast {
  * body is a non-null pointer to a BlockStatement.
  */
 struct Function final : public Declaration {
+  static std::unique_ptr<Function> Create(
+    std::shared_ptr<Identifier> identifier,
+    std::vector<std::shared_ptr<Parameter>> parameters,
+    std::shared_ptr<DataType> return_type,
+    std::shared_ptr<BlockStatement> body,
+    std::shared_ptr<SourceLocation> location = nullptr
+  );
+  
   Function(
     std::shared_ptr<Identifier> identifier,
     std::vector<std::shared_ptr<Parameter>> parameters,

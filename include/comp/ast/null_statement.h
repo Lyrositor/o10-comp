@@ -11,6 +11,7 @@ struct NullStatement final : public Statement {
   NullStatement(
     std::shared_ptr<SourceLocation> location = nullptr
   );
+
   ~NullStatement();
 };
 }

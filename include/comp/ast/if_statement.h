@@ -11,12 +11,20 @@ namespace ast {
  * If there is no alternative ("else" branch), then `alternative` is the `nullptr`.
  */
 struct IfStatement final : public Statement {
+  static std::unique_ptr<IfStatement> Create(
+    std::shared_ptr<Expression> test,
+    std::shared_ptr<Statement> consequence,
+    std::shared_ptr<Statement> alternative,
+    std::shared_ptr<SourceLocation> location = nullptr
+  );
+
   IfStatement(
     std::shared_ptr<Expression> test,
     std::shared_ptr<Statement> consequence,
     std::shared_ptr<Statement> alternative,
     std::shared_ptr<SourceLocation> location = nullptr
   );
+
   ~IfStatement();
 
   const std::shared_ptr<Expression> test;

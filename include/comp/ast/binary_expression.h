@@ -26,7 +26,7 @@ enum class BinaryOperator {
  * ```
  */
 struct BinaryExpression final : public Expression {
-  static std::shared_ptr<BinaryExpression> create(
+  static std::unique_ptr<BinaryExpression> Create(
     BinaryOperator op,
     std::shared_ptr<Expression> left,
     std::shared_ptr<Expression> right,
@@ -40,7 +40,7 @@ struct BinaryExpression final : public Expression {
     std::shared_ptr<SourceLocation> location = nullptr
   );
 
-  virtual ~BinaryExpression();
+  ~BinaryExpression();
 
   const BinaryOperator op;
   const std::shared_ptr<Expression> left;

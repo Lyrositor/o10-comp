@@ -16,6 +16,7 @@ struct ReturnStatement final : public Statement {
     std::shared_ptr<Expression> expression,
     std::shared_ptr<SourceLocation> location = nullptr
   );
+
   ~ReturnStatement();
 
   const std::shared_ptr<Expression> expression;
