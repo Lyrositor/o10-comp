@@ -16,8 +16,10 @@ struct Node {
     IfStatement,
     Int64Literal,
     LiteralDataType,
+    NullStatement,
     Parameter,
     Program,
+    ReturnStatement,
     VariableDeclaration,
     VariableDeclarator
   };

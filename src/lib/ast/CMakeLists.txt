@@ -9,7 +9,9 @@ add_library(
   int64_literal.cpp
   literal.cpp
   literal_data_type.cpp
+  null_statement.cpp
   node.cpp
   position.cpp
+  return_statement.cpp
   statement.cpp
 )

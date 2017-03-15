@@ -3,9 +3,10 @@
 #include <memory>
 #include <vector>
 #include "block_statement.h"
+#include "data_type.h"
 #include "declaration.h"
-#include "parameter.h"
 #include "identifier.h"
+#include "parameter.h"
 
 namespace comp {
 namespace ast {
@@ -19,13 +20,15 @@ struct Function final : public Declaration {
   Function(
     std::shared_ptr<Identifier> identifier,
     std::vector<std::shared_ptr<Parameter>> parameters,
+    std::shared_ptr<DataType> return_type,
     std::shared_ptr<BlockStatement> body,
     std::shared_ptr<SourceLocation> location = nullptr
   );
-  virtual ~Function();
+  ~Function();
 
   const std::shared_ptr<Identifier> identifier;
   const std::vector<std::shared_ptr<Parameter>> parameters;
+  const std::shared_ptr<DataType> return_type;
   const std::shared_ptr<BlockStatement> body;
 };
 }
