@@ -1,3 +1,4 @@
+#include <string>
 #include <comp/ast.h>
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
@@ -10,11 +11,11 @@ void yyerror(yyscan_t scanner, comp::ast::Expression *res, const char *msg) {
 
 namespace comp {
 namespace parser {
-std::shared_ptr<comp::ast::Expression> parse() {
+std::shared_ptr<comp::ast::Expression> parse(const std::string &input) {
   yyscan_t scanner;
   int initResult = yylex_init(&scanner);
   comp::ast::Expression *root = nullptr;
-  yy_scan_string("123+456", scanner);
+  yy_scan_string(input.c_str(), scanner);
   yyparse(scanner, root);
   yylex_destroy(scanner);
   return std::shared_ptr<comp::ast::Expression>(root);

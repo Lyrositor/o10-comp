@@ -6,12 +6,21 @@ add_library(
   data_type.cpp
   declaration.cpp
   expression.cpp
+  expression_statement.cpp
+  function.cpp
+  identifier.cpp
+  if_statement.cpp
   int64_literal.cpp
   literal.cpp
   literal_data_type.cpp
-  null_statement.cpp
   node.cpp
+  null_statement.cpp
+  parameter.cpp
   position.cpp
+  program.cpp
   return_statement.cpp
   statement.cpp
+  uint8_literal.cpp
+  variable_declaration.cpp
+  variable_declarator.cpp
 )

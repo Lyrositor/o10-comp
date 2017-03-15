@@ -33,7 +33,7 @@ set(
   src/test/ir/data_type.spec.cpp
   src/test/ir/variable.spec.cpp
   src/test/ast.spec.cpp
-  src/test/parser.spec.cpp
+  src/test/parser/parser.spec.cpp
 )
 add_executable(comp_test ${TEST_SOURCES})
 target_link_libraries(comp_test comp gtest gtest_main)

@@ -20,6 +20,7 @@ struct Node {
     Parameter,
     Program,
     ReturnStatement,
+    Uint8Literal,
     VariableDeclaration,
     VariableDeclarator
   };
