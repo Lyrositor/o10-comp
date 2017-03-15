@@ -22,10 +22,10 @@ struct Op {
     NoOp
   };
 
-  Op(Type opType);
+  Op(Type op_type);
   virtual ~Op() = 0;
 
-  const Type opType;
+  const Type op_type;
 };
 
 /**

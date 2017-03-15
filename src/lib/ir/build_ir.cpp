@@ -9,12 +9,13 @@
 
 namespace comp {
 namespace ir {
-void buildProgramIR(std::shared_ptr<const ast::Program> node) {
+void BuildProgramIR(std::shared_ptr<const ast::Program> node) {
+  RootContext context;
   for (auto declaration : node->body) {
     switch (declaration->nodeType) {
       case ast::Node::Type::Function: {
         std::shared_ptr<ast::Function> e = std::static_pointer_cast<ast::Function>(declaration);
-        buildFunctionIR(*e);
+        BuildFunctionIR(*e, context);
         break;
       }
       default: {
@@ -24,30 +25,37 @@ void buildProgramIR(std::shared_ptr<const ast::Program> node) {
   }
 }
 
-void buildFunctionIR(const ast::Function &node) {
+void BuildFunctionIR(const ast::Function &node, Context &context) {
   if (node.body == nullptr) {
-
+    // TODO: Add declaration to context
   } else {
-    ir::RootContext context;
-    std::shared_ptr<BasicBlock> firstBlock = ir::BasicBlock::create();
-    std::shared_ptr<BasicBlock> currentBlock = firstBlock;
-    // TODO: context.registerVariable(arg1, arg1Type)
-    buildBlockStatementIR(*node.body, context, currentBlock);
+    std::shared_ptr<BasicBlock> first_block = BasicBlock::create();
+    std::shared_ptr<BasicBlock> current_block = first_block;
+    // TODO: context.RegisterVariable(arg1, arg1Type)
+    BuildBlockStatementIR(*node.body, context, current_block);
   }
 }
 
-void buildStatementIR(
+void BuildStatementIR(
   const ast::Statement &node,
-  ir::Context &context,
-  std::shared_ptr<BasicBlock> &currentBlock
+  Context &context,
+  std::shared_ptr<BasicBlock> &current_block
 ) {
   switch (node.nodeType) {
     case ast::Node::Type::BlockStatement: {
-      buildBlockStatementIR(static_cast<const ast::BlockStatement &>(node), context, currentBlock);
+      BuildBlockStatementIR(
+        static_cast<const ast::BlockStatement &>(node),
+        context,
+        current_block
+      );
       break;
     }
     case ast::Node::Type::ExpressionStatement: {
-      buildExpressionStatementIR(static_cast<const ast::ExpressionStatement &>(node), context, currentBlock);
+      BuildExpressionStatementIR(
+        static_cast<const ast::ExpressionStatement &>(node),
+        context,
+        current_block
+      );
       break;
     }
     default: {
@@ -56,37 +64,44 @@ void buildStatementIR(
   }
 }
 
-void buildBlockStatementIR(
+void BuildBlockStatementIR(
   const ast::BlockStatement &node,
-  ir::Context &context,
-  std::shared_ptr<BasicBlock> &currentBlock
+  Context &context,
+  std::shared_ptr<BasicBlock> &current_block
 ) {
-  std::unique_ptr<ir::ChildContext> childContext = context.fork();
+  std::unique_ptr<ChildContext> childContext = context.Fork();
   for (auto statement : node.body) {
-    buildStatementIR(*statement, *childContext, currentBlock);
+    BuildStatementIR(*statement, *childContext, current_block);
   }
-  context.join(std::move(childContext));
+  context.Join(std::move(childContext));
 }
 
-void buildExpressionStatementIR(
+void BuildExpressionStatementIR(
   const ast::ExpressionStatement &node,
-  ir::Context &context,
-  std::shared_ptr<BasicBlock> &currentBlock
+  Context &context,
+  std::shared_ptr<BasicBlock> &current_block
 ) {
-  buildExpressionRValueIR(*node.expression, context, currentBlock);
+  BuildExpressionRValueIR(*node.expression, context, current_block);
 }
 
-std::shared_ptr<ir::Variable> buildExpressionRValueIR(
+std::shared_ptr<Variable> BuildExpressionRValueIR(
   const ast::Expression &node,
-  ir::Context &context,
-  std::shared_ptr<BasicBlock> &currentBlock
+  Context &context,
+  std::shared_ptr<BasicBlock> &current_block
 ) {
   switch (node.nodeType) {
     case ast::Node::Type::Identifier: {
-      return buildIdentifierRValueIR(static_cast<const ast::Identifier &>(node), context);
+      return BuildIdentifierRValueIR(
+        static_cast<const ast::Identifier &>(node),
+        context
+      );
     }
     case ast::Node::Type::BinaryExpression: {
-      return buildBinaryExpressionRValueIR(static_cast<const ast::BinaryExpression &>(node), context, currentBlock);
+      return BuildBinaryExpressionRValueIR(
+        static_cast<const ast::BinaryExpression &>(node),
+        context,
+        current_block
+      );
     }
     default: {
       throw std::domain_error("Unexpected value for `node.expression->nodeType`");
@@ -95,43 +110,46 @@ std::shared_ptr<ir::Variable> buildExpressionRValueIR(
 }
 
 // TODO: handle mismatched types
-std::shared_ptr<ir::Variable> buildBinaryExpressionRValueIR(
+std::shared_ptr<Variable> BuildBinaryExpressionRValueIR(
   const ast::BinaryExpression &node,
-  ir::Context &context,
-  std::shared_ptr<BasicBlock> &currentBlock
+  Context &context,
+  std::shared_ptr<BasicBlock> &current_block
 ) {
-  const std::shared_ptr<ir::Variable> left = buildExpressionRValueIR(*node.left, context, currentBlock);
-  const std::shared_ptr<ir::Variable> right = buildExpressionRValueIR(*node.right, context, currentBlock);
-  const std::shared_ptr<const DataType> leftType = left->getDataType();
-  const std::shared_ptr<const DataType> rightType = right->getDataType();
-  if (leftType != rightType) {
+  const std::shared_ptr<Variable> left =
+    BuildExpressionRValueIR(*node.left, context, current_block);
+  const std::shared_ptr<Variable> right =
+    BuildExpressionRValueIR(*node.right, context, current_block);
+  const std::shared_ptr<const DataType> left_type = left->GetDataType();
+  const std::shared_ptr<const DataType> right_type = right->GetDataType();
+  if (left_type != right_type) {
     throw std::runtime_error("Mismatched types for left and right operands");
   }
-  const std::shared_ptr<ir::Variable> rValue = context.createVariable(leftType);
+  const std::shared_ptr<Variable> r_value = context.CreateVariable(left_type);
 
   switch (node.op) {
     case ast::BinaryOperator::Addition: {
-      currentBlock->push(std::shared_ptr<ir::Add>(new Add(rValue, left, right)));
+      current_block->Push(std::shared_ptr<Add>(new Add(r_value, left, right)));
       break;
     }
     default: {
       throw std::domain_error("Unexpected value for node.op");
     }
   }
-  return rValue;
+  return r_value;
 }
 
-std::shared_ptr<ir::Variable> buildIdentifierRValueIR(
+std::shared_ptr<Variable> BuildIdentifierRValueIR(
   const ast::Identifier &node,
-  ir::Context &context
+  Context &context
 ) {
-  std::shared_ptr<ir::Variable> rValue = context.resolveVariable(node.name);
-  return rValue;
+  return context.ResolveVariable(node.name);
 }
 
-std::shared_ptr<ir::Variable> buildIdentifierLValueIR(const ast::Identifier &node, ir::Context &context) {
-  std::shared_ptr<ir::Variable> lValue = context.resolveVariable(node.name);
-  return lValue;
+std::shared_ptr<Variable> BuildIdentifierLValueIR(
+  const ast::Identifier &node,
+  Context &context
+) {
+  return context.ResolveVariable(node.name);
 }
 }
 }

@@ -12,13 +12,13 @@ namespace ir {
  */
 class Variable {
  public:
-  static std::unique_ptr<Variable> create(std::shared_ptr<const DataType> dataType);
+  static std::unique_ptr<Variable> Create(std::shared_ptr<const DataType> dataType);
 
-  Variable(std::shared_ptr<const DataType> dataType);
-  std::shared_ptr<const DataType> getDataType() const;
+  Variable(std::shared_ptr<const DataType> data_type);
   virtual ~Variable();
+  std::shared_ptr<const DataType> GetDataType() const;
  private:
-  const std::shared_ptr<const DataType> dataType;
+  const std::shared_ptr<const DataType> data_type_;
 };
 }
 }

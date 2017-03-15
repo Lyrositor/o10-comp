@@ -9,12 +9,12 @@ namespace comp {
 namespace ir {
 Function::Function(
   std::vector<std::shared_ptr<const Parameter>> parameters,
-  std::shared_ptr<const DataType> returnType) :
-  parameters(parameters), returnType(returnType) {
+  std::shared_ptr<const DataType> return_type) :
+  parameters_(parameters), return_type_(return_type) {
 }
 
-std::shared_ptr<const DataType> Function::getReturnType() const {
-  return this->returnType;
+std::shared_ptr<const DataType> Function::GetReturnType() const {
+  return this->return_type_;
 }
 
 Function::~Function() {

@@ -12,13 +12,14 @@ class BasicBlock {
 
   BasicBlock(std::vector<std::shared_ptr<Op>> ops = std::vector<std::shared_ptr<Op>>());
 
-  void push(std::shared_ptr<Op> op);
-
   virtual ~BasicBlock();
+
+  void Push(std::shared_ptr<Op> op);
+
  private:
-  std::vector<std::shared_ptr<Op>> ops;
-  std::shared_ptr<BasicBlock> branchIfTrue;
-  std::shared_ptr<BasicBlock> branchIfFalse;
+  std::vector<std::shared_ptr<Op>> ops_;
+  std::shared_ptr<BasicBlock> branchIfTrue_;
+  std::shared_ptr<BasicBlock> branchIfFalse_;
 };
 }
 }

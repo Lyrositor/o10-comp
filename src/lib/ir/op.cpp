@@ -2,7 +2,7 @@
 
 namespace comp {
 namespace ir {
-Op::Op(Type opType) : opType(opType) {
+Op::Op(Type op_type) : op_type(op_type) {
 }
 
 Add::Add(

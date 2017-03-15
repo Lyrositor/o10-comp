@@ -20,20 +20,34 @@ class Context {
  public:
   Context();
   Context(
-    std::map<std::string, std::shared_ptr<DataType>> dataTypesTable,
-    std::map<std::string, std::shared_ptr<Variable>> variablesTable,
-    std::map<std::string, std::shared_ptr<Function>> functionsTable,
+    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
+    std::map<std::string, std::shared_ptr<Variable>> variables_table,
+    std::map<std::string, std::shared_ptr<Function>> functions_table,
     std::set<std::shared_ptr<Variable>> variables
   );
 
-  void registerDataType(const std::string name, std::shared_ptr<DataType> dataType);
-  void registerVariable(const std::string name, std::shared_ptr<Variable> variable);
-  void registerFunction(const std::string name, std::shared_ptr<Function> function);
-  std::shared_ptr<Variable> createVariable(std::shared_ptr<const DataType> dataType);
+  virtual ~Context() = 0;
+
+  void RegisterDataType(
+    const std::string name,
+    std::shared_ptr<DataType> data_type
+  );
+  void RegisterVariable(
+    const std::string name,
+    std::shared_ptr<Variable> variable
+  );
+  void RegisterFunction(
+    const std::string name,
+    std::shared_ptr<Function> function
+  );
+  std::shared_ptr<Variable> CreateVariable(
+    std::shared_ptr<const DataType> data_type
+  );
+
   /**
    * @return The set of allocated variables
    */
-  std::set<std::shared_ptr<Variable>> getVariables() const;
+  std::set<std::shared_ptr<Variable>> GetVariables() const;
 
   /**
    * Resolve the `DataType` instance named `name` in the current context.
@@ -42,11 +56,11 @@ class Context {
    *
    * @param name Name of the dataType
    * @return `DataType` instance named `name` in the current context.
-   * @throw {std::runtime_exception} "Unkown dataType" If the dataType is not found.
+   * @throw {std::runtime_exception} "Unknown dataType" If the dataType is not found.
    */
-  virtual std::shared_ptr<DataType> resolveDataType(const std::string &name) const = 0;
-  virtual std::shared_ptr<Function> resolveFunction(const std::string &name) const = 0;
-  virtual std::shared_ptr<Variable> resolveVariable(const std::string &name) const = 0;
+  virtual std::shared_ptr<DataType> ResolveDataType(const std::string &name) const = 0;
+  virtual std::shared_ptr<Function> ResolveFunction(const std::string &name) const = 0;
+  virtual std::shared_ptr<Variable> ResolveVariable(const std::string &name) const = 0;
 
   /**
    * Forks parentContext by creating a new child context.
@@ -55,7 +69,7 @@ class Context {
    *
    * @return A new child context
    */
-  std::unique_ptr<ChildContext> fork();
+  std::unique_ptr<ChildContext> Fork();
 
   /**
    * Joins the provided child context into the current context.
@@ -65,83 +79,82 @@ class Context {
    * The symbols table won't be merged.
    * The provided source context will be deleted.
    *
-   * @param childContext The child context to join into this context.
+   * @param child_context The child context to join into this context.
    */
-  void join(std::unique_ptr<ChildContext> childContext);
-
-  virtual ~Context() = 0;
+  void Join(std::unique_ptr<ChildContext> child_context);
 
  protected:
   /**
    * Named dataTypes
    */
-  std::map<std::string, std::shared_ptr<DataType>> dataTypesTable;
+  std::map<std::string, std::shared_ptr<DataType>> data_types_table_;
   /**
    * Named variables
    */
-  std::map<std::string, std::shared_ptr<Variable>> variablesTable;
+  std::map<std::string, std::shared_ptr<Variable>> variables_table_;
   /**
    * Named functions
    */
-  std::map<std::string, std::shared_ptr<Function>> functionsTable;
+  std::map<std::string, std::shared_ptr<Function>> functions_table_;
   /**
    * Shadowed and anonymous variables.
    */
-  std::set<std::shared_ptr<Variable>> variables;
+  std::set<std::shared_ptr<Variable>> variables_;
 };
 
 class RootContext final : public Context {
  public:
-  static std::unique_ptr<RootContext> create();
-  static std::unique_ptr<RootContext> create(
-    std::map<std::string, std::shared_ptr<DataType>> dataTypesTable,
-    std::map<std::string, std::shared_ptr<Variable>> variablesTable,
-    std::map<std::string, std::shared_ptr<Function>> functionsTable,
+  static std::unique_ptr<RootContext> Create();
+  static std::unique_ptr<RootContext> Create(
+    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
+    std::map<std::string, std::shared_ptr<Variable>> variables_table,
+    std::map<std::string, std::shared_ptr<Function>> functions_table,
     std::set<std::shared_ptr<Variable>> variables
   );
 
   RootContext();
   RootContext(
-    std::map<std::string, std::shared_ptr<DataType>> dataTypesTable,
-    std::map<std::string, std::shared_ptr<Variable>> variablesTable,
-    std::map<std::string, std::shared_ptr<Function>> functionsTable,
+    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
+    std::map<std::string, std::shared_ptr<Variable>> variables_table,
+    std::map<std::string, std::shared_ptr<Function>> functions_table,
     std::set<std::shared_ptr<Variable>> variables
   );
 
-  std::shared_ptr<DataType> resolveDataType(const std::string &name) const;
-  std::shared_ptr<Function> resolveFunction(const std::string &name) const;
-  std::shared_ptr<Variable> resolveVariable(const std::string &name) const;
-
   ~RootContext();
+
+  std::shared_ptr<DataType> ResolveDataType(const std::string &name) const;
+  std::shared_ptr<Function> ResolveFunction(const std::string &name) const;
+  std::shared_ptr<Variable> ResolveVariable(const std::string &name) const;
 };
 
 class ChildContext final : public Context {
  public:
-  static std::unique_ptr<ChildContext> create(Context &parentContext);
-  static std::unique_ptr<ChildContext> create(
-    Context &parentContext,
-    std::map<std::string, std::shared_ptr<DataType>> dataTypesTable,
-    std::map<std::string, std::shared_ptr<Variable>> variablesTable,
-    std::map<std::string, std::shared_ptr<Function>> functionsTable,
+  static std::unique_ptr<ChildContext> Create(Context &parentContext);
+  static std::unique_ptr<ChildContext> Create(
+    Context &parent_context,
+    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
+    std::map<std::string, std::shared_ptr<Variable>> variables_table,
+    std::map<std::string, std::shared_ptr<Function>> functions_table,
     std::set<std::shared_ptr<Variable>> variables
   );
 
   ChildContext(Context &parentContext);
   ChildContext(
     Context &parentContext,
-    std::map<std::string, std::shared_ptr<DataType>> dataTypesTable,
-    std::map<std::string, std::shared_ptr<Variable>> variablesTable,
-    std::map<std::string, std::shared_ptr<Function>> functionsTable,
+    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
+    std::map<std::string, std::shared_ptr<Variable>> variables_table,
+    std::map<std::string, std::shared_ptr<Function>> functions_table,
     std::set<std::shared_ptr<Variable>> variables
   );
 
-  std::shared_ptr<DataType> resolveDataType(const std::string &name) const;
-  std::shared_ptr<Function> resolveFunction(const std::string &name) const;
-  std::shared_ptr<Variable> resolveVariable(const std::string &name) const;
-
   ~ChildContext();
+
+  std::shared_ptr<DataType> ResolveDataType(const std::string &name) const;
+  std::shared_ptr<Function> ResolveFunction(const std::string &name) const;
+  std::shared_ptr<Variable> ResolveVariable(const std::string &name) const;
+
  protected:
-  Context &parentContext;
+  Context &parent_context_;
 };
 }
 }

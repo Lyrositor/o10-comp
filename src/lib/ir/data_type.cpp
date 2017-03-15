@@ -11,31 +11,32 @@ DataType::DataType() {
 DataType::~DataType() {
 }
 
-std::unique_ptr<PrimitiveDataType> PrimitiveDataType::create(size_t size) {
+std::unique_ptr<PrimitiveDataType> PrimitiveDataType::Create(size_t size) {
   return std::unique_ptr<PrimitiveDataType>(new PrimitiveDataType(size));
 }
 
 PrimitiveDataType::PrimitiveDataType(size_t size) :
-  size(size) {
+  size_(size) {
 }
 
-size_t PrimitiveDataType::getSize() const {
-  return this->size;
+size_t PrimitiveDataType::GetSize() const {
+  return this->size_;
 }
 
 PrimitiveDataType::~PrimitiveDataType() {
 }
 
-std::unique_ptr<ArrayDataType> ArrayDataType::create(const std::shared_ptr<const DataType> itemType, const size_t arrayLength) {
+std::unique_ptr<ArrayDataType> ArrayDataType::Create(std::shared_ptr<const DataType> itemType,
+                                                     size_t arrayLength) {
   return std::unique_ptr<ArrayDataType>(new ArrayDataType(itemType, arrayLength));
 }
 
-ArrayDataType::ArrayDataType(std::shared_ptr<const DataType> itemType, size_t arrayLength) :
-  itemType(itemType), length(arrayLength) {
+ArrayDataType::ArrayDataType(std::shared_ptr<const DataType> item_type, size_t array_length) :
+  item_type_(item_type), length_(array_length) {
 }
 
-size_t ArrayDataType::getSize() const {
-  return this->length * this->itemType->getSize();
+size_t ArrayDataType::GetSize() const {
+  return this->length_ * this->item_type_->GetSize();
 }
 
 ArrayDataType::~ArrayDataType() {

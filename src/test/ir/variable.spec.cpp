@@ -4,6 +4,6 @@
 
 TEST(comp__ir__Variable, getType) {
   // Create a variable of type int64
-  comp::ir::Variable intVariable(comp::ir::int64Type);
-  EXPECT_EQ(comp::ir::int64Type, intVariable.getDataType());
+  comp::ir::Variable intVariable(comp::ir::kInt64Type);
+  EXPECT_EQ(comp::ir::kInt64Type, intVariable.GetDataType());
 }
