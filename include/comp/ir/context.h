@@ -1,4 +1,4 @@
-#pragma  once
+#pragma once
 
 #include <memory>
 #include <string>
@@ -7,6 +7,7 @@
 #include "data_type.h"
 #include "function.h"
 #include "variable.h"
+#include "symbol_table.h"
 
 namespace comp {
 namespace ir {
@@ -20,9 +21,7 @@ class Context {
  public:
   Context();
   Context(
-    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
-    std::map<std::string, std::shared_ptr<Variable>> variables_table,
-    std::map<std::string, std::shared_ptr<Function>> functions_table,
+    SymbolTable symbols,
     std::set<std::shared_ptr<Variable>> variables
   );
 
@@ -85,17 +84,9 @@ class Context {
 
  protected:
   /**
-   * Named dataTypes
+   * Symbol table
    */
-  std::map<std::string, std::shared_ptr<DataType>> data_types_table_;
-  /**
-   * Named variables
-   */
-  std::map<std::string, std::shared_ptr<Variable>> variables_table_;
-  /**
-   * Named functions
-   */
-  std::map<std::string, std::shared_ptr<Function>> functions_table_;
+  SymbolTable symbols_;
   /**
    * Shadowed and anonymous variables.
    */
@@ -106,17 +97,13 @@ class RootContext final : public Context {
  public:
   static std::unique_ptr<RootContext> Create();
   static std::unique_ptr<RootContext> Create(
-    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
-    std::map<std::string, std::shared_ptr<Variable>> variables_table,
-    std::map<std::string, std::shared_ptr<Function>> functions_table,
+    SymbolTable symbols,
     std::set<std::shared_ptr<Variable>> variables
   );
 
   RootContext();
   RootContext(
-    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
-    std::map<std::string, std::shared_ptr<Variable>> variables_table,
-    std::map<std::string, std::shared_ptr<Function>> functions_table,
+    SymbolTable symbols,
     std::set<std::shared_ptr<Variable>> variables
   );
 
@@ -132,18 +119,14 @@ class ChildContext final : public Context {
   static std::unique_ptr<ChildContext> Create(Context &parentContext);
   static std::unique_ptr<ChildContext> Create(
     Context &parent_context,
-    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
-    std::map<std::string, std::shared_ptr<Variable>> variables_table,
-    std::map<std::string, std::shared_ptr<Function>> functions_table,
+    SymbolTable symbols,
     std::set<std::shared_ptr<Variable>> variables
   );
 
   ChildContext(Context &parentContext);
   ChildContext(
     Context &parentContext,
-    std::map<std::string, std::shared_ptr<DataType>> data_types_table,
-    std::map<std::string, std::shared_ptr<Variable>> variables_table,
-    std::map<std::string, std::shared_ptr<Function>> functions_table,
+    SymbolTable symbols,
     std::set<std::shared_ptr<Variable>> variables
   );
 
