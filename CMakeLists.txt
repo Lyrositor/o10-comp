@@ -24,10 +24,14 @@ add_executable(comp_main ${MAIN_SOURCES})
 target_link_libraries(comp_main comp)
 
 add_subdirectory(vendor/googletest)
-include_directories("${gtest_SOURCE_DIR}/include/" "${gtest_SOURCE_DIR}/")
+include_directories("${gmock_SOURCE_DIR}/include/" "${gtest_SOURCE_DIR}/include/")
 
 set(
   TEST_SOURCES
+  src/test/ir/build_ir.spec.cpp
+  src/test/ir/context.spec.cpp
+  src/test/ir/data_type.spec.cpp
+  src/test/ir/variable.spec.cpp
   src/test/ast.spec.cpp
   src/test/parser.spec.cpp
 )
@@ -39,7 +43,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 if (CMAKE_COMPILER_IS_GNUCXX)
   include(CodeCoverage)
   if (LCOV_PATH AND GENHTML_PATH)
-    set(LCOV_REMOVE_EXTRA "'vendor/*'")
+    set(LCOV_REMOVE_EXTRA " 'vendor/*' ")
     include(CodeCoverage)
     setup_target_for_coverage(${PROJECT_NAME}_coverage comp_test coverage)
   endif ()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "expression.h"
 
 namespace comp {
