@@ -37,11 +37,5 @@ class ArrayDataType final : public DataType {
   const std::shared_ptr<const DataType> item_type_;
   const size_t length_;
 };
-
-// Built-in types
-extern std::shared_ptr<const PrimitiveDataType> kVoidType;
-extern std::shared_ptr<const PrimitiveDataType> kCharType;
-extern std::shared_ptr<const PrimitiveDataType> kInt32Type;
-extern std::shared_ptr<const PrimitiveDataType> kInt64Type;
 }
 }

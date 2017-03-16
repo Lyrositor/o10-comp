@@ -5,11 +5,12 @@
 #include <comp/ir/context.h>
 #include <comp/ir/variable.h>
 #include <comp/ir/data_type.h>
+#include <comp/ir/builtins.h>
 
 TEST(comp__ir__context, registerAndResolveVariable) {
   std::unique_ptr<comp::ir::Context> context = comp::ir::RootContext::Create();
   std::shared_ptr<comp::ir::Variable> variable =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   std::string varName = "varName";
   context->RegisterVariable(varName, variable);
   EXPECT_EQ(variable, context->ResolveVariable(varName));
@@ -45,12 +46,12 @@ TEST(comp__ir__context, registerThenForkAndResolveVariable) {
   std::shared_ptr<comp::ir::Context> parentContext =
     comp::ir::RootContext::Create();
   std::shared_ptr<comp::ir::Variable> parentVariable =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   std::string parentVarName = "parentVar";
   parentContext->RegisterVariable(parentVarName, parentVariable);
   std::unique_ptr<comp::ir::Context> childContext = parentContext->Fork();
   std::shared_ptr<comp::ir::Variable> childVariable =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   std::string childVarName = "childVar";
   childContext->RegisterVariable(childVarName, childVariable);
 
@@ -64,12 +65,12 @@ TEST(comp__ir__context, registerThenForkAndResolveVariable) {
 TEST(comp__ir__context, registerWithShadowing) {
   std::unique_ptr<comp::ir::Context> context = comp::ir::RootContext::Create();
   std::shared_ptr<comp::ir::Variable> variable1 =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   std::string varName = "varName";
   context->RegisterVariable(varName, variable1);
   EXPECT_EQ(variable1, context->ResolveVariable(varName));
   std::shared_ptr<comp::ir::Variable> variable2 =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   context->RegisterVariable(varName, variable2);
   EXPECT_EQ(variable2, context->ResolveVariable(varName));
   EXPECT_NE(variable1, variable2);
@@ -79,12 +80,12 @@ TEST(comp__ir__context, registerWithForkedShadowing) {
   std::shared_ptr<comp::ir::Context> parentContext =
     comp::ir::RootContext::Create();
   std::shared_ptr<comp::ir::Variable> parentVariable =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   std::string varName = "varName";
   parentContext->RegisterVariable(varName, parentVariable);
   std::unique_ptr<comp::ir::Context> childContext = parentContext->Fork();
   std::shared_ptr<comp::ir::Variable> childVariable =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   childContext->RegisterVariable(varName, childVariable);
 
   EXPECT_EQ(childVariable, childContext->ResolveVariable(varName));
@@ -97,19 +98,19 @@ TEST(comp__ir__context, forkAndJoin) {
   std::shared_ptr<comp::ir::Context> parentContext =
     comp::ir::RootContext::Create();
   std::shared_ptr<comp::ir::Variable> parentVariable1 =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   std::string parentVarName = "parentVar";
   parentContext->RegisterVariable(parentVarName, parentVariable1);
   std::unique_ptr<comp::ir::ChildContext> childContext = parentContext->Fork();
   std::shared_ptr<comp::ir::Variable> childVariable =
-    comp::ir::Variable::Create(comp::ir::kInt64Type);
+    comp::ir::Variable::Create(comp::ir::GetInt64Type());
   std::string childVarName = "childVar";
   childContext->RegisterVariable(childVarName, childVariable);
   std::shared_ptr<comp::ir::Variable> anonymousVar =
-    childContext->CreateVariable(comp::ir::kInt32Type);
+    childContext->CreateVariable(comp::ir::GetInt32Type());
   parentContext->Join(std::move(childContext));
   std::shared_ptr<comp::ir::Variable> parentVariable2 =
-    comp::ir::Variable::Create(comp::ir::kInt32Type);
+    comp::ir::Variable::Create(comp::ir::GetInt32Type());
   parentContext->RegisterVariable(parentVarName, parentVariable2);
 
   std::set<std::shared_ptr<comp::ir::Variable>> expectedVariables;

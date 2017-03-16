@@ -2,10 +2,18 @@
 
 namespace comp {
 namespace ir {
-static const FunctionsTable kBuiltInFunctions = {
+static const std::shared_ptr<const PrimitiveDataType> kVoidType(new PrimitiveDataType(0));
+
+static const std::shared_ptr<const PrimitiveDataType> kCharType(new PrimitiveDataType(1));
+
+static const std::shared_ptr<const PrimitiveDataType> kInt32Type(new PrimitiveDataType(4));
+
+static const std::shared_ptr<const PrimitiveDataType> kInt64Type(new PrimitiveDataType(8));
+
+static const FunctionsTable kBuiltInFunctions({
   {"getchar", nullptr},
   {"putchar", nullptr}
-};
+});
 
 static const DataTypesTable kBuiltInDataTypes = {
   {"void", kVoidType},
@@ -15,6 +23,22 @@ static const DataTypesTable kBuiltInDataTypes = {
 };
 
 const SymbolTable kBuiltInSymbols(kBuiltInDataTypes, {}, kBuiltInFunctions);
+
+const std::shared_ptr<const PrimitiveDataType> GetVoidType() {
+  return kVoidType;
+}
+
+const std::shared_ptr<const PrimitiveDataType> GetCharType() {
+  return kCharType;
+}
+
+const std::shared_ptr<const PrimitiveDataType> GetInt32Type() {
+  return kInt32Type;
+}
+
+const std::shared_ptr<const PrimitiveDataType> GetInt64Type() {
+  return kInt64Type;
+}
 
 RootContext CreateRootContextWithBuiltIns() {
   return RootContext(kBuiltInSymbols, {});
