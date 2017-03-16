@@ -41,5 +41,10 @@ size_t ArrayDataType::GetSize() const {
 
 ArrayDataType::~ArrayDataType() {
 }
+
+std::shared_ptr<const PrimitiveDataType> kVoidType(new PrimitiveDataType(0));
+std::shared_ptr<const PrimitiveDataType> kCharType(new PrimitiveDataType(1));
+std::shared_ptr<const PrimitiveDataType> kInt32Type(new PrimitiveDataType(4));
+std::shared_ptr<const PrimitiveDataType> kInt64Type(new PrimitiveDataType(8));
 }
 }

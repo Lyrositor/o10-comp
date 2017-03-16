@@ -8,17 +8,21 @@
 
 namespace comp {
 namespace ir {
+typedef std::map<std::string, std::shared_ptr<const DataType>> DataTypesTable;
+typedef std::map<std::string, std::shared_ptr<Variable>> VariablesTable;
+typedef std::map<std::string, std::shared_ptr<Function>> FunctionsTable;
+
 struct SymbolTable {
   SymbolTable();
   SymbolTable(
-    std::map<std::string, std::shared_ptr<DataType>> data_types,
-    std::map<std::string, std::shared_ptr<Variable>> variables,
-    std::map<std::string, std::shared_ptr<Function>> functions
+    DataTypesTable data_types,
+    VariablesTable variables,
+    FunctionsTable functions
   );
 
-  std::map<std::string, std::shared_ptr<DataType>> data_types;
-  std::map<std::string, std::shared_ptr<Variable>> variables;
-  std::map<std::string, std::shared_ptr<Function>> functions;
+  DataTypesTable data_types;
+  VariablesTable variables;
+  FunctionsTable functions;
 };
 }
 }

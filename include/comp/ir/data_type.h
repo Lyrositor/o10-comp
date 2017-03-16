@@ -1,4 +1,4 @@
-#pragma  once
+#pragma once
 
 #include <memory>
 #include <cstddef>
@@ -39,9 +39,9 @@ class ArrayDataType final : public DataType {
 };
 
 // Built-in types
-const std::shared_ptr<const PrimitiveDataType> kVoidType(new PrimitiveDataType(0));
-const std::shared_ptr<const PrimitiveDataType> kCharType(new PrimitiveDataType(1));
-const std::shared_ptr<const PrimitiveDataType> kInt32Type(new PrimitiveDataType(4));
-const std::shared_ptr<const PrimitiveDataType> kInt64Type(new PrimitiveDataType(8));
+extern std::shared_ptr<const PrimitiveDataType> kVoidType;
+extern std::shared_ptr<const PrimitiveDataType> kCharType;
+extern std::shared_ptr<const PrimitiveDataType> kInt32Type;
+extern std::shared_ptr<const PrimitiveDataType> kInt64Type;
 }
 }

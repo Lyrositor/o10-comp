@@ -1,9 +1,5 @@
 #include <comp/ir/context.h>
-#include <comp/ir/data_type.h>
-#include <comp/ir/function.h>
-#include <comp/ir/variable.h>
 #include <cstddef>
-#include <memory>
 
 namespace comp {
 namespace ir {
@@ -23,7 +19,7 @@ Context::~Context() {
 }
 
 void Context::RegisterDataType(
-  const std::string name, std::shared_ptr<DataType> data_type
+  const std::string name, std::shared_ptr<const DataType> data_type
 ) {
   symbols_.data_types[name] = data_type;
 }
@@ -93,7 +89,7 @@ RootContext::RootContext(
 RootContext::~RootContext() {
 }
 
-std::shared_ptr<DataType> RootContext::ResolveDataType(
+std::shared_ptr<const DataType> RootContext::ResolveDataType(
   const std::string &name
 ) const {
   auto it = symbols_.data_types.find(name);
@@ -161,7 +157,7 @@ ChildContext::ChildContext(
 ChildContext::~ChildContext() {
 }
 
-std::shared_ptr<DataType> ChildContext::ResolveDataType(
+std::shared_ptr<const DataType> ChildContext::ResolveDataType(
   const std::string &name
 ) const {
   auto it = symbols_.data_types.find(name);

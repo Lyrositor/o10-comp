@@ -1,16 +1,15 @@
-#include <comp/ast.h>
 #include <comp/ir/build_ir.h>
-#include <memory>
+
 #include <iostream>
-#include <comp/ir/variable.h>
-#include <comp/ir/context.h>
+#include <memory>
+
+#include <comp/ir/builtins.h>
 #include <comp/ir/op.h>
-#include <comp/ir/basic_block.h>
 
 namespace comp {
 namespace ir {
 void BuildProgramIR(std::shared_ptr<const ast::Program> node) {
-  RootContext context;
+  RootContext context = CreateRootContextWithBuiltIns();
   for (auto declaration : node->body) {
     switch (declaration->nodeType) {
       case ast::Node::Type::Function: {

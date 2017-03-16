@@ -1,9 +1,9 @@
 #pragma once
 
 #include <memory>
-#include <string>
 #include <map>
 #include <set>
+#include <string>
 #include "data_type.h"
 #include "function.h"
 #include "variable.h"
@@ -20,16 +20,13 @@ class ChildContext;
 class Context {
  public:
   Context();
-  Context(
-    SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables
-  );
+  Context(SymbolTable symbols, std::set<std::shared_ptr<Variable>> variables);
 
   virtual ~Context() = 0;
 
   void RegisterDataType(
     const std::string name,
-    std::shared_ptr<DataType> data_type
+    std::shared_ptr<const DataType> data_type
   );
   void RegisterVariable(
     const std::string name,
@@ -57,7 +54,7 @@ class Context {
    * @return `DataType` instance named `name` in the current context.
    * @throw {std::runtime_exception} "Unknown dataType" If the dataType is not found.
    */
-  virtual std::shared_ptr<DataType> ResolveDataType(const std::string &name) const = 0;
+  virtual std::shared_ptr<const DataType> ResolveDataType(const std::string &name) const = 0;
   virtual std::shared_ptr<Function> ResolveFunction(const std::string &name) const = 0;
   virtual std::shared_ptr<Variable> ResolveVariable(const std::string &name) const = 0;
 
@@ -109,7 +106,7 @@ class RootContext final : public Context {
 
   ~RootContext();
 
-  std::shared_ptr<DataType> ResolveDataType(const std::string &name) const;
+  std::shared_ptr<const DataType> ResolveDataType(const std::string &name) const;
   std::shared_ptr<Function> ResolveFunction(const std::string &name) const;
   std::shared_ptr<Variable> ResolveVariable(const std::string &name) const;
 };
@@ -132,7 +129,7 @@ class ChildContext final : public Context {
 
   ~ChildContext();
 
-  std::shared_ptr<DataType> ResolveDataType(const std::string &name) const;
+  std::shared_ptr<const DataType> ResolveDataType(const std::string &name) const;
   std::shared_ptr<Function> ResolveFunction(const std::string &name) const;
   std::shared_ptr<Variable> ResolveVariable(const std::string &name) const;
 
