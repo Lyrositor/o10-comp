@@ -1,4 +1,5 @@
 #include <comp/ir/builtins.h>
+#include <comp/ir/function.h>
 
 namespace comp {
 namespace ir {
@@ -10,10 +11,20 @@ static const std::shared_ptr<const PrimitiveDataType> kInt32Type(new PrimitiveDa
 
 static const std::shared_ptr<const PrimitiveDataType> kInt64Type(new PrimitiveDataType(8));
 
-static const FunctionsTable kBuiltInFunctions({
-  {"getchar", nullptr},
-  {"putchar", nullptr}
-});
+static const std::shared_ptr<Function> kGetcharFunction = Function::Create(
+  std::vector<std::shared_ptr<const Parameter>>(),
+  kCharType
+);
+
+static const std::shared_ptr<Function> kPutcharFunction = Function::Create(
+  std::vector<std::shared_ptr<const Parameter>>({Parameter::Create(kCharType, "c")}),
+  kVoidType
+);
+
+static const FunctionsTable kBuiltInFunctions = {
+  {"getchar", kGetcharFunction},
+  {"putchar", kPutcharFunction}
+};
 
 static const DataTypesTable kBuiltInDataTypes = {
   {"void", kVoidType},
