@@ -3,23 +3,23 @@
 [C99 Specification](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf)
 
 ## sourceChar
-[sourceChar]: sourcechar
+[sourceChar]: #sourcechar
 
 - `[^\\'\n]`
 
 ## octalEscape
-[octalEscape]: octalescape
+[octalEscape]: #octalescape
 
 - `[0-3][0-7]{2}`
 - `[0-7]{1,2}`
 
 ## hexEscape
-[hexEscape]: hexescape
+[hexEscape]: #hexescape
 
 - `[0-9a-fA-F]{2}`
 
 ## escapeChar
-[escapeChar]: escapechar
+[escapeChar]: #escapechar
 
 - `[abfnrtv\\'"?]`
 
