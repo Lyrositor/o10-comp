@@ -96,7 +96,7 @@ std::shared_ptr<const DataType> RootContext::ResolveDataType(
   if (it != symbols_.data_types.end()) {
     return it->second;
   } else {
-    throw std::runtime_error(std::string("Unknown dataType"));
+    throw std::runtime_error(std::string("Unknown data_type"));
   }
 }
 

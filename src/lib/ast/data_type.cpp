@@ -2,11 +2,11 @@
 
 namespace comp {
 namespace ast {
-DataType::DataType(Node::Type nodeType, std::shared_ptr<SourceLocation> location) :
-  Node(nodeType, location) {
+DataType::DataType(Type node_type, std::shared_ptr<SourceLocation> location) :
+  Node(node_type, location) {
 }
 
 DataType::~DataType() {
 }
-}
-}
+}  // namespace ast
+}  // namespace comp

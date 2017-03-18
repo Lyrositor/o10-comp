@@ -5,6 +5,6 @@
 
 namespace comp {
 namespace eval {
-int64_t eval_expression(comp::ast::Expression &expression);
+int64_t eval_expression(comp::ast::RExpression &expression);
 }
 }

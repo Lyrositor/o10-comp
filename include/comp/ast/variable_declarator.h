@@ -1,28 +1,27 @@
 #pragma once
 
-#include "expression.h"
-#include "identifier.h"
-#include "node.h"
+#include "comp/ast/expression.h"
+#include "comp/ast/identifier.h"
+#include "comp/ast/node.h"
 
 namespace comp {
 namespace ast {
 struct VariableDeclarator final : public Node {
   static std::unique_ptr<VariableDeclarator> Create(
     std::shared_ptr<Identifier> identifier,
-    std::shared_ptr<Expression> initial_value,
-    std::shared_ptr<SourceLocation> location = nullptr
-  );
+    std::shared_ptr<RExpression> initial_value,
+    std::shared_ptr<SourceLocation> location = nullptr);
 
   VariableDeclarator(
     std::shared_ptr<Identifier> identifier,
-    std::shared_ptr<Expression> initial_value,
-    std::shared_ptr<SourceLocation> location = nullptr
-  );  // TODO Handle int a[], b
+    std::shared_ptr<RExpression> initial_value,
+    std::shared_ptr<SourceLocation> location = nullptr);
+  // TODO(Lyrositor) Handle int a[], b
 
   ~VariableDeclarator();
 
   const std::shared_ptr<Identifier> identifier;
-  const std::shared_ptr<Expression> initial_value;
+  const std::shared_ptr<RExpression> initial_value;
 };
-}
-}
+}  // namespace ast
+}  // namespace comp

@@ -22,5 +22,5 @@ struct SourceLocation final {
   const Position start;
   const Position end;
 };
-}
-}
+}  // namespace ast
+}  // namespace comp

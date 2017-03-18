@@ -2,20 +2,17 @@
 
 namespace comp {
 namespace ast {
-std::unique_ptr<comp::ast::NullStatement> comp::ast::NullStatement::Create(
-  std::shared_ptr<comp::ast::SourceLocation> location
+std::unique_ptr<NullStatement> NullStatement::Create(
+  std::shared_ptr<SourceLocation> location
 ) {
-  return std::unique_ptr<comp::ast::NullStatement>(
-    new NullStatement(location)
-  );
+  return std::unique_ptr<NullStatement>(new NullStatement(location));
 }
 
-comp::ast::NullStatement::NullStatement(
-  std::shared_ptr<comp::ast::SourceLocation> location
-) : Statement(Node::Type::NullStatement, location) {
+NullStatement::NullStatement(std::shared_ptr<SourceLocation> location) :
+  Statement(Type::NullStatement, location) {
 }
 
-comp::ast::NullStatement::~NullStatement() {
+NullStatement::~NullStatement() {
 }
-}
-}
+}  // namespace ast
+}  // namespace comp

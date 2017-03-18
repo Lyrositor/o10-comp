@@ -1,13 +1,19 @@
 #pragma once
 
-#include "node.h"
+#include "comp/ast/node.h"
 
 namespace comp {
 namespace ast {
-struct Expression : public Node {
-  Expression(Node::Type nodeType, std::shared_ptr<SourceLocation> location);
+struct LExpression : public Node {
+  LExpression(Type node_type, std::shared_ptr<SourceLocation> location);
 
-  virtual ~Expression() = 0;
+  virtual ~LExpression() = 0;
 };
-}
-}
+
+struct RExpression : public Node {
+  RExpression(Type node_type, std::shared_ptr<SourceLocation> location);
+
+  virtual ~RExpression() = 0;
+};
+}  // namespace ast
+}  // namespace comp

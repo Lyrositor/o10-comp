@@ -2,11 +2,22 @@
 
 namespace comp {
 namespace ast {
-Expression::Expression(Node::Type nodeType, std::shared_ptr<SourceLocation> location) :
-  Node(nodeType, location) {
+LExpression::LExpression(
+  Node::Type node_type,
+  std::shared_ptr<SourceLocation> location
+) : Node(node_type, location) {
 }
 
-Expression::~Expression() {
+LExpression::~LExpression() {
 }
+
+RExpression::RExpression(
+  Node::Type node_type,
+  std::shared_ptr<SourceLocation> location
+) : Node(node_type, location) {
 }
+
+RExpression::~RExpression() {
 }
+}  // namespace ast
+}  // namespace comp

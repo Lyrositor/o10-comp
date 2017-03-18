@@ -11,14 +11,14 @@ namespace ir {
 void BuildProgramIR(std::shared_ptr<const ast::Program> node) {
   RootContext context = CreateRootContextWithBuiltIns();
   for (auto declaration : node->body) {
-    switch (declaration->nodeType) {
+    switch (declaration->node_type) {
       case ast::Node::Type::Function: {
         std::shared_ptr<ast::Function> e = std::static_pointer_cast<ast::Function>(declaration);
         BuildFunctionIR(*e, context);
         break;
       }
       default: {
-        throw std::domain_error("Unexpected value for `declaration->nodeType`");
+        throw std::domain_error("Unexpected value for `declaration->node_type`");
       }
     }
   }
@@ -40,7 +40,7 @@ void BuildStatementIR(
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  switch (node.nodeType) {
+  switch (node.node_type) {
     case ast::Node::Type::BlockStatement: {
       BuildBlockStatementIR(
         static_cast<const ast::BlockStatement &>(node),
@@ -58,7 +58,7 @@ void BuildStatementIR(
       break;
     }
     default: {
-      throw std::domain_error("Unexpected value for `node.nodeType`");
+      throw std::domain_error("Unexpected value for `node.node_type`");
     }
   }
 }
@@ -84,11 +84,11 @@ void BuildExpressionStatementIR(
 }
 
 std::shared_ptr<Variable> BuildExpressionRValueIR(
-  const ast::Expression &node,
+  const ast::RExpression &node,
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  switch (node.nodeType) {
+  switch (node.node_type) {
     case ast::Node::Type::Identifier: {
       return BuildIdentifierRValueIR(
         static_cast<const ast::Identifier &>(node),
@@ -103,7 +103,7 @@ std::shared_ptr<Variable> BuildExpressionRValueIR(
       );
     }
     default: {
-      throw std::domain_error("Unexpected value for `node.expression->nodeType`");
+      throw std::domain_error("Unexpected value for `node.expression->node_type`");
     }
   }
 }

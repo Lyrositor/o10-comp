@@ -1,8 +1,8 @@
 #pragma once
 
-#include "node.h"
-#include "identifier.h"
-#include "data_type.h"
+#include "comp/ast/data_type.h"
+#include "comp/ast/identifier.h"
+#include "comp/ast/node.h"
 
 namespace comp {
 namespace ast {
@@ -12,17 +12,15 @@ namespace ast {
 struct LiteralDataType final : public DataType {
   static std::unique_ptr<LiteralDataType> Create(
     std::shared_ptr<Identifier> identifier,
-    std::shared_ptr<SourceLocation> location = nullptr
-  );
+    std::shared_ptr<SourceLocation> location = nullptr);
 
   LiteralDataType(
     std::shared_ptr<Identifier> identifier,
-    std::shared_ptr<SourceLocation> location = nullptr
-  );
+    std::shared_ptr<SourceLocation> location = nullptr);
 
   ~LiteralDataType();
 
   const std::shared_ptr<Identifier> identifier;
 };
-}
-}
+}  // namespace ast
+}  // namespace comp

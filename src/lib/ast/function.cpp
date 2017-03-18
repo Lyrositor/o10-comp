@@ -10,7 +10,8 @@ std::unique_ptr<Function> Function::Create(
   std::shared_ptr<BlockStatement> body,
   std::shared_ptr<SourceLocation> location
 ) {
-  return std::unique_ptr<Function>(new Function(identifier, parameters, return_type, body, location));
+  return std::unique_ptr<Function>(
+    new Function(identifier, parameters, return_type, body, location));
 }
 
 Function::Function(
@@ -29,5 +30,5 @@ Function::Function(
 
 Function::~Function() {
 }
-}
-}
+}  // namespace ast
+}  // namespace comp

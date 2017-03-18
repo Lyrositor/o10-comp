@@ -22,8 +22,8 @@ int64_t evalBinaryExpression(comp::ast::BinaryExpression &expression) {
   }
 }
 
-int64_t eval_expression(comp::ast::Expression &expression) {
-  switch (expression.nodeType) {
+int64_t eval_expression(comp::ast::RExpression &expression) {
+  switch (expression.node_type) {
     case comp::ast::Node::Type::Int64Literal: {
       return evalInt64Literal(static_cast<comp::ast::Int64Literal &>(expression));
     }

@@ -2,11 +2,12 @@
 
 namespace comp {
 namespace ast {
-Literal::Literal(Node::Type nodeType, std::shared_ptr<SourceLocation> location) :
-  Expression(nodeType, location) {
+Literal::Literal(
+  Node::Type node_type, std::shared_ptr<SourceLocation> location
+) : RExpression(node_type, location) {
 }
 
 Literal::~Literal() {
 }
-}
-}
+}  // namespace ast
+}  // namespace comp

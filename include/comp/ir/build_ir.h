@@ -32,7 +32,7 @@ void BuildExpressionStatementIR(
 
 // R-values
 std::shared_ptr<ir::Variable> BuildExpressionRValueIR(
-  const ast::Expression &node,
+  const ast::RExpression &node,
   ir::Context &context,
   std::shared_ptr<BasicBlock> &current_block
 );

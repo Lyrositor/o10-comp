@@ -1,13 +1,13 @@
 #pragma once
 
-#include "statement.h"
+#include "comp/ast/statement.h"
 
 namespace comp {
 namespace ast {
 struct Declaration : public Statement {
-  Declaration(Node::Type nodeType, std::shared_ptr<SourceLocation> location);
+  Declaration(Type node_type, std::shared_ptr<SourceLocation> location);
 
   virtual ~Declaration() = 0;
 };
-}
-}
+}  // namespace ast
+}  // namespace comp

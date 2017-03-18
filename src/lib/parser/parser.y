@@ -7,7 +7,7 @@
 
 union YYSTYPE;
 
-void yyerror(void *scanner, comp::ast::Expression *, const char *);
+void yyerror(void *scanner, comp::ast::RExpression *, const char *);
 int yylex(YYSTYPE *lvalp, void *scanner);
 void yy_scan_string(const char *str);
 
@@ -19,12 +19,12 @@ void yy_scan_string(const char *str);
 %lex-param {void *scanner}
 
 %parse-param {void *scanner}
-%parse-param {comp::ast::Expression *&root}
+%parse-param {comp::ast::RExpression *&root}
 
 %union {
  uint8_t uint8;
  int32_t i;
- comp::ast::Expression *e;
+ comp::ast::RExpression *e;
 }
 
 %token ADDITION_OPERATOR SUBTRACTION_OPERATOR MULTIPLICATION_OPERATOR DIVISION_OPERATOR REMAINDER_OPERATOR
@@ -68,28 +68,28 @@ expression:
     $$ = $1;
   }
   | expression ADDITION_OPERATOR expression {
-    std::shared_ptr<comp::ast::Expression> left($1);
-    std::shared_ptr<comp::ast::Expression> right($3);
+    std::shared_ptr<comp::ast::RExpression> left($1);
+    std::shared_ptr<comp::ast::RExpression> right($3);
     $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Addition, left, right, nullptr);
   }
   | expression SUBTRACTION_OPERATOR expression {
-    std::shared_ptr<comp::ast::Expression> left($1);
-    std::shared_ptr<comp::ast::Expression> right($3);
+    std::shared_ptr<comp::ast::RExpression> left($1);
+    std::shared_ptr<comp::ast::RExpression> right($3);
     $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Subtraction, left, right, nullptr);
   }
   | expression MULTIPLICATION_OPERATOR expression {
-    std::shared_ptr<comp::ast::Expression> left($1);
-    std::shared_ptr<comp::ast::Expression> right($3);
+    std::shared_ptr<comp::ast::RExpression> left($1);
+    std::shared_ptr<comp::ast::RExpression> right($3);
     $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Multiplication, left, right, nullptr);
   }
   | expression DIVISION_OPERATOR expression {
-    std::shared_ptr<comp::ast::Expression> left($1);
-    std::shared_ptr<comp::ast::Expression> right($3);
+    std::shared_ptr<comp::ast::RExpression> left($1);
+    std::shared_ptr<comp::ast::RExpression> right($3);
     $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Division, left, right, nullptr);
   }
   | expression REMAINDER_OPERATOR expression {
-    std::shared_ptr<comp::ast::Expression> left($1);
-    std::shared_ptr<comp::ast::Expression> right($3);
+    std::shared_ptr<comp::ast::RExpression> left($1);
+    std::shared_ptr<comp::ast::RExpression> right($3);
     $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Remainder, left, right, nullptr);
   }
 %%

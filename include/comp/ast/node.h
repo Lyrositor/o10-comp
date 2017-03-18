@@ -1,7 +1,8 @@
 #pragma once
 
 #include <memory>
-#include "position.h"
+
+#include "comp/ast/position.h"
 
 namespace comp {
 namespace ast {
@@ -25,11 +26,11 @@ struct Node {
     VariableDeclarator
   };
 
-  Node(Type nodeType, std::shared_ptr<SourceLocation> location);
+  Node(Type node_type, std::shared_ptr<SourceLocation> location);
   virtual ~Node() = 0;
 
-  const Type nodeType;
+  const Type node_type;
   const std::shared_ptr<SourceLocation> location;
 };
-}
-}
+}  // namespace ast
+}  // namespace comp
