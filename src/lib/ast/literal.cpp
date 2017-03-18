@@ -2,9 +2,8 @@
 
 namespace comp {
 namespace ast {
-Literal::Literal(
-  Node::Type node_type, std::shared_ptr<SourceLocation> location
-) : RExpression(node_type, location) {
+Literal::Literal(Type node_type, std::shared_ptr<SourceLocation> location) :
+  RExpression(node_type, location) {
 }
 
 Literal::~Literal() {

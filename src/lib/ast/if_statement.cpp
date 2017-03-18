@@ -18,7 +18,7 @@ IfStatement::IfStatement(
   std::shared_ptr<Statement> alternative,
   std::shared_ptr<SourceLocation> location
 ) :
-  Statement(Node::Type::IfStatement, location),
+  Statement(Type::IfStatement, location),
   test(test),
   consequence(consequence),
   alternative(alternative) {

@@ -12,7 +12,7 @@ std::shared_ptr<Int64Literal> Int64Literal::Create(
 Int64Literal::Int64Literal(
   int64_t value,
   std::shared_ptr<SourceLocation> location
-) : Literal(Node::Type::Int64Literal, location), value(value) {
+) : Literal(Type::Int64Literal, location), value(value) {
 }
 
 Int64Literal::~Int64Literal() {

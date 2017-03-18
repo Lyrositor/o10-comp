@@ -9,9 +9,11 @@ namespace ast {
 struct Node {
   enum class Type {
     ArrayDataType,
+    AssignmentExpression,
     BinaryExpression,
     BlockStatement,
     ExpressionStatement,
+    ForStatement,
     Function,
     Identifier,
     IfStatement,
@@ -22,8 +24,10 @@ struct Node {
     Program,
     ReturnStatement,
     Uint8Literal,
+    UnaryExpression,
     VariableDeclaration,
-    VariableDeclarator
+    VariableDeclarator,
+    WhileStatement
   };
 
   Node(Type node_type, std::shared_ptr<SourceLocation> location);

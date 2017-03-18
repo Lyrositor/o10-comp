@@ -21,7 +21,7 @@ Function::Function(
   std::shared_ptr<BlockStatement> body,
   std::shared_ptr<SourceLocation> location
 ) :
-  Declaration(Node::Type::Function, location),
+  Declaration(Type::Function, location),
   identifier(identifier),
   parameters(parameters),
   return_type(return_type),
