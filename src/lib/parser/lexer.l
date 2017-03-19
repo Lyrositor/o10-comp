@@ -21,15 +21,15 @@
 
 %x charLiteral
 
-// charLiteral '([^\\'\n]|\\[abfnrtv\\'"?0]|\\[0-7]{1,3}|\\x[0-9a-e]{1,2})'
+/* charLiteral '([^\\'\n]|\\[abfnrtv\\'"?0]|\\[0-7]{1,3}|\\x[0-9a-e]{1,2})' */
 intLiteral [0-9]+
 identifier [a-zA-Z_$][a-zA-Z_$0-9]*
 
 
 %%
 
-[ \n\t]                           {/* ignore */}
-{intLiteral}           {yylval->i = atoi(yytext); return INTEGER_LITERAL;}
+[ \n\t]       {/* ignore */}
+{intLiteral}  {yylval->i = atoi(yytext); return INTEGER_LITERAL;}
 {identifier}  {yylval->s = yytext; return IDENTIFIER;}
 
 
@@ -85,5 +85,7 @@ identifier [a-zA-Z_$][a-zA-Z_$0-9]*
 <charLiteral>{
   [^\\'\n]                        {yylval->uint8 = yytext[0]; return SOURCE_CHAR;}
   (\\([1-7]?[0-7]|[1-3][0-7]{2})) {std::sscanf(yytext + 1, "%o", &(yylval->uint8)); return OCTAL_ESCAPE_SEQUENCE;}
+  (\\x[1-9a-f]?[0-9a-f])          {std::sscanf(yytext + 2, "%x", &(yylval->uint8)); return HEX_ESCAPE_SEQUENCE;}
+  (\\[abfnrtv\\'"?0])             {yylval->uint8 = yytext[0]; return SOURCE_CHAR;}
   "'"                             {BEGIN(INITIAL); return SIMPLE_QUOTE;}
 }
