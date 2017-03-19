@@ -11,14 +11,14 @@ struct ForStatement final : public Statement {
     std::shared_ptr<Statement> initialization,
     std::shared_ptr<Statement> condition,
     std::shared_ptr<Statement> iteration,
-    std::shared_ptr<Statement> loop,
+    std::shared_ptr<Statement> body,
     std::shared_ptr<SourceLocation> location = nullptr);
 
   ForStatement(
     std::shared_ptr<Statement> initialization,
     std::shared_ptr<Statement> condition,
     std::shared_ptr<Statement> iteration,
-    std::shared_ptr<Statement> loop,
+    std::shared_ptr<Statement> body,
     std::shared_ptr<SourceLocation> location = nullptr);
 
   ~ForStatement();
@@ -26,7 +26,7 @@ struct ForStatement final : public Statement {
   const std::shared_ptr<Statement> initialization;
   const std::shared_ptr<Statement> condition;
   const std::shared_ptr<Statement> iteration;
-  const std::shared_ptr<Statement> loop;
+  const std::shared_ptr<Statement> body;
 };
 }  // namespace ast
 }  // namespace comp

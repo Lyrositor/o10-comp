@@ -13,9 +13,9 @@ enum class UnaryOperator {
   PostDecrement,
   Address,
   Positive,
-  Negative,
-  Complement,
-  Negation
+  Negation,
+  Plus,
+  Not
 };
 
 struct UnaryExpression final : public RExpression {

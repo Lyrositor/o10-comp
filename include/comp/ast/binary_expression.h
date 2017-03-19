@@ -5,7 +5,6 @@
 namespace comp {
 namespace ast {
 enum class BinaryOperator {
-  None,
   Addition,
   Subtraction,
   Division,

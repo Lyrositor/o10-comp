@@ -5,7 +5,7 @@ namespace ast {
 std::unique_ptr<AssignmentExpression> AssignmentExpression::Create(
   std::shared_ptr<LExpression> lvalue,
   std::shared_ptr<RExpression> rvalue,
-  BinaryOperator op,
+  AssignmentOperator op,
   std::shared_ptr<SourceLocation> location
 ) {
   return std::unique_ptr<AssignmentExpression>(
@@ -14,7 +14,7 @@ std::unique_ptr<AssignmentExpression> AssignmentExpression::Create(
 AssignmentExpression::AssignmentExpression(
   std::shared_ptr<LExpression> lvalue,
   std::shared_ptr<RExpression> rvalue,
-  BinaryOperator op,
+  AssignmentOperator op,
   std::shared_ptr<SourceLocation> location
 ) :
   RExpression(Type::AssignmentExpression, location),
