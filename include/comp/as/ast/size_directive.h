@@ -11,7 +11,7 @@ namespace ast {
 /**
  * @see: https://sourceware.org/binutils/docs/as/Size.html#Size
  */
-struct SizeDirective : public Directive {
+struct SizeDirective final : public Directive {
   std::unique_ptr<SizeDirective> Create(
       std::shared_ptr<Symbol> symbol,
       std::shared_ptr<Expression> size);
@@ -19,6 +19,8 @@ struct SizeDirective : public Directive {
   SizeDirective(
       std::shared_ptr<Symbol> symbol,
       std::shared_ptr<Expression> size);
+
+  ~SizeDirective();
 
   std::shared_ptr<Symbol> symbol;
   std::shared_ptr<Expression> size;

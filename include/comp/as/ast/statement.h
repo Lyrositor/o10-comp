@@ -9,7 +9,9 @@ namespace comp {
 namespace as {
 namespace ast {
 struct Statement : public Node {
-  Statement(Type node_type, std::vector<std::shared_ptr<Symbol>> labels);
+  Statement(
+      Type node_type,
+      std::vector<std::shared_ptr<Symbol>> labels = {});
 
   virtual ~Statement() = 0;
 

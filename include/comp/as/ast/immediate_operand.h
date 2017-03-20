@@ -6,6 +6,15 @@
 namespace comp {
 namespace as {
 namespace ast {
+/**
+ * A numeric constant directly used as an operand.
+ *
+ * Example:
+ *
+ * ```
+ * $42
+ * ```
+ */
 struct ImmediateOperand final : public SimpleOperand {
   std::unique_ptr<ImmediateOperand> Create(int64_t value);
 

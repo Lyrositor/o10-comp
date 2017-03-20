@@ -16,6 +16,8 @@ struct GlobalDirective final : public Directive {
   GlobalDirective(std::shared_ptr<Symbol> symbol);
 
   ~GlobalDirective();
+
+  std::shared_ptr<Symbol> symbol;
 };
 }  // namespace ast
 }  // namespace as

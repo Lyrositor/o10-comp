@@ -15,6 +15,9 @@ namespace ast {
 struct GlobalSymbol final : public Symbol {
   std::unique_ptr<GlobalSymbol> Create(std::string name);
 
+  /**
+   * @param name Name of the label
+   */
   GlobalSymbol(std::string name);
 
   ~GlobalSymbol();
