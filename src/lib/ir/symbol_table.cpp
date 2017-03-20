@@ -14,5 +14,5 @@ SymbolTable::SymbolTable(
   variables(std::move(variables)),
   functions(std::move(functions)) {
 }
-}
-}
+}  // namespace ir
+}  // namespace comp

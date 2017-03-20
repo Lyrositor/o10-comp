@@ -2,11 +2,13 @@
 
 namespace comp {
 namespace ir {
-std::unique_ptr<BasicBlock> BasicBlock::create(std::vector<std::shared_ptr<Op>> ops) {
+std::unique_ptr<BasicBlock> BasicBlock::create(
+  std::vector<std::shared_ptr<Op>> ops) {
   return std::unique_ptr<BasicBlock>(new BasicBlock(std::move(ops)));
 }
 
-BasicBlock::BasicBlock(std::vector<std::shared_ptr<Op>> ops) : ops_(std::move(ops)) {
+BasicBlock::BasicBlock(
+  std::vector<std::shared_ptr<Op>> ops) : ops_(std::move(ops)) {
 }
 
 void BasicBlock::Push(std::shared_ptr<Op> op) {
@@ -15,5 +17,5 @@ void BasicBlock::Push(std::shared_ptr<Op> op) {
 
 BasicBlock::~BasicBlock() {
 }
-}
-}
+}  // namespace ir
+}  // namespace comp

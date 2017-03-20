@@ -1,6 +1,4 @@
 #include <comp/ir/data_type.h>
-#include <cstddef>
-#include <memory>
 
 namespace comp {
 namespace ir {
@@ -26,12 +24,14 @@ size_t PrimitiveDataType::GetSize() const {
 PrimitiveDataType::~PrimitiveDataType() {
 }
 
-std::unique_ptr<ArrayDataType> ArrayDataType::Create(std::shared_ptr<const DataType> itemType,
-                                                     size_t arrayLength) {
-  return std::unique_ptr<ArrayDataType>(new ArrayDataType(itemType, arrayLength));
+std::unique_ptr<ArrayDataType> ArrayDataType::Create(
+  std::shared_ptr<const DataType> itemType, size_t arrayLength) {
+  return std::unique_ptr<ArrayDataType>(
+    new ArrayDataType(itemType, arrayLength));
 }
 
-ArrayDataType::ArrayDataType(std::shared_ptr<const DataType> item_type, size_t array_length) :
+ArrayDataType::ArrayDataType(
+  std::shared_ptr<const DataType> item_type, size_t array_length) :
   item_type_(item_type), length_(array_length) {
 }
 
@@ -41,5 +41,5 @@ size_t ArrayDataType::GetSize() const {
 
 ArrayDataType::~ArrayDataType() {
 }
-}
-}
+}  // namespace ir
+}  // namespace comp

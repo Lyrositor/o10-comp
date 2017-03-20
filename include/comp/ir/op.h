@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstddef>
-#include "variable.h"
+#include "comp/ir/variable.h"
 
 namespace comp{
 namespace ir {
@@ -87,5 +87,5 @@ struct NoOp final : public Op {
   NoOp();
   virtual ~NoOp();
 };
-}
-}
+}  // namespace ir
+}  // namespace comp

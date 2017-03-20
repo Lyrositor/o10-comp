@@ -1,7 +1,8 @@
-#pragma  once
+#pragma once
 
 #include <memory>
-#include "data_type.h"
+
+#include "comp/ir/data_type.h"
 
 namespace comp {
 namespace ir {
@@ -12,7 +13,8 @@ namespace ir {
  */
 class Variable {
  public:
-  static std::unique_ptr<Variable> Create(std::shared_ptr<const DataType> dataType);
+  static std::unique_ptr<Variable> Create(
+    std::shared_ptr<const DataType> data_type);
 
   Variable(std::shared_ptr<const DataType> data_type);
   virtual ~Variable();
@@ -20,5 +22,5 @@ class Variable {
  private:
   const std::shared_ptr<const DataType> data_type_;
 };
-}
-}
+}  // namespace ir
+}  // namespace comp

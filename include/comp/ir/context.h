@@ -1,13 +1,14 @@
 #pragma once
 
-#include <memory>
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
-#include "data_type.h"
-#include "function.h"
-#include "variable.h"
-#include "symbol_table.h"
+
+#include "comp/ir/data_type.h"
+#include "comp/ir/program_symbol.h"
+#include "comp/ir/symbol_table.h"
+#include "comp/ir/variable.h"
 
 namespace comp {
 namespace ir {
@@ -26,19 +27,15 @@ class Context {
 
   void RegisterDataType(
     const std::string name,
-    std::shared_ptr<const DataType> data_type
-  );
+    std::shared_ptr<const DataType> data_type);
   void RegisterVariable(
     const std::string name,
-    std::shared_ptr<Variable> variable
-  );
+    std::shared_ptr<Variable> variable);
   void RegisterFunction(
     const std::string name,
-    std::shared_ptr<Function> function
-  );
+    std::shared_ptr<FunctionSymbol> function);
   std::shared_ptr<Variable> CreateVariable(
-    std::shared_ptr<const DataType> data_type
-  );
+    std::shared_ptr<const DataType> data_type);
 
   /**
    * @return The set of allocated variables
@@ -54,9 +51,12 @@ class Context {
    * @return `DataType` instance named `name` in the current context.
    * @throw {std::runtime_exception} "Unknown dataType" If the dataType is not found.
    */
-  virtual std::shared_ptr<const DataType> ResolveDataType(const std::string &name) const = 0;
-  virtual std::shared_ptr<Function> ResolveFunction(const std::string &name) const = 0;
-  virtual std::shared_ptr<Variable> ResolveVariable(const std::string &name) const = 0;
+  virtual std::shared_ptr<const DataType> ResolveDataType(
+    const std::string &name) const = 0;
+  virtual std::shared_ptr<FunctionSymbol> ResolveFunction(
+    const std::string &name) const = 0;
+  virtual std::shared_ptr<Variable> ResolveVariable(
+    const std::string &name) const = 0;
 
   /**
    * Forks parentContext by creating a new child context.
@@ -84,6 +84,7 @@ class Context {
    * Symbol table
    */
   SymbolTable symbols_;
+
   /**
    * Shadowed and anonymous variables.
    */
@@ -95,20 +96,21 @@ class RootContext final : public Context {
   static std::unique_ptr<RootContext> Create();
   static std::unique_ptr<RootContext> Create(
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables
-  );
+    std::set<std::shared_ptr<Variable>> variables);
 
   RootContext();
   RootContext(
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables
-  );
+    std::set<std::shared_ptr<Variable>> variables);
 
   ~RootContext();
 
-  std::shared_ptr<const DataType> ResolveDataType(const std::string &name) const;
-  std::shared_ptr<Function> ResolveFunction(const std::string &name) const;
-  std::shared_ptr<Variable> ResolveVariable(const std::string &name) const;
+  std::shared_ptr<const DataType> ResolveDataType(
+    const std::string &name) const;
+  std::shared_ptr<FunctionSymbol> ResolveFunction(
+    const std::string &name) const;
+  std::shared_ptr<Variable> ResolveVariable(
+    const std::string &name) const;
 };
 
 class ChildContext final : public Context {
@@ -117,24 +119,25 @@ class ChildContext final : public Context {
   static std::unique_ptr<ChildContext> Create(
     Context &parent_context,
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables
-  );
+    std::set<std::shared_ptr<Variable>> variables);
 
   ChildContext(Context &parentContext);
   ChildContext(
     Context &parentContext,
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables
-  );
+    std::set<std::shared_ptr<Variable>> variables);
 
   ~ChildContext();
 
-  std::shared_ptr<const DataType> ResolveDataType(const std::string &name) const;
-  std::shared_ptr<Function> ResolveFunction(const std::string &name) const;
-  std::shared_ptr<Variable> ResolveVariable(const std::string &name) const;
+  std::shared_ptr<const DataType> ResolveDataType(
+    const std::string &name) const;
+  std::shared_ptr<FunctionSymbol> ResolveFunction(
+    const std::string &name) const;
+  std::shared_ptr<Variable> ResolveVariable(
+    const std::string &name) const;
 
  protected:
   Context &parent_context_;
 };
-}
-}
+}  // namespace ir
+}  // namespace comp

@@ -5,8 +5,10 @@ add_library(
   builtins.cpp
   context.cpp
   data_type.cpp
-  function.cpp
   op.cpp
+  parameter.cpp
+  program.cpp
+  program_symbol.cpp
   symbol_table.cpp
   variable.cpp
 )

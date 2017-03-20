@@ -1,23 +1,33 @@
 #include <comp/ir/builtins.h>
-#include <comp/ir/function.h>
+
+#include <vector>
+
+#include <comp/ir/program_symbol.h>
 
 namespace comp {
 namespace ir {
-static const std::shared_ptr<const PrimitiveDataType> kVoidType(new PrimitiveDataType(0));
+static const std::shared_ptr<const PrimitiveDataType>
+  kVoidType(new PrimitiveDataType(0));
 
-static const std::shared_ptr<const PrimitiveDataType> kCharType(new PrimitiveDataType(1));
+static const std::shared_ptr<const PrimitiveDataType>
+  kCharType(new PrimitiveDataType(1));
 
-static const std::shared_ptr<const PrimitiveDataType> kInt32Type(new PrimitiveDataType(4));
+static const std::shared_ptr<const PrimitiveDataType>
+  kInt32Type(new PrimitiveDataType(4));
 
-static const std::shared_ptr<const PrimitiveDataType> kInt64Type(new PrimitiveDataType(8));
+static const std::shared_ptr<const PrimitiveDataType>
+  kInt64Type(new PrimitiveDataType(8));
 
-static const std::shared_ptr<Function> kGetcharFunction = Function::Create(
+static const std::shared_ptr<FunctionSymbol>
+  kGetcharFunction = FunctionSymbol::Create(
   std::vector<std::shared_ptr<const Parameter>>(),
   kCharType
 );
 
-static const std::shared_ptr<Function> kPutcharFunction = Function::Create(
-  std::vector<std::shared_ptr<const Parameter>>({Parameter::Create(kCharType, "c")}),
+static const std::shared_ptr<FunctionSymbol>
+  kPutcharFunction = FunctionSymbol::Create(
+  std::vector<std::shared_ptr<const Parameter>>(
+    {Parameter::Create(kCharType, "c")}),
   kVoidType
 );
 
@@ -54,5 +64,5 @@ const std::shared_ptr<const PrimitiveDataType> GetInt64Type() {
 RootContext CreateRootContextWithBuiltIns() {
   return RootContext(kBuiltInSymbols, {});
 }
-}
-}
+}  // namespace ir
+}  // namespace comp

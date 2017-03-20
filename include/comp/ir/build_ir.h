@@ -1,15 +1,17 @@
 #pragma once
 
-#include "../ast.h"
-#include "basic_block.h"
-#include "context.h"
-#include "variable.h"
+#include "comp/ast.h"
+#include "comp/ir/basic_block.h"
+#include "comp/ir/context.h"
+#include "comp/ir/program.h"
+#include "comp/ir/variable.h"
 
 namespace comp {
 namespace ir {
-void BuildProgramIR(const ast::Program &node);
+std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node);
 
-void BuildFunctionIR(const ast::Function &node, Context &context);
+std::shared_ptr<FunctionSymbol> BuildFunctionIR(
+  const ast::Function &node, Context &context);
 
 // Statements
 void BuildStatementIR(
@@ -53,5 +55,5 @@ std::shared_ptr<ir::Variable> BuildIdentifierLValueIR(
   const ast::Identifier &node,
   ir::Context &context
 );
-}
-}
+}  // namespace ir
+}  // namespace comp

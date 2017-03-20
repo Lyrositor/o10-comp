@@ -1,4 +1,5 @@
 #include <comp/ir/context.h>
+
 #include <cstddef>
 
 namespace comp {
@@ -32,7 +33,7 @@ void Context::RegisterVariable(
 }
 
 void Context::RegisterFunction(
-  const std::string name, std::shared_ptr<Function> function
+  const std::string name, std::shared_ptr<FunctionSymbol> function
 ) {
   symbols_.functions[name] = function;
 }
@@ -111,7 +112,7 @@ std::shared_ptr<Variable> RootContext::ResolveVariable(
   }
 }
 
-std::shared_ptr<Function> RootContext::ResolveFunction(
+std::shared_ptr<FunctionSymbol> RootContext::ResolveFunction(
   const std::string &name
 ) const {
   auto it = symbols_.functions.find(name);
@@ -177,7 +178,7 @@ std::shared_ptr<Variable> ChildContext::ResolveVariable(const std::string &name)
   }
 }
 
-std::shared_ptr<Function> ChildContext::ResolveFunction(const std::string &name) const {
+std::shared_ptr<FunctionSymbol> ChildContext::ResolveFunction(const std::string &name) const {
   auto it = symbols_.functions.find(name);
   if (it != symbols_.functions.end()) {
     return it->second;
@@ -185,5 +186,5 @@ std::shared_ptr<Function> ChildContext::ResolveFunction(const std::string &name)
     return parent_context_.ResolveFunction(name);
   }
 }
-}
-}
+}  // namespace ir
+}  // namespace comp
