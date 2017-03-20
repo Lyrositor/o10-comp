@@ -25,6 +25,7 @@
 #include "comp/ast/program.h"
 #include "comp/ast/return_statement.h"
 #include "comp/ast/statement.h"
+#include "comp/ast/subscript_expression.h"
 #include "comp/ast/uint8_literal.h"
 #include "comp/ast/unary_expression.h"
 #include "comp/ast/variable_declaration.h"

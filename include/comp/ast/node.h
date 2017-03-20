@@ -25,6 +25,7 @@ struct Node {
     Parameter,
     Program,
     ReturnStatement,
+    SubscriptExpression,
     Uint8Literal,
     UnaryExpression,
     VariableDeclaration,

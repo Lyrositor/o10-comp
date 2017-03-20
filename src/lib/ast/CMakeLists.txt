@@ -25,6 +25,7 @@ add_library(
   program.cpp
   return_statement.cpp
   statement.cpp
+  subscript_expression.cpp
   uint8_literal.cpp
   unary_expression.cpp
   variable_declaration.cpp
