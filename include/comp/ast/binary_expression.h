@@ -5,11 +5,25 @@
 namespace comp {
 namespace ast {
 enum class BinaryOperator {
-  Addition,
-  Subtraction,
-  Division,
-  Multiplication,
-  Remainder,
+  Addition, // left + right
+  BitwiseAnd, // left & right
+  BitwiseOr, // left | right
+  BitwiseXor, // left ^ right
+  Comma, // left, right
+  Division, // left / right
+  Equality, // left == right
+  GreaterThan, // left > right
+  GreaterThanOrEqual, // left >= right
+  Inequality, // left != right
+  LeftShift, // left << right
+  LessThan, // left < right
+  LessThanOrEqualTo, // left <= right
+  LogicalAnd, // left && right
+  LogicalOr, // left || right
+  RightShift, // left >> right
+  Subtraction, // left - right
+  Multiplication, // left * right
+  Remainder, // left % right
 };
 
 /**

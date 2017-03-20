@@ -6,17 +6,17 @@
 namespace comp {
 namespace ast {
 enum class AssignmentOperator {
-  Simple,
-  Multiplication,
-  Division,
-  Remainder,
-  Addition,
-  Subtraction,
-  LeftShift,
-  RightShift,
-  And,
-  Xor,
-  Or
+  Addition, // lvalue += rvalue
+  BitwiseAnd, // lvalue &= rvalue
+  BitwiseOr, // lvalue |= rvalue
+  BitwiseXor, // lvalue ^= rvalue
+  Division, // lvalue /= rvalue
+  LeftShift, // lvalue <<= rvalue
+  Multiplication, // lvalue *= rvalue
+  Remainder, // lvalue %= rvalue
+  RightShift, // lvalue >>= rvalue
+  Simple, // lvalue = rvalue
+  Subtraction // lvalue -= rvalue
 };
 
 struct AssignmentExpression final : public RExpression {

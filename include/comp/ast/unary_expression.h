@@ -7,15 +7,16 @@
 namespace comp {
 namespace ast {
 enum class UnaryOperator {
-  PreIncrement,
-  PreDecrement,
-  PostIncrement,
-  PostDecrement,
-  Address,
-  Positive,
-  Negation,
-  Plus,
-  Not
+  Address, // &expression
+  BitwiseComplement, // ~expression
+  Indirection, // *expression
+  LogicalNegation, // !expression
+  PostfixDecrement, // expression--
+  PostfixIncrement, // expression++
+  PrefixDecrement, // --expression
+  PrefixIncrement, // ++expression
+  UnaryMinus, // -expression
+  UnaryPlus // +expression
 };
 
 struct UnaryExpression final : public RExpression {

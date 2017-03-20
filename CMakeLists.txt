@@ -33,7 +33,7 @@ set(
   src/test/ir/context.spec.cpp
   src/test/ir/data_type.spec.cpp
   src/test/ir/variable.spec.cpp
-  src/test/ast.spec.cpp
+  src/test/ast/ast.spec.cpp
   src/test/parser/parser.spec.cpp
 )
 add_executable(comp_test ${TEST_SOURCES})
