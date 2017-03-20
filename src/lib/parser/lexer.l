@@ -93,7 +93,7 @@ identifier [a-zA-Z_$][a-zA-Z_$0-9]*
   "\\r"                           {yylval->uint8 = 0x0d; return SOURCE_CHAR;}
   "\\t"                           {yylval->uint8 = 0x09; return SOURCE_CHAR;}
   "\\v"                           {yylval->uint8 = 0x0b; return SOURCE_CHAR;}
-  "\\\'"                           {yylval->uint8 = 0x27; return SOURCE_CHAR;}
+  "\\\'"                          {yylval->uint8 = 0x27; return SOURCE_CHAR;}
   "\\\""                          {yylval->uint8 = 0x22; return SOURCE_CHAR;}
   "\\?"                           {yylval->uint8 = 0x3f; return SOURCE_CHAR;}
   "\\"                            {yylval->uint8 = 0x5c; return SOURCE_CHAR;}

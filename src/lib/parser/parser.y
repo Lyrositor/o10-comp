@@ -71,6 +71,9 @@ charAtom:
   | OCTAL_ESCAPE_SEQUENCE {
     $$ = $1;
   }
+  | HEX_ESCAPE_SEQUENCE {
+      $$ = $1;
+  }
 
 expression:
   INTEGER_LITERAL {
