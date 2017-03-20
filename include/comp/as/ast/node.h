@@ -12,6 +12,7 @@ struct Node {
     CfiEndprocDirective,
     CfiStartprocDirective,
     CurrentAddress,
+    EmptyStatement,
     GlobalDirective,
     GlobalSymbol,
     ImmediateOperand,

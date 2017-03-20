@@ -4,6 +4,7 @@
 #include "comp/as/ast/cfi_endproc_directive.h"
 #include "comp/as/ast/current_address.h"
 #include "comp/as/ast/directive.h"
+#include "comp/as/ast/empty_statement.h"
 #include "comp/as/ast/expression.h"
 #include "comp/as/ast/global_directive.h"
 #include "comp/as/ast/global_symbol.h"
