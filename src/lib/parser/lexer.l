@@ -96,6 +96,6 @@ identifier [a-zA-Z_$][a-zA-Z_$0-9]*
   "\\\'"                          {yylval->uint8 = 0x27; return SOURCE_CHAR;}
   "\\\""                          {yylval->uint8 = 0x22; return SOURCE_CHAR;}
   "\\?"                           {yylval->uint8 = 0x3f; return SOURCE_CHAR;}
-  "\\"                            {yylval->uint8 = 0x5c; return SOURCE_CHAR;}
+  "\\\\"                          {yylval->uint8 = 0x5c; return SOURCE_CHAR;}
   "'"                             {BEGIN(INITIAL); return SIMPLE_QUOTE;}
 }
