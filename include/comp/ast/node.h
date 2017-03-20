@@ -9,6 +9,7 @@ namespace ast {
 struct Node {
   enum class Type {
     ArrayDataType,
+    ArrayDeclarator,
     AssignmentExpression,
     BinaryExpression,
     BlockStatement,

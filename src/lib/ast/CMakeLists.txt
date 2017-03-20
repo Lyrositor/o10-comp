@@ -1,11 +1,13 @@
 add_library(
   ast STATIC
   array_data_type.cpp
+  array_declarator.cpp
   assignment_expression.cpp
   binary_expression.cpp
   block_statement.cpp
   data_type.cpp
   declaration.cpp
+  declarator.cpp
   expression.cpp
   expression_statement.cpp
   for_statement.cpp
@@ -25,6 +27,5 @@ add_library(
   uint8_literal.cpp
   unary_expression.cpp
   variable_declaration.cpp
-  variable_declarator.cpp
   while_statement.cpp
 )

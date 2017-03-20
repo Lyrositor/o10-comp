@@ -3,10 +3,11 @@
 #include <string>
 
 #include "comp/ast/expression.h"
+#include "comp/ast/declarator.h"
 
 namespace comp {
 namespace ast {
-struct Identifier final : public LExpression, public RExpression {
+struct Identifier final : public LExpression, public RExpression, public Declarator {
   static std::unique_ptr<Identifier> Create(
     std::string name,
     std::shared_ptr<SourceLocation> location = nullptr);
