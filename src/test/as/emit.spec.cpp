@@ -11,7 +11,7 @@ TEST(comp__as__emit, DiscriminantProgram) {
   body.push_back(ast::TextDirective::Create());
   // .global main
   body.push_back(ast::GlobalDirective::Create(ast::GlobalSymbol::Create("main")));
-  //.align 16, 0x90
+  // .align 16, 0x90
   body.push_back(ast::AlignDirective::Create(ast::IntegerLiteral::Create(16), ast::IntegerLiteral::Create(0x90)));
   // .type main STT_FUNC
   body.push_back(ast::TypeDirective::Create(ast::GlobalSymbol::Create("main"), ast::TypeDescriptor::Function));
@@ -48,8 +48,16 @@ TEST(comp__as__emit, DiscriminantProgram) {
   std::shared_ptr<ast::Program> program = ast::Program::Create(body);
 
   std::stringstream expected;
-  expected << ""
-    << "/* o10 compiler */\n";
+  expected << ".text\n";
+  expected << ".global main\n";
+  expected << ".align 16, 144\n";
+  expected << ".type main CTT_FUNC\n";
+  expected << "main:\n";
+  expected << ".cfi_startproc\n";
+  expected << "movq $-23, %rax\n";
+  expected << "retq\n";
+  expected << ".size main, (. - main)\n";
+  expected << ".cfi_endproc\n";
 
   std::stringstream actual;
   emitProgram(*program, actual);
