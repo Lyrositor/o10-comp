@@ -1,4 +1,34 @@
 add_library(
   as STATIC
+  ast/align_directive.cpp
+  ast/asciz_directive.cpp
+  ast/big_integer_literal.cpp
+  ast/binary_expression.cpp
+  ast/cfi_endproc_directive.cpp
+  ast/cfi_startproc_directive.cpp
+  ast/current_address.cpp
+  ast/directive.cpp
+  ast/empty_statement.cpp
+  ast/expression.cpp
+  ast/global_directive.cpp
+  ast/global_symbol.cpp
+  ast/immediate_operand.cpp
+  ast/instruction.cpp
+  ast/integer_literal.cpp
+  ast/literal.cpp
+  ast/local_symbol.cpp
+  ast/memory_reference.cpp
+  ast/mnemonic.cpp
+  ast/node.cpp
+  ast/operand.cpp
+  ast/program.cpp
+  ast/quad_directive.cpp
+  ast/register_operand.cpp
+  ast/simple_operand.cpp
+  ast/size_directive.cpp
+  ast/statement.cpp
+  ast/symbol.cpp
+  ast/text_directive.cpp
+  ast/type_directive.cpp
   emit.cpp
-  ast/align_directive.cpp)
+)

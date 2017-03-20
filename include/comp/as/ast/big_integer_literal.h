@@ -6,7 +6,7 @@
 namespace comp {
 namespace as {
 namespace ast {
-struct BigIntegerLiteral : public Literal {
+struct BigIntegerLiteral final : public Literal {
   static std::unique_ptr<BigIntegerLiteral> Create(int64_t value);
 
   BigIntegerLiteral(int64_t value);

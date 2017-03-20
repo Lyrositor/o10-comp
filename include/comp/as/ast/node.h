@@ -10,6 +10,7 @@ struct Node {
     AlignDirective,
     AscizDirective,
     BigIntegerLiteral,
+    BinaryExpression,
     CfiEndprocDirective,
     CfiStartprocDirective,
     CurrentAddress,

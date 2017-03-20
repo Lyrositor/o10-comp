@@ -2,7 +2,7 @@
 
 namespace comp {
 namespace as {
-void emitProgram(ast::Program node, std::ostream out) {
+void emitProgram(const ast::Program &node, std::ostream &out) {
   out << "/* o10 compiler */\n";
 }
 }

@@ -6,7 +6,7 @@
 namespace comp {
 namespace as {
 namespace ast {
-struct IntegerLiteral : public Literal {
+struct IntegerLiteral final : public Literal {
   static std::unique_ptr<IntegerLiteral> Create(int32_t value);
 
   IntegerLiteral(int32_t value);

@@ -1,6 +1,7 @@
 #include "comp/as/ast/align_directive.h"
 #include "comp/as/ast/asciz_directive.h"
 #include "comp/as/ast/big_integer_literal.h"
+#include "comp/as/ast/binary_expression.h"
 #include "comp/as/ast/cfi_startproc_directive.h"
 #include "comp/as/ast/cfi_endproc_directive.h"
 #include "comp/as/ast/current_address.h"

@@ -10,6 +10,6 @@ namespace as {
  *
  * The generated assembly code will use the AT&T syntax.
  */
-void emitProgram(ast::Program node, std::ostream out);
+void emitProgram(const ast::Program &node, std::ostream &out);
 }
 }

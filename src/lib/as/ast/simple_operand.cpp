@@ -6,7 +6,7 @@ namespace ast {
 SimpleOperand::SimpleOperand(
   Type node_type
 ) :
-  Node(node_type) {
+  Operand(node_type) {
 }
 
 SimpleOperand::~SimpleOperand() {

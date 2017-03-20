@@ -8,13 +8,13 @@ namespace comp {
 namespace as {
 namespace ast {
 enum class TypeDescriptor {
-  FUNCTION,
-  INDIRECT_FUNCTION,
-  DATA_OBJECT,
-  THREAD_LOCAL_DATA_OBJECT,
-  COMMON_DATA_OBJECT,
-  NO_TYPE,
-  UNIQUE_DATA_OBJECT
+  Function,
+  IndirectFunction,
+  DataObject,
+  ThreadLocalDataObject,
+  CommonDataObject,
+  NoType,
+  UniqueDataObject
 };
 
 /**
