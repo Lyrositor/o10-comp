@@ -9,6 +9,7 @@ struct Node {
   enum class Type {
     AlignDirective,
     AscizDirective,
+    BigIntegerLiteral,
     CfiEndprocDirective,
     CfiStartprocDirective,
     CurrentAddress,
@@ -17,6 +18,7 @@ struct Node {
     GlobalSymbol,
     ImmediateOperand,
     Instruction,
+    IntegerLiteral,
     LocalSymbol,
     MemoryReference,
     Mnemonic,
