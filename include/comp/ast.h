@@ -5,6 +5,7 @@
 #include "comp/ast/assignment_expression.h"
 #include "comp/ast/binary_expression.h"
 #include "comp/ast/block_statement.h"
+#include "comp/ast/call_expression.h"
 #include "comp/ast/data_type.h"
 #include "comp/ast/declaration.h"
 #include "comp/ast/declarator.h"

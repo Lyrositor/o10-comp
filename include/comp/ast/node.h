@@ -13,6 +13,7 @@ struct Node {
     AssignmentExpression,
     BinaryExpression,
     BlockStatement,
+    CallExpression,
     ExpressionStatement,
     ForStatement,
     Function,
