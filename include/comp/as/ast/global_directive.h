@@ -11,7 +11,7 @@ namespace ast {
  * @see: https://sourceware.org/binutils/docs/as/Global.html#Global
  */
 struct GlobalDirective final : public Directive {
-  std::unique_ptr<GlobalDirective> Create(std::shared_ptr<Symbol> symbol);
+  static std::unique_ptr<GlobalDirective> Create(std::shared_ptr<Symbol> symbol);
 
   GlobalDirective(std::shared_ptr<Symbol> symbol);
 

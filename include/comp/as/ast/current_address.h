@@ -11,7 +11,7 @@ namespace ast {
  * @see: https://sourceware.org/binutils/docs/as/Dot.html#Dot
  */
 struct CurrentAddress final : public Expression {
-  std::unique_ptr<CurrentAddress> Create();
+  static std::unique_ptr<CurrentAddress> Create();
 
   CurrentAddress();
 

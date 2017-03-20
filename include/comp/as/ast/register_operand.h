@@ -8,7 +8,7 @@ namespace comp {
 namespace as {
 namespace ast {
 struct RegisterOperand final : public SimpleOperand {
-  std::unique_ptr<RegisterOperand> Create(std::string name);
+  static std::unique_ptr<RegisterOperand> Create(std::string name);
 
   RegisterOperand(std::string name);
 

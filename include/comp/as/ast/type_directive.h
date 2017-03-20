@@ -21,7 +21,7 @@ enum class TypeDescriptor {
  * @see: https://sourceware.org/binutils/docs/as/Type.html#Type
  */
 struct TypeDirective final : public Directive {
-  std::unique_ptr<TypeDirective> Create(
+  static std::unique_ptr<TypeDirective> Create(
     std::shared_ptr<Symbol> symbol,
     TypeDescriptor type_descriptor);
 

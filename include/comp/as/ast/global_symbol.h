@@ -13,7 +13,7 @@ namespace ast {
  * @see: https://sourceware.org/binutils/docs/as/Symbol-Names.html#Symbol-Names
  */
 struct GlobalSymbol final : public Symbol {
-  std::unique_ptr<GlobalSymbol> Create(std::string name);
+  static std::unique_ptr<GlobalSymbol> Create(std::string name);
 
   /**
    * @param name Name of the label

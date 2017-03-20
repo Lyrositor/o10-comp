@@ -10,7 +10,7 @@ namespace comp {
 namespace as {
 namespace ast {
 struct Instruction final : public Statement {
-  std::unique_ptr<Instruction> Create(
+  static std::unique_ptr<Instruction> Create(
       std::shared_ptr<Mnemonic> mnemonic,
       std::vector<std::shared_ptr<Operand>> operands);
 

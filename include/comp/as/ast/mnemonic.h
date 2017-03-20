@@ -8,7 +8,7 @@ namespace comp {
 namespace as {
 namespace ast {
 struct Mnemonic final : public Node {
-  std::unique_ptr<Mnemonic> Create(std::string name);
+  static std::unique_ptr<Mnemonic> Create(std::string name);
 
   Mnemonic(std::string name);
 

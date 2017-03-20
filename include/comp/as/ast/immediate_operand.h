@@ -16,7 +16,7 @@ namespace ast {
  * ```
  */
 struct ImmediateOperand final : public SimpleOperand {
-  std::unique_ptr<ImmediateOperand> Create(int64_t value);
+  static std::unique_ptr<ImmediateOperand> Create(int64_t value);
 
   ImmediateOperand(int64_t value);
 

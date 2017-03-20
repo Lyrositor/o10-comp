@@ -11,7 +11,7 @@ namespace ast {
  * @see: https://sourceware.org/binutils/docs/as/Quad.html#Quad
  */
 struct QuadDirective final : public Directive {
-  std::unique_ptr<QuadDirective> Create(std::vector<uint64_t> bignums);
+  static std::unique_ptr<QuadDirective> Create(std::vector<uint64_t> bignums);
 
   QuadDirective(std::vector<uint64_t> bignums);
 

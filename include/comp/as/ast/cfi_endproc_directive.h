@@ -10,7 +10,7 @@ namespace ast {
  * @see: https://sourceware.org/binutils/docs/as/CFI-directives.html#CFI-directives
  */
 struct CfiEndprocDirective final : public Directive {
-  std::unique_ptr<CfiEndprocDirective> Create();
+  static std::unique_ptr<CfiEndprocDirective> Create();
 
   CfiEndprocDirective();
 

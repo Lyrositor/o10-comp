@@ -12,7 +12,7 @@ namespace ast {
  * @see: https://sourceware.org/binutils/docs/as/Asciz.html#Asciz
  */
 struct AscizDirective final : public Directive {
-  std::unique_ptr<AscizDirective> Create(std::string value);
+  static std::unique_ptr<AscizDirective> Create(std::string value);
 
   AscizDirective(std::string value);
 

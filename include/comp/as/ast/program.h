@@ -9,7 +9,7 @@ namespace comp {
 namespace as {
 namespace ast {
 struct Program final : public Node {
-  std::unique_ptr<Program> Create(std::vector<std::shared_ptr<Statement>> body);
+  static std::unique_ptr<Program> Create(std::vector<std::shared_ptr<Statement>> body);
 
   Program(std::vector<std::shared_ptr<Statement>> body);
 
