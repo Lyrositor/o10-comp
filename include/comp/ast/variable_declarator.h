@@ -1,5 +1,6 @@
 #pragma once
 
+#include "comp/ast/declarator.h"
 #include "comp/ast/expression.h"
 #include "comp/ast/identifier.h"
 #include "comp/ast/node.h"

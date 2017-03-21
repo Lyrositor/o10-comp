@@ -17,6 +17,7 @@ struct Node {
     ForStatement,
     Function,
     Identifier,
+    IdentifierDeclarator,
     IfStatement,
     Int64Literal,
     LiteralDataType,

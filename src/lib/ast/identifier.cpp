@@ -14,7 +14,6 @@ Identifier::Identifier(
 ) :
   LExpression(Type::Identifier, location),
   RExpression(Type::Identifier, location),
-  Declarator(Type::Identifier, location),
   name(name) {
 }
 

@@ -13,6 +13,7 @@ add_library(
   for_statement.cpp
   function.cpp
   identifier.cpp
+  identifier_declarator.cpp
   if_statement.cpp
   int64_literal.cpp
   literal.cpp

@@ -13,6 +13,7 @@
 #include "comp/ast/for_statement.h"
 #include "comp/ast/function.h"
 #include "comp/ast/identifier.h"
+#include "comp/ast/identifier_declarator.h"
 #include "comp/ast/if_statement.h"
 #include "comp/ast/int64_literal.h"
 #include "comp/ast/literal.h"
