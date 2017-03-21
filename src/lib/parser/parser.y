@@ -31,12 +31,14 @@ void yy_scan_string(const char *str);
  comp::ast::Datatype *datatype;
  comp::ast::VarDecAffLitteral *varDecAffLitteral;
  comp::ast::SuiteDecAffLitteral *suiteDecAffLitteral;
- comp::ast::Datatype *datatype;
- comp::ast::Datatype *datatype;
+ comp::ast::UnaryOperator *unaryOperator;
+ comp::ast::UnaryExpression *unaryExpression;
  std::vector<comp::ast::Declaration> *declarationsList;
 }
 
 %token ADDITION_OPERATOR SUBTRACTION_OPERATOR MULTIPLICATION_OPERATOR DIVISION_OPERATOR REMAINDER_OPERATOR
+%token EQUAL_OPERATOR GREATERTHAN_OPERATOR GREATERTHANOREQUAL_OPERATOR LESSERTHAN_OPERATOR LESSERTHANOREQUAL_OPERATOR
+%token EQUALEQUAL_OPERATOR LOGICALAND_OPERATOR LOGICALOR_OPERATOR LOGICALNOT_OPERATOR XOR_OPERATOR
 %token <i> INTEGER_LITERAL
 %type <e> expression
 %type <e> root
@@ -44,6 +46,8 @@ void yy_scan_string(const char *str);
 %type <function> function
 %type <identifier> identifier
 %type <declarationsList> declarationsList
+%type <unaryOperator> unaryOperator
+%type <unaryExpression> unaryExpression
 
 %left SUBTRACTION_OPERATOR ADDITION_OPERATOR
 %left MULTIPLICATION_OPERATOR DIVISION_OPERATOR
@@ -81,8 +85,8 @@ declarationsList:
 
 datatype:
     identifier{
-        std::shared_ptr<std::vector<comp::ast::Identifier> name($1);
-        $$ = new comp::ast::Datatype(name);
+        std::shared_ptr<std::vector<comp::ast::Identifier> type($1);
+        $$ = new comp::ast::DataType(type);
     }
 
 /* Déclaration, affectation de variables */
@@ -123,8 +127,8 @@ varDecAff:
 
 suiteDecAff:
     varIdentifierTabLiteral {
-        std::shared_ptr<comp::ast::VarDecAffLitteral> var($1);
-        $$ = new comp::ast::VariableDeclarator(var);
+        std::shared_ptr<comp::ast::Identifier> identifier($1);
+        $$ = new comp::ast::VariableDeclarator(identifier);
     }
     | identifier "=" expr {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
@@ -141,38 +145,46 @@ varAff:
 
 varUpdate:
     varIdentifier "++" {
-
+        std::shared_ptr<comp::ast::Identifier> identifier($1);
+        std::shared_ptr<comp::ast::UnaryOperator> operator($2);
+        $$ = new comp::ast::UnaryExpression(identifier, operator);
     }
     | varIdentifier "--" {
-
+        std::shared_ptr<comp::ast::Identifier> identifier($1);
+        std::shared_ptr<comp::ast::UnaryOperator> operator($2);
+        $$ = new comp::ast::UnaryExpression(identifier, operator);
     }
     | "++" varIdentifier {
-
+        std::shared_ptr<comp::ast::UnaryOperator> operator($1);
+        std::shared_ptr<comp::ast::Identifier> identifier($2);
+        $$ = new comp::ast::UnaryExpression(identifier, operator);
     }
     | "--" varIdentifier{
-
+        std::shared_ptr<comp::ast::UnaryOperator> operator($1);
+        std::shared_ptr<comp::ast::Identifier> identifier($2);
+        $$ = new comp::ast::UnaryExpression(identifier, operator);
     }
 
 varIdentifier:
     identifier {
         std::shared_ptr<std::vector<comp::ast::Identifier> identifier($1);
-        $$ = new comp::ast::Datatype(identifier, expression);
+        $$ = new comp::ast::DataType(identifier);
     }
     | identifier "[" expr "]"{
         std::shared_ptr<std::vector<comp::ast::Identifier> identifier($1);
         std::shared_ptr<std::vector<comp::ast::Expression> expression($3);
-        $$ = new comp::ast::Datatype(identifier, expression);
+        $$ = new comp::ast::DataType(identifier, expression);
     }
 
 varIdentifierTabLiteral:
     identifier{
         std::shared_ptr<std::vector<comp::ast::Identifier> identifier($1);
-        $$ = new comp::ast::Datatype(identifier);
+        $$ = new comp::ast::DataType(identifier);
     }
     | identifier "[" intLiteral "]"{
         std::shared_ptr<std::vector<comp::ast::Identifier> identifier($1);
         std::shared_ptr<std::vector<comp::ast::Expression> expression($3);
-        $$ = new comp::ast::Datatype(identifier, expression);
+        $$ = new comp::ast::DataType(identifier, expression);
     }
 
 /* instructions */
@@ -273,18 +285,22 @@ paramsDec:
 
 nonEmptyDecParametersList:
     nonEmptyDecParametersList "," paramsDec {
-
+        std::shared_ptr<comp::ast::DataType> paramsList($1);
+        std::shared_ptr<comp::ast::DataType> paramsDec($3);
+        $$ = new comp::ast::Parameter(paramsList, paramsDec);
     }
     | paramsDec {
-
+        std::shared_ptr<comp::ast::DataType> paramsDec($1);
+        $$ = new comp::ast::Parameter(paramsDec);
     }
 
 decParametersList:
     nonEmptyDecParametersList{
-
+        std::shared_ptr<comp::ast::DataType> paramsDec($1);
+        $$ = new comp::ast::Parameter(paramsDec);
     }
     | {
-
+        $$ = new comp::ast::Parameter();
     }
 
 paramsDef:
@@ -348,38 +364,252 @@ LiteralExpr:
         $$ = new comp::ast::Expression(char);
     }
 
-expression:
-      LITTERAL_EXPRESSION {
-        $$ = new comp::ast::Int64Literal($1, nullptr);
-      }
+exprOrVoid:
+    expr{
+        std::shared_ptr<comp::ast::Expression> expr($1);
+        $$ = new comp::ast::Expression(expr);
+    }
+    | {
+        $$ = new comp::ast::Expression();
+    }
 
-      INTEGER_LITERAL {
+expression:
+    expr op expr{
+        std::shared_ptr<comp::ast::Expression> expr1($1);
+        std::shared_ptr<comp::ast::BinaryOperator> op($2);
+        std::shared_ptr<comp::ast::Expression> expr2($3);
+        $$ = new comp::ast::BinaryExpression(op, expr1, expr2);
+    }
+    | LiteralExpr {
+        std::shared_ptr<comp::ast::LiteralExpr> expr($1);
+        $$ = new comp::ast::Expression(expr);
+    }
+    | varAff {
+        std::shared_ptr<comp::ast::varAff> var($1);
+        $$ = new comp::ast::Expression(var);
+    }
+    | varUpdate {
+        std::shared_ptr<comp::ast::varUpdate> var($1);
+        $$ = new comp::ast::Expression(var);
+    }
+    | varIdentifier {
+        std::shared_ptr<comp::ast::varIdentifier> var($1);
+        $$ = new comp::ast::Expression(var);
+    }
+    | "(" expr ")" {
+        std::shared_ptr<comp::ast::Expression> expr($2);
+        $$ = new comp::ast::Expression(expr);
+    }
+    | "-" expr {
+        std::shared_ptr<comp::ast::UnaryOperator> op($1);
+        std::shared_ptr<comp::ast::Expression> expr($2);
+        $$ = new comp::ast::UnaryExpression(op, expr);
+    }
+    | "+" expr {
+        std::shared_ptr<comp::ast::UnaryOperator> op($1);
+        std::shared_ptr<comp::ast::Expression> expr($2);
+        $$ = new comp::ast::UnaryExpression(op, expr);
+    }
+    | "!" expr {
+        std::shared_ptr<comp::ast::UnaryOperator> op($1);
+        std::shared_ptr<comp::ast::Expression> expr($2);
+        $$ = new comp::ast::UnaryExpression(op, expr);
+    }
+    | "~" expr {
+        std::shared_ptr<comp::ast::UnaryOperator> op($1);
+        std::shared_ptr<comp::ast::Expression> expr($2);
+        $$ = new comp::ast::UnaryExpression(op, expr);
+    }
+    | identifier "(" insideList ")" {
+        std::shared_ptr<comp::ast::Identifier> identifier($1);
+        std::shared_ptr<comp::ast::Expression> expr($3);
+        $$ = new comp::ast::Expression(identifier, expr);
+    }
+    | identifier "(" ")" {
+        std::shared_ptr<comp::ast::Identifier> identifier($1);
+        $$ = new comp::ast::Expression(identifier);
+    }
+    | LITTERAL_EXPRESSION {
+        $$ = new comp::ast::Int64Literal($1, nullptr);
+    }
+    | INTEGER_LITERAL {
         $$ = new comp::ast::Int64Literal($1, nullptr);
       }
-      | expression ADDITION_OPERATOR expression {
+    | expression ADDITION_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Addition, left, right, nullptr);
+    }
+    | expression SUBTRACTION_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Subtraction, left, right, nullptr);
+    }
+    | expression MULTIPLICATION_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Multiplication, left, right, nullptr);
+    }
+    | expression DIVISION_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Division, left, right, nullptr);
+    }
+    | expression REMAINDER_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Remainder, left, right, nullptr);
+    }
+    | expression EQUALITY_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Equality, left, right, nullptr);
+    }
+    | expression INEQUALITY_OPERATOR expression {
         std::shared_ptr<comp::ast::Expression> left($1);
         std::shared_ptr<comp::ast::Expression> right($3);
-        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Addition, left, right, nullptr);
-      }
-      | expression SUBTRACTION_OPERATOR expression {
+        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Inequality, left, right, nullptr);
+    }
+    | expression IDENTITY_OPERATOR expression {
         std::shared_ptr<comp::ast::Expression> left($1);
         std::shared_ptr<comp::ast::Expression> right($3);
-        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Subtraction, left, right, nullptr);
-      }
-      | expression MULTIPLICATION_OPERATOR expression {
+        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Identity, left, right, nullptr);
+    }
+    | expression NONIDENTITY_OPERATOR expression {
         std::shared_ptr<comp::ast::Expression> left($1);
         std::shared_ptr<comp::ast::Expression> right($3);
-        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Multiplication, left, right, nullptr);
-      }
-      | expression DIVISION_OPERATOR expression {
+        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Nonidentity, left, right, nullptr);
+    }
+    | expression COMMA_OPERATOR expression {
         std::shared_ptr<comp::ast::Expression> left($1);
         std::shared_ptr<comp::ast::Expression> right($3);
-        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Division, left, right, nullptr);
-      }
-      | expression REMAINDER_OPERATOR expression {
+        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Comma, left, right, nullptr);
+    }
+    | expression GREATERTHAN_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Greaterthan, left, right, nullptr);
+    }
+    | expression GREATERTHANOREQUAL_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Greaterthanorequal, left, right, nullptr);
+    }
+    | expression LESSERTHAN_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Lesserthan, left, right, nullptr);
+    }
+    | expression LESSERTHANOREQUAL_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Lesserthanorequal, left, right, nullptr);
+    }
+    | expression LOGICALAND_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Logicaland, left, right, nullptr);
+    }
+    | expression LOGICALOR_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Logicalor, left, right, nullptr);
+    }
+    | expression XOR_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Xor, left, right, nullptr);
+    }
+    | expression ADDITIONASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Additionassignment, left, right, nullptr);
+    }
+    | expression SUBSTRACTIONASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Substractionassignment, left, right, nullptr);
+    }
+    | expression MULTIPLICATIONASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Multiplicationassignment, left, right, nullptr);
+    }
+    | expression DIVISIONASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Divisionassignment, left, right, nullptr);
+    }
+    | expression REMAINDREASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Remainderassignment, left, right, nullptr);
+    }
+    | expression EXPONENTIATIONASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Exponentiationassignment, left, right, nullptr);
+    }
+    | expression LEFTSHIFTASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Leftshiftassignment, left, right, nullptr);
+    }
+    | expression RIGHTSHIFTASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Rightshiftassignment, left, right, nullptr);
+    }
+    | expression BITWISEANDASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Bitwiseandassignment, left, right, nullptr);
+    }
+    | expression BITWISEXORASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Bitwisexorassignment, left, right, nullptr);
+    }
+    | expression BITWISEORASSIGNMENT_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      std::shared_ptr<comp::ast::Expression> right($3);
+      $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Bitwiseornassignment, left, right, nullptr);
+    }
+    | expression EXPONENTIATION_OPERATOR expression {
         std::shared_ptr<comp::ast::Expression> left($1);
         std::shared_ptr<comp::ast::Expression> right($3);
-        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Remainder, left, right, nullptr);
-      }
+        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Exponentiation, left, right, nullptr);
+    }
+    | expression LEFTSHIFT_OPERATOR expression {
+        std::shared_ptr<comp::ast::Expression> left($1);
+        std::shared_ptr<comp::ast::Expression> right($3);
+        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Leftshift, left, right, nullptr);
+    }
+    | expression RIGHTSHIFT_OPERATOR expression {
+        std::shared_ptr<comp::ast::Expression> left($1);
+        std::shared_ptr<comp::ast::Expression> right($3);
+        $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Rightshift, left, right, nullptr);
+    }
+    /*
+    | expression LOGICALNOT_OPERATOR {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Greaterthan, left, nullptr);
+    }
+    | expression INCREMENT_OPERATOR {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Increment, left, nullptr);
+    }
+    | expression DECREMENT_OPERATOR {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Decrement, left, nullptr);
+    }
+    | UNARYNEGATION_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Unarynegation, left, nullptr);
+    }
+    | UNARYPLUS_OPERATOR expression {
+      std::shared_ptr<comp::ast::Expression> left($1);
+      $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Unaryplus, left, nullptr);
+    }
 
 %%
