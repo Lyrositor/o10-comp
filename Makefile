@@ -4,6 +4,7 @@ default: build
 
 prepare:
 	rm -rf vendor/googletest && git clone https://github.com/google/googletest.git vendor/googletest
+	rm -rf vendor/rapidjson && git clone https://github.com/miloyip/rapidjson.git vendor/rapidjson
 
 clean:
 	cd build && make clean

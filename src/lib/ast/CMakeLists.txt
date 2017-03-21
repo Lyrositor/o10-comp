@@ -27,6 +27,7 @@ add_library(
   return_statement.cpp
   statement.cpp
   subscript_expression.cpp
+  to_json.cpp
   uint8_literal.cpp
   unary_expression.cpp
   variable_declaration.cpp

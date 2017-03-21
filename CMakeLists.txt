@@ -12,8 +12,7 @@ endif ()
 set(CMAKE_SOURCE_DIR src)
 
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR} include "vendor/rapidjson/include")
 add_subdirectory(src/lib)
 
 set(
@@ -35,6 +34,7 @@ set(
   src/test/ir/data_type.spec.cpp
   src/test/ir/variable.spec.cpp
   src/test/ast/ast.spec.cpp
+  src/test/ast/to_json.spec.cpp
   src/test/parser/parser.spec.cpp
 )
 add_executable(comp_test ${TEST_SOURCES})
