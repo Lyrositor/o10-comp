@@ -8,6 +8,7 @@
 - break and continue are not implemented
 - we should use a number/constant to make a global affectation (e.g int a = 3 works but int a = 3 + 3 doesn't )
 - The %-alternate forms are not implemented (<% %: ...)
+- multidimensional arrays
 - 3 types, no operator overloading, struct, typeof ...
 
 
