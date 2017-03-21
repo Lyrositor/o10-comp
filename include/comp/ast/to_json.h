@@ -6,37 +6,37 @@
 
 namespace comp {
 namespace ast {
-std::unique_ptr<rapidjson::Document> ArrayDataTypeToJson(const ArrayDataType &node);
-std::unique_ptr<rapidjson::Document> ArrayDeclaratorToJson(const ArrayDeclarator &node);
-std::unique_ptr<rapidjson::Document> AssignmentExpressionToJson(const AssignmentExpression &node);
-std::unique_ptr<rapidjson::Document> BinaryExpressionToJson(const BinaryExpression &node);
-std::unique_ptr<rapidjson::Document> BlockStatementToJson(const BlockStatement &node);
-std::unique_ptr<rapidjson::Document> CallExpressionToJson(const CallExpression &node);
-std::unique_ptr<rapidjson::Document> DataTypeToJson(const DataType &node);
-std::unique_ptr<rapidjson::Document> DeclarationToJson(const Declaration &node);
-std::unique_ptr<rapidjson::Document> ExpressionStatementToJson(const ExpressionStatement &node);
-std::unique_ptr<rapidjson::Document> ForStatementToJson(const ForStatement &node);
-std::unique_ptr<rapidjson::Document> FunctionToJson(const Function &node);
-std::unique_ptr<rapidjson::Document> IdentifierToJson(const Identifier &node);
-std::unique_ptr<rapidjson::Document> IdentifierDeclaratorToJson(const IdentifierDeclarator &node);
-std::unique_ptr<rapidjson::Document> IfStatementToJson(const IfStatement &node);
-std::unique_ptr<rapidjson::Document> Int64LiteralToJson(const Int64Literal &node);
-std::unique_ptr<rapidjson::Document> LExpressionToJson(const LExpression &node);
-std::unique_ptr<rapidjson::Document> LiteralToJson(const Literal &node);
-std::unique_ptr<rapidjson::Document> LiteralDataTypeToJson(const LiteralDataType &node);
-std::unique_ptr<rapidjson::Document> NodeToJson(const Node &node);
-std::unique_ptr<rapidjson::Document> NullStatementToJson(const NullStatement &node);
-std::unique_ptr<rapidjson::Document> ParameterToJson(const Parameter &node);
-std::unique_ptr<rapidjson::Document> PositionToJson(const Position &node);
+std::unique_ptr<rapidjson::Value> ArrayDataTypeToJson(const ArrayDataType &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ArrayDeclaratorToJson(const ArrayDeclarator &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> AssignmentExpressionToJson(const AssignmentExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> BinaryExpressionToJson(const BinaryExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> BlockStatementToJson(const BlockStatement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> CallExpressionToJson(const CallExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> DataTypeToJson(const DataType &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> DeclarationToJson(const Declaration &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ExpressionStatementToJson(const ExpressionStatement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ForStatementToJson(const ForStatement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> FunctionToJson(const Function &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> IdentifierToJson(const Identifier &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> IdentifierDeclaratorToJson(const IdentifierDeclarator &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> IfStatementToJson(const IfStatement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> Int64LiteralToJson(const Int64Literal &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> LExpressionToJson(const LExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> LiteralToJson(const Literal &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> LiteralDataTypeToJson(const LiteralDataType &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> NullStatementToJson(const NullStatement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ParameterToJson(const Parameter &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> PositionToJson(const Position &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Document> ProgramToJson(const Program &node);
-std::unique_ptr<rapidjson::Document> RExpressionToJson(const RExpression &node);
-std::unique_ptr<rapidjson::Document> ReturnStatementToJson(const ReturnStatement &node);
-std::unique_ptr<rapidjson::Document> StatementToJson(const Statement &node);
-std::unique_ptr<rapidjson::Document> SubscriptExpressionToJson(const SubscriptExpression &node);
-std::unique_ptr<rapidjson::Document> Uint8LiteralToJson(const Uint8Literal &node);
-std::unique_ptr<rapidjson::Document> UnaryExpressionToJson(const UnaryExpression &node);
-std::unique_ptr<rapidjson::Document> VariableDeclarationToJson(const VariableDeclaration &node);
-std::unique_ptr<rapidjson::Document> VariableDeclaratorToJson(const VariableDeclarator &node);
-std::unique_ptr<rapidjson::Document> WhileStatementToJson(const WhileStatement &node);
+std::unique_ptr<rapidjson::Value> RExpressionToJson(const RExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ReturnStatementToJson(const ReturnStatement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> StatementToJson(const Statement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> SubscriptExpressionToJson(const SubscriptExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> Uint8LiteralToJson(const Uint8Literal &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> UnaryExpressionToJson(const UnaryExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> VariableDeclarationToJson(const VariableDeclaration &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> VariableDeclaratorToJson(const VariableDeclarator &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> WhileStatementToJson(const WhileStatement &node, rapidjson::Document::AllocatorType &allocator);
 }  // namespace ast
 }  // namespace comp
