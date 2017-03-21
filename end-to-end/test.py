@@ -6,6 +6,8 @@
 import json
 import os
 import subprocess
+import sys
+
 
 END_TO_END_ROOT = os.path.dirname(os.path.realpath(__file__))
 CONFIG_FILE = "test.json"
@@ -30,28 +32,31 @@ for test_dir_name in os.listdir(END_TO_END_ROOT):
         config_data = json.loads(config_json)
 
         source_path = config_data["source"]
+        should_error = "error" in config_data and config_data["error"]
+
         abs_source_path = os.path.join(test_dir_path, source_path)
 
         if abs_source_path not in files:
             raise Exception("File not found: {}".format(abs_source_path))
 
-        # Run gcc
-        for optimization_level in range(0, 3 + 1):
-            subprocess.call([
-                GCC_PATH,
-                "-S",
-                "-O{}".format(optimization_level),
-                "-o", "{}.gcc-{}.a".format(abs_source_path, optimization_level),
-                abs_source_path
-            ])
+        for compiler_path in [GCC_PATH, CLANG_PATH]:
+            for optimization_level in range(0, 3 + 1):
+                arguments = [
+                    compiler_path,
+                    "-S",
+                    "-O{}".format(optimization_level),
+                    "-o", "{}.gcc-{}.a".format(abs_source_path, optimization_level)
+                ]
+                if compiler_path == CLANG_PATH:
+                    arguments += ["-Wno-main-return-type"]
+                arguments += [abs_source_path]
 
-        # Run clang
-        for optimization_level in range(0, 3 + 1):
-            subprocess.call([
-                CLANG_PATH,
-                "-S",
-                "-O{}".format(optimization_level),
-                "-o", "{}.clang-{}.a".format(abs_source_path, optimization_level),
-                "-Wno-main-return-type",
-                abs_source_path
-            ])
+                completed_process = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+                if should_error:
+                    if completed_process.returncode == 0:
+                        sys.stderr.buffer.write(completed_process.stdout)
+                        raise Exception("Expected non-zero return code")
+                elif completed_process.returncode != 0:
+                    sys.stderr.buffer.write(completed_process.stdout)
+                    raise Exception("Expected zero return code")
