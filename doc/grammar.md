@@ -35,15 +35,18 @@ Moreover, comments are treated as a white-space characters:
 ## declarationsList
 [declarationsList]: #declarationslist
 
-- _[declarationsList]_ _[fctDec]_
-- _[declarationsList]_ _[varDecAffLitteral]_ `;`
-- _[declarationsList]_ _[fctDef]_
+- _[declarationsList]_ _[fonctionDeclaration]_
+- _[declarationsList]_ _[variableDeclarationOrAffectationLitteral]_ `;`
+- _[declarationsList]_ _[functionDefinition]_
 - ε
 
-## fctDec
-[fctDec]: #fctdec
+## fonctionDeclaration
+[fonctionDeclaration]: #fonctionDeclaration
 
-- _[dataType]_ _[identifier]_ `(` _[decParametersList]_ `)` `;`
+- _[dataType]_ _[identifier]_ `(` _[declarationParametersList]_ `)` `;`
+
+DataType = ArrayDataType | LiteralDataType
+ArrayDataType = DataType "[" IntegerLiteral "]"
 
 ## dataType
 [dataType]: #datatype
@@ -57,67 +60,67 @@ Moreover, comments are treated as a white-space characters:
 
 - `[a-zA-Z_$][a-zA-Z_$0-9]*`
 
-## decParametersList
-[decParametersList]: #decparameterslist
+## declarationParametersList
+[declarationParametersList]: #declarationParametersList
 
-- _[nonEmptyDecParametersList]_
+- _[nonEmptyDeclarationParametersList]_
 - ε
 
-## nonEmptyDecParametersList
-[nonEmptyDecParametersList]: #nonemptydecparameterslist
+## nonEmptyDeclarationParametersList
+[nonEmptyDeclarationParametersList]: #nonEmptyDeclarationParametersList
 
-- _[nonEmptyDecParametersList]_ `,` _[paramsDec]_
-- _[paramsDec]_
+- _[nonEmptyDeclarationParametersList]_ `,` _[declarationParameters]_
+- _[declarationParameters]_
 
-## paramsDec
-[paramsDec]: #paramsdec
+## declarationParameters
+[declarationParameters]: #declarationParameters
 
-- _[paramsDef]_
+- _[definitionParameters]_
 - _[dataType]_
 - _[dataType]_  `[` `]`
 
-## paramsDef
-[paramsDef]: #paramsdef
+## definitionParameters
+[definitionParameters]: #definitionParameters
 
 - _[dataType]_ _[identifier]_
 - _[dataType]_ _[identifier]_ `[` `]`
 
-## varDecAffLitteral
-[varDecAffLitteral]: #vardecafflitteral
+## variableDeclarationOrAffectationLitteral
+[variableDeclarationOrAffectationLitteral]: #variableDeclarationOrAffectationLitteral
 
-- _[varDecAffLitteral]_ `,` _[suiteDecAffLitteral]_
-- _[dataType]_ _[suiteDecAffLitteral]_
+- _[variableDeclarationOrAffectationLitteral]_ `,` _[restOfVarDecAffLitteral]_
+- _[dataType]_ _[restOfVarDecAffLitteral]_
 
-## suiteDecAffLitteral
-[suiteDecAffLitteral]: #suitedecafflitteral
+## restOfVarDecAffLitteral
+[restOfVarDecAffLitteral]: #restOfVarDecAffLitteral
 
-- _[varIdentifierTabLiteral]_
-- _[identifier]_ `=` _[literalExpr]_
+- _[variableIdentifierArrayLiteral]_
+- _[identifier]_ `=` _[LiteralExpression]_
 
-## varIdentifierTabLiteral
-[varIdentifierTabLiteral]: #varidentifiertabliteral
+## variableIdentifierArrayLiteral
+[variableIdentifierArrayLiteral]: #variableIdentifierArrayLiteral
 
 - _[identifier]_
-- _[identifier]_ `[` _[intLiteral]_ `]`
+- _[identifier]_ `[` _[integerLiteral]_ `]`
 
-## intLiteral
-[intLiteral]: #intliteral
+## integerLiteral
+[integerLiteral]: #integerLiteral
 
 - `[0-9]+`
 
-## LiteralExpr
-[LiteralExpr]: #literalexpr
+## LiteralExpression
+[LiteralExpression]: #LiteralExpression
 
-- _[intLiteral]_
+- _[integerLiteral]_
 - _[charLiteral]_
 
 ## charLiteral
 [charLiteral]: #charliteral
 
--  `'` _[charAtom]_ `'`
+-  `'` _[atomicChar]_ `'`
 
-## charAtom
-[charAtom]: #charatom
+## atomicChar
+[atomicChar]: #atomicChar
 
 - _[sourceChar]_
 - <code>&#92;</code> _[escapeSequence]_
@@ -150,22 +153,22 @@ Moreover, comments are treated as a white-space characters:
 
 - `[abfnrtv\\'"?]`
 
-## fctDef
-[fctDef]: #fctdef
+## functionDefinition
+[functionDefinition]: #functionDefinition
 
-- _[dataType]_ _[identifier]_ `(` _[defParametersList]_ `)` _[bloc]_
+- _[dataType]_ _[identifier]_ `(` _[definitionParametersList]_ `)` _[bloc]_
 
-## defParametersList
-[defParametersList]: #defparameterslist
+## definitionParametersList
+[definitionParametersList]: #definitionParametersList
 
-- _[nonEmptyDefParametersList]_
+- _[nonEmptyDefinitionParametersList]_
 - ε
 
-## nonEmptyDefParametersList
-[nonEmptyDefParametersList]: #nonemptydefparameterslist
+## nonEmptyDefinitionParametersList
+[nonEmptyDefinitionParametersList]: #nonEmptyDefinitionParametersList
 
-- _[nonEmptyDefParametersList]_ `,` _[paramsDef]_
-- _[paramsDef]_
+- _[nonEmptyDefinitionParametersList]_ `,` _[definitionParameters]_
+- _[definitionParameters]_
 
 ## bloc
 [bloc]: #bloc
@@ -175,48 +178,48 @@ Moreover, comments are treated as a white-space characters:
 ## insideBloc
 [insideBloc]: #insidebloc
 
-- _[insideBloc]_ _[varDecAff]_ `;`
+- _[insideBloc]_ _[variableDeclarationOrAffectation]_ `;`
 - _[insideBloc]_ _[return]_
-- _[insideBloc]_ _[instr]_
+- _[insideBloc]_ _[instruction]_
 - ε
 
-## varDecAff
-[varDecAff]: #vardecaff
+## variableDeclarationOrAffectation
+[variableDeclarationOrAffectation]: #variableDeclarationOrAffectation
 
-- _[varDecAff]_ `,` _[suiteDecAff]_
-- _[dataType]_ _[suiteDecAff]_
+- _[variableDeclarationOrAffectation]_ `,` _[restOfVarDecAff]_
+- _[dataType]_ _[restOfVarDecAff]_
 
-## suiteDecAff
-[suiteDecAff]: #suitedecaff
+## restOfVarDecAff
+[restOfVarDecAff]: #restOfVarDecAff
 
-- _[varIdentifierTabLiteral]_
-- _[identifier]_ `=` _[expr]_
+- _[variableIdentifierArrayLiteral]_
+- _[identifier]_ `=` _[expression]_
 
 
 ## return
 [return]: #return
 
-- `return` _[exprOrVoid]_ `;`
+- `return` _[expressionOrVoid]_ `;`
 
-## exprOrVoid
-[exprOrVoid]: #exprorvoid
+## expressionOrVoid
+[expressionOrVoid]: #expressionOrVoid
 
-- _[expr]_
+- _[expression]_
 - ε 
 
-## expr
-[expr]: #expr
+## expression
+[expression]: #expression
 
-- _[expr]_ _[OP]_ _[expr]_
-- _[LiteralExpr]_
-- _[varAff]_
+- _[expression]_ _[OP]_ _[expression]_
+- _[LiteralExpression]_
+- _[variableAffectation]_
 - _[varUpdate]_
 - _[varIdentifier]_
-- `(` _[expr]_ `)`
-- `-` _[expr]_
-- `+` _[expr]_
-- `!` _[expr]_
-- `~` _[expr]_
+- `(` _[expression]_ `)`
+- `-` _[expression]_
+- `+` _[expression]_
+- `!` _[expression]_
+- `~` _[expression]_
 - _[functionCall]_
 - _[identifier]_ `(` `)`
 
@@ -254,17 +257,17 @@ Moreover, comments are treated as a white-space characters:
 - `&&`
 - `,`
 
-## varAff
-[varAff]: #varaff
+## variableAffectation
+[variableAffectation]: #variableAffectation
 
-- _[varIdentifier]_ `=` expr]_
+- _[varIdentifier]_ `=` expression]_
 
 ## varIdentifier
 [varIdentifier]: #varidentifier
 
 - _[identifier]_
-- _[identifier]_ `[` _[expr]_ `]`
-- _[functionCall]_ `[` _[expr]_ `]`
+- _[identifier]_ `[` _[expression]_ `]`
+- _[functionCall]_ `[` _[expression]_ `]`
 
 ## varUpdate
 [varUpdate]: #varupdate
@@ -288,13 +291,13 @@ Moreover, comments are treated as a white-space characters:
 ## functionCallParams
 [functionCallParams]: #functioncallparams
 
-- _[functionCallParams]_ `,` _[expr]_
-- _[expr]_
+- _[functionCallParams]_ `,` _[expression]_
+- _[expression]_
 
-## instr
-[instr]: #instr
+## instruction
+[instruction]: #instruction
 
-- _[expr]_ `;`
+- _[expression]_ `;`
 - _[bloc]_
 - _[if]_
 - _[while]_
@@ -304,18 +307,18 @@ Moreover, comments are treated as a white-space characters:
 ## if
 [if]: #if
 
-- `if` `(` _[expr]_ `)` _[instr]_  `else` _[instr]_
-- `if` `(` _[expr]_ `)` _[instr]_
+- `if` `(` _[expression]_ `)` _[instruction]_  `else` _[instruction]_
+- `if` `(` _[expression]_ `)` _[instruction]_
 
 ## while
 [while]: #while
 
-- `while` `(` _[expr]_ `)` _[instr]_
+- `while` `(` _[expression]_ `)` _[instruction]_
 
 ## for
 [for]: #for
 
-- `for` `(`  _[exprOrVoid]_ `;` _[exprOrVoid]_  `;` _[exprOrVoid]_ `)` _[instr]_
+- `for` `(`  _[expressionOrVoid]_ `;` _[expressionOrVoid]_  `;` _[expressionOrVoid]_ `)` _[instruction]_
 
 
 
