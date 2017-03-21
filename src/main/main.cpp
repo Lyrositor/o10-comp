@@ -1,8 +1,8 @@
 #include <comp/parser.h>
 #include <iostream>
 #include <comp/eval.h>
-
-
+#include <cerrno>
+#include <cstring>
 #include <string>
 #include <fstream>
 
