@@ -2,10 +2,137 @@
 
 [C99 Specification](http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1124.pdf)
 
+## Choices of conception :
+
+- trigraphs are not implemented
+- break and continue are not implemented
+- we should use a number/constant to make a global affectation (e.g int a = 3 works but int a = 3 + 3 doesn't )
+- The %-alternate forms are not matched (<% %: ...)
+
+## white-space characters
+
+Each keyword should be separated by at least one white-space character.
+
+White-space characters are the following : 
+- `space (' ')`
+- `form feed ('\f')`
+- `new-line ('\n')`
+- `carriage return ('\r')`
+- `horizontal tab ('\t')`
+- `vertical tab ('\v')`
+
+Moreover, comments are treated as a white-space characters:
+
+- `\/\*.*\*\/`
+- `\/\/[^\n]+`
+- `(^|\n)#[^\n]+`
+
+## Program
+[Program]: #program
+
+- _[declarationsList]_
+
+## declarationsList
+[declarationsList]: #declarationslist
+
+- _[declarationsList]_ _[fctDec]_
+- _[declarationsList]_ _[varDecAffLitteral]_ `;`
+- _[declarationsList]_ _[fctDef]_
+- ε
+
+## fctDec
+[fctDec]: #fctdec
+
+- _[dataType]_ _[identifier]_ `(` _[decParametersList]_ `)` `;`
+
+## dataType
+[dataType]: #datatype
+
+- `int32_t`
+- `int64_t`
+- `char`
+
+## identifier
+[identifier]: #identifier
+
+- `[a-zA-Z_$][a-zA-Z_$0-9]*`
+
+## decParametersList
+[decParametersList]: #decparameterslist
+
+- _[nonEmptyDecParametersList]_
+- ε
+
+## nonEmptyDecParametersList
+[nonEmptyDecParametersList]: #nonemptydecparameterslist
+
+- _[nonEmptyDecParametersList]_ `,` _[paramsDec]_
+- _[paramsDec]_
+
+## paramsDec
+[paramsDec]: #paramsdec
+
+- _[paramsDef]_
+- _[dataType]_
+- _[dataType]_  `[` `]`
+
+## paramsDef
+[paramsDef]: #paramsdef
+
+- _[dataType]_ _[identifier]_
+- _[dataType]_ _[identifier]_ `[` `]`
+
+## varDecAffLitteral
+[varDecAffLitteral]: #vardecafflitteral
+
+- _[varDecAffLitteral]_ `,` _[suiteDecAffLitteral]_
+- _[dataType]_ _[suiteDecAffLitteral]_
+
+## suiteDecAffLitteral
+[suiteDecAffLitteral]: #suitedecafflitteral
+
+- _[varIdentifierTabLiteral]_
+- _[identifier]_ `=` _[literalExpr]_
+
+## varIdentifierTabLiteral
+[varIdentifierTabLiteral]: #varidentifiertabliteral
+
+- _[identifier]_
+- _[identifier]_ `[` _[intLiteral]_ `]`
+
+## intLiteral
+[intLiteral]: #intliteral
+
+- `[0-9]+`
+
+## LiteralExpr
+[LiteralExpr]: #literalexpr
+
+- _[intLiteral]_
+- _[charLiteral]_
+
+## charLiteral
+[charLiteral]: #charliteral
+
+-  `'` _[charAtom]_ `'`
+
+## charAtom
+[charAtom]: #charatom
+
+- _[sourceChar]_
+- <code>&#92;</code> _[escapeSequence]_
+
 ## sourceChar
 [sourceChar]: #sourcechar
 
 - `[^\\'\n]`
+
+## escapeSequence
+[escapeSequence]: #escapesequence
+
+- _[octalEscape]_
+- `x` _[hexEscape]_
+- _[escapeChar]_
 
 ## octalEscape
 [octalEscape]: #octalescape
@@ -23,126 +150,22 @@
 
 - `[abfnrtv\\'"?]`
 
-## intLiteral
-[intLiteral]: #intliteral
+## fctDef
+[fctDef]: #fctdef
 
-- `[0-9]+`
+- _[dataType]_ _[identifier]_ `(` _[defParametersList]_ `)` _[bloc]_
 
-## identifier
-[identifier]: #identifier
+## defParametersList
+[defParametersList]: #defparameterslist
 
-- `[a-zA-Z_$][a-zA-Z_$0-9]*`
-
-## charLiteral
-[charLiteral]: #charliteral
-
--  `'` _[charAtom]_ `'`
-
-## charAtom
-[charAtom]: #charatom
-
-- <code>&#92;</code> _[escapeSequence]_
-- _[sourceChar]_
-
-## escapeSequence
-[escapeSequence]: #escapesequence
-
-- _[octalEscape]_
-- `x` _[hexEscape]_
-- _[escapeChar]_
-
-## Program
-[Program]: #program
-
-- _[declarationsList]_
-
-## declarationsList
-[declarationsList]: #declarationslist
-
-- _[declarationsList]_ _[fctDec]_
-- _[declarationsList]_ _[fctDef]_
-- _[declarationsList]_ _[varDecAffLitteral]_ `;`
+- _[nonEmptyDefParametersList]_
 - ε
 
-## dataType
-[dataType]: #datatype
+## nonEmptyDefParametersList
+[nonEmptyDefParametersList]: #nonemptydefparameterslist
 
-- [identifier]
-
-## varDecAffLitteral
-[varDecAffLitteral]: #vardecafflitteral
-
-- _[varDecAffLitteral]_ `,` _[suiteDecAffLitteral]_
-- _[dataType]_ _[suiteDecAffLitteral]_
-
-## suiteDecAffLitteral
-[suiteDecAffLitteral]: #suitedecafflitteral
-
-- _[varIdentifierTabLiteral]_
-- _[identifier]_ `=` _[literalExpr]_
-
-## varDecAff
-[varDecAff]: #vardecaff
-
-- _[varDecAff]_ `,` _[suite]_
-- _[dataType]_ _[suite]_
-
-## suiteDecAff
-[suiteDecAff]: #suitedecaff
-
-- _[varIdentifierTabLiteral]_
-- _[identifier]_ `=` _[expr]_
-
-## varAff
-[varAff]: #varaff
-
-- _[varIdentifier]_ `=` expr]_
-
-## varUpdate
-[varUpdate]: #varupdate
-
-- _[varIdentifier]_ `++`
-- _[varIdentifier]_ `--`
-- `++` _[varIdentifier]_
-- `--` _[varIdentifier]_
-
-## varIdentifier
-[varIdentifier]: #varidentifier
-
-- _[identifier]_
-- _[identifier]_ `[` _[expr]_ `]`
-
-## varIdentifierTabLiteral
-[varIdentifierTabLiteral]: #varidentifiertabliteral
-
-- _[identifier]_
-- _[identifier]_ `[` _[intLiteral]_ `]`
-
-## instr
-[instr]: #instr
-
-- _[expr]_ `;`
-- _[bloc]_
-- _[if]_
-- _[while]_
-- _[for]_
-- `;`
-
-## if
-[if]: #if
-
-- `if` `(` _[expr]_ `)` _[instr]_  `else` _[instr]_
-- `if` `(` _[expr]_ `)` _[instr]_
-
-## while
-[while]: #while
-
-- `while` `(` _[expr]_ `)` _[instr]_
-
-## for
-[for]: #for
-
-- `for` `(`  _[exprOrVoid]_ `;` _[exprOrVoid]_  `;` _[exprOrVoid]_ `)` _[instr]_
+- _[nonEmptyDefParametersList]_ `,` _[paramsDef]_
+- _[paramsDef]_
 
 ## bloc
 [bloc]: #bloc
@@ -152,68 +175,50 @@
 ## insideBloc
 [insideBloc]: #insidebloc
 
-- _[insideBloc]_ _[instr]_
-- _[insideBloc]_ _[varDec]_ `;`
+- _[insideBloc]_ _[varDecAff]_ `;`
 - _[insideBloc]_ _[return]_
+- _[insideBloc]_ _[instr]_
 - ε
 
-## paramsDec
-[paramsDec]: #paramsdec
+## varDecAff
+[varDecAff]: #vardecaff
 
-- _[paramsDef]_
-- _[dataType]_
-- _[dataType]_  `[` `]`
+- _[varDecAff]_ `,` _[suiteDecAff]_
+- _[dataType]_ _[suiteDecAff]_
 
-## nonEmptyDecParametersList
-[nonEmptyDecParametersList]: #nonemptydecparameterslist
+## suiteDecAff
+[suiteDecAff]: #suitedecaff
 
-- _[nonEmptyDecParametersList]_ `,` _[paramsDec]_
-- _[paramsDec]_
+- _[varIdentifierTabLiteral]_
+- _[identifier]_ `=` _[expr]_
 
-## decParametersList
-[decParametersList]: #decparameterslist
-
-- _[nonEmptyDecParametersList]_
-- ε
-
-## paramsDef
-[paramsDef]: #paramsdef
-
-- _[dataType]_ _[identifier]_
-- _[dataType]_ _[identifier]_ `[` `]`
-
-## nonEmptyDefParametersList
-[nonEmptyDefParametersList]: #nonemptydefparameterslist
-
-- _[nonEmptyDefParametersList]_ `,` _[paramsDef]_
-- _[paramsDef]_
-
-## defParametersList
-[defParametersList]: #defparameterslist
-
-- _[nonEmptyDefParametersList]_
-- ε
-
-## fctDec
-[fctDec]: #fctdec
-
-- _[dataType]_ _[identifier]_ `(` _[decParametersList]_ `)` `;`
-
-## fctDef
-[fctDef]: #fctdef
-
-- _[dataType]_ _[identifier]_ `(` _[defParametersList]_ `)` _[bloc]_
 
 ## return
 [return]: #return
 
 - `return` _[exprOrVoid]_ `;`
 
-## LiteralExpr
-[LiteralExpr]: #literalexpr
+## exprOrVoid
+[exprOrVoid]: #exprorvoid
 
-- _[intLiteral]_
-- _[charLiteral]_
+- _[expr]_
+- ε 
+
+## expr
+[expr]: #expr
+
+- _[expr]_ _[OP]_ _[expr]_
+- _[LiteralExpr]_
+- _[varAff]_
+- _[varUpdate]_
+- _[varIdentifier]_
+- `(` _[expr]_ `)`
+- `-` _[expr]_
+- `+` _[expr]_
+- `!` _[expr]_
+- `~` _[expr]_
+- _[functionCall]_
+- _[identifier]_ `(` `)`
 
 ## op
 [op]: #op
@@ -249,24 +254,83 @@
 - `&&`
 - `,`
 
-## expr
-[expr]: #expr
+## varAff
+[varAff]: #varaff
 
-- _[expr]_ _[OP]_ _[expr]_
-- _[LiteralExpr]_
-- _[varAff]_
-- _[varUpdate]_
-- _[varIdentifier]_
-- `(` _[expr]_ `)`
-- `-` _[expr]_
-- `+` _[expr]_
-- `!` _[expr]_
-- `~` _[expr]_
-- _[identifier]_ `(` _[insideList]_ `)`
-- _[identifier]_ `(` `)`
+- _[varIdentifier]_ `=` expr]_
 
-## exprOrVoid
-[exprOrVoid]: #exprorvoid
+## varIdentifier
+[varIdentifier]: #varidentifier
 
+- _[identifier]_
+- _[identifier]_ `[` _[expr]_ `]`
+
+## varUpdate
+[varUpdate]: #varupdate
+
+- _[varIdentifier]_ `++`
+- _[varIdentifier]_ `--`
+- `++` _[varIdentifier]_
+- `--` _[varIdentifier]_
+
+## functionCall
+[functionCall]: #functioncall
+
+- _[identifier]_ `(` _[functionCallParamsOrVoid]_ `)`
+
+## functionCallParamsOrVoid
+[functionCallParams]: #functioncallparams
+
+- _[functionCallParams]_
+- ε
+
+## functionCallParams
+[functionCallParams]: #functioncallparams
+
+- _[functionCallParams]_ `,` _[expr]_
 - _[expr]_
-- ε 
+
+## instr
+[instr]: #instr
+
+- _[expr]_ `;`
+- _[bloc]_
+- _[if]_
+- _[while]_
+- _[for]_
+- `;`
+
+## if
+[if]: #if
+
+- `if` `(` _[expr]_ `)` _[instr]_  `else` _[instr]_
+- `if` `(` _[expr]_ `)` _[instr]_
+
+## while
+[while]: #while
+
+- `while` `(` _[expr]_ `)` _[instr]_
+
+## for
+[for]: #for
+
+- `for` `(`  _[exprOrVoid]_ `;` _[exprOrVoid]_  `;` _[exprOrVoid]_ `)` _[instr]_
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
