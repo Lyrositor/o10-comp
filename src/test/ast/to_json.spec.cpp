@@ -15,7 +15,7 @@ TEST(comp__ast__to_json, EmptyProgram) {
   rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   document->Accept(writer);
 
-  std::string expected = "{\"node_type\":\"program\"}";
+  std::string expected = "{\"node_type\":\"Program\",\"body\":[]}";
   std::string actual = buffer.GetString();
 
   EXPECT_EQ(expected, actual);
