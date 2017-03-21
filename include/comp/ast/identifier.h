@@ -6,7 +6,7 @@
 
 namespace comp {
 namespace ast {
-struct Identifier final : public LExpression, public RExpression {
+struct Identifier final : public LExpression {
   static std::unique_ptr<Identifier> Create(
     std::string name,
     std::shared_ptr<SourceLocation> location = nullptr);

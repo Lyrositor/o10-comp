@@ -16,7 +16,6 @@ SubscriptExpression::SubscriptExpression(
   std::shared_ptr<SourceLocation> location
 ) :
   LExpression(Type::SubscriptExpression, location),
-  RExpression(Type::SubscriptExpression, location),
   array(array),
   index(index) {
 }

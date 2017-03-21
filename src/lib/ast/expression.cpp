@@ -5,7 +5,7 @@ namespace ast {
 LExpression::LExpression(
   Type node_type,
   std::shared_ptr<SourceLocation> location
-) : Node(node_type, location) {
+) : RExpression(node_type, location) {
 }
 
 LExpression::~LExpression() {

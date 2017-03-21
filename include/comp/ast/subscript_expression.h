@@ -6,7 +6,7 @@
 namespace comp {
 namespace ast {
 
-struct SubscriptExpression final : public LExpression, public RExpression {
+struct SubscriptExpression final : public LExpression {
   static std::unique_ptr<SubscriptExpression> Create(
     std::shared_ptr<RExpression> array,
     std::shared_ptr<RExpression> index,

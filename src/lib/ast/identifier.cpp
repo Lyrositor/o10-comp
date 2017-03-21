@@ -13,7 +13,6 @@ Identifier::Identifier(
   std::shared_ptr<SourceLocation> location
 ) :
   LExpression(Type::Identifier, location),
-  RExpression(Type::Identifier, location),
   name(name) {
 }
 
