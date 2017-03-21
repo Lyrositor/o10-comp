@@ -264,6 +264,7 @@ Moreover, comments are treated as a white-space characters:
 
 - _[identifier]_
 - _[identifier]_ `[` _[expr]_ `]`
+- _[functionCall]_ `[` _[expr]_ `]`
 
 ## varUpdate
 [varUpdate]: #varupdate
