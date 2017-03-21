@@ -19,5 +19,13 @@ Parameter::Parameter(
 
 Parameter::~Parameter() {
 }
+
+std::shared_ptr<const DataType> Parameter::GetDataType() const {
+  return data_type_;
+}
+
+std::string Parameter::GetName() const {
+  return name_;
+}
 }  // namespace ir
 }  // namespace comp

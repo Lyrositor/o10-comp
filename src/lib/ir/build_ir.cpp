@@ -36,14 +36,19 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   // Create the IR of the function's parameters
   std::vector<std::shared_ptr<const Parameter>> parameters;
   for (auto parameter : node.parameters) {
-    std::shared_ptr<DataType> data_type;
+    std::shared_ptr<const DataType> data_type;
     switch (parameter->data_type->node_type) {
-      case ast::Node::Type::ArrayDataType:
+      case ast::Node::Type::ArrayDataType: {
         // TODO(Lyrositor) Handle arrays
         break;
-      case ast::Node::Type::LiteralDataType:
-        // TODO(Lyrositor) Handle literals
+      }
+      case ast::Node::Type::LiteralDataType: {
+        std::shared_ptr<ast::LiteralDataType>
+          e = std::static_pointer_cast<ast::LiteralDataType>(
+          parameter->data_type);
+        data_type = context.ResolveDataType(e->identifier->name);
         break;
+      }
       default: {
         throw std::domain_error("Unexpected data type for parameter");
       }
@@ -53,20 +58,24 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   }
 
   // Create the IR of the function's return type
-  const std::shared_ptr<const DataType> return_type;
+  std::shared_ptr<const DataType> return_type;
   switch (node.return_type->node_type) {
-    case ast::Node::Type::ArrayDataType:
+    case ast::Node::Type::ArrayDataType: {
       // TODO(Lyrositor) Handle arrays
       break;
-    case ast::Node::Type::LiteralDataType:
-      // TODO(Lyrositor) Handle literals
+    }
+    case ast::Node::Type::LiteralDataType: {
+      std::shared_ptr<ast::LiteralDataType>
+        e = std::static_pointer_cast<ast::LiteralDataType>(node.return_type);
+      return_type = context.ResolveDataType(e->identifier->name);
       break;
+    }
     default: {
       throw std::domain_error("Unexpected data type for parameter");
     }
   }
 
-  // TODO(Lyrositor) Add declaration to context if applicable
+  // Add declaration to context, if it hasn't already been done
   std::shared_ptr<FunctionSymbol> function;
   try {
     function = context.ResolveFunction(node.identifier->name);
@@ -80,16 +89,13 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     }
   }
 
-  // Check that this function isn't being declared twice
-  // TODO(Lyrositor) Make sure this is a part of the C standard
-  if (node.body == nullptr) {
-    throw std::runtime_error("Function was previously declared");
-  }
   // TODO(Lyrositor) Check that the signatures match
 
   // Create the child context
   VariablesTable variables_table;
   for (auto parameter : parameters) {
+    variables_table[parameter->GetName()] = Variable::Create(
+      parameter->GetDataType());
   }
   // TODO(Lyrositor) Handle `variables` parameter properly
   ChildContext function_context(
