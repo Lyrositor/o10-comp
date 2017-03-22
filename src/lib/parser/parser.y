@@ -7,7 +7,7 @@
 
 union YYSTYPE;
 
-void yyerror(void *scanner, comp::ast::RExpression *, const char *);
+void yyerror(void *scanner, comp::ast::Program *, const char *);
 int yylex(YYSTYPE *lvalp, void *scanner);
 void yy_scan_string(const char *str);
 
@@ -19,12 +19,13 @@ void yy_scan_string(const char *str);
 %lex-param {void *scanner}
 
 %parse-param {void *scanner}
-%parse-param {comp::ast::RExpression *&root}
+%parse-param {comp::ast::Program *&root}
 
 %union {
  uint8_t uint8;
  int32_t i;
  comp::ast::RExpression *e;
+ comp::ast::Program *program;
  char* s;
 }
 
@@ -49,7 +50,7 @@ void yy_scan_string(const char *str);
 %type <uint8> charAtom
 %type <e> expression
 %type <e> charLiteral
-%type <e> root
+%type <program> root
 
 %left SUBTRACTION_OPERATOR ADDITION_OPERATOR
 %left MULTIPLICATION_OPERATOR DIVISION_OPERATOR
@@ -57,7 +58,11 @@ void yy_scan_string(const char *str);
 
 %%
 root:
-  expression {root = $1;};
+  expression {
+    // root = $1;
+    delete $1;
+    root = new comp::ast::Program(std::vector<std::shared_ptr<comp::ast::Declaration>>());
+  };
 
 charLiteral:
   SIMPLE_QUOTE charAtom SIMPLE_QUOTE {
