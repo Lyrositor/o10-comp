@@ -29,7 +29,7 @@ identifier [a-zA-Z_$][a-zA-Z_$0-9]*
 %%
 
 [ \n\t]       {/* ignore */}
-{intLiteral}  {yylval->i = atoi(yytext); return INTEGER_LITERAL;}
+{intLiteral}  {yylval->int64 = atoi(yytext); return INTEGER_LITERAL;}
 {identifier}  {yylval->s = yytext; return IDENTIFIER;}
 
 
@@ -80,6 +80,10 @@ identifier [a-zA-Z_$][a-zA-Z_$0-9]*
 "&&"          {return AND_OPERATOR;}
 "!"           {return NOT_OPERATOR;}
 "~"           {return BINARY_ONES_COMPLEMENT_OPERATOR;}
+
+"int32_t"   {return INT32_TYPE;}
+"int64_t"   {return INT64_TYPE;}
+"char"   {return CHAR;}       
 
 <INITIAL>"'"                      {BEGIN(charLiteral); return SIMPLE_QUOTE;}
 <charLiteral>{
