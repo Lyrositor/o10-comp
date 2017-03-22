@@ -37,6 +37,10 @@ class FunctionSymbol final : public ProgramSymbol {
 
   virtual ~FunctionSymbol();
 
+  std::shared_ptr<BasicBlock> GetBody() const;
+
+  std::vector<std::shared_ptr<const Parameter>> GetParameters() const;
+
   std::shared_ptr<const DataType> GetReturnType() const;
 
   void SetBody(std::shared_ptr<BasicBlock> body);

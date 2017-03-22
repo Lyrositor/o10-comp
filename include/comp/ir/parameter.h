@@ -16,6 +16,8 @@ class Parameter final {
 
   ~Parameter();
 
+  bool operator==(const Parameter &other) const;
+
   std::shared_ptr<const DataType> GetDataType() const;
 
   std::string GetName() const;

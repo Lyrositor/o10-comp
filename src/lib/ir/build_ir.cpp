@@ -5,12 +5,10 @@
 
 namespace comp {
 namespace ir {
-std::shared_ptr<Program> BuildProgramIR(
-  std::shared_ptr<const ast::Program> program_node
-) {
+std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node) {
   std::shared_ptr<Program> program(new Program());
   RootContext context = CreateRootContextWithBuiltIns();
-  for (auto declaration : program_node->body) {
+  for (auto declaration : program_node.body) {
     switch (declaration->node_type) {
       case ast::Node::Type::Function: {
         std::shared_ptr<ast::Function>
@@ -89,7 +87,18 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     }
   }
 
-  // TODO(Lyrositor) Check that the signatures match
+  // Ensure this function is not being declared twice or defined twice
+  if (node.body == nullptr) {
+    throw std::runtime_error("Function was already declared");
+  }
+  if (function->GetBody() != nullptr) {
+    throw std::runtime_error("Function was already defined");
+  }
+
+  if (parameters != function->GetParameters() ||
+    return_type != function->GetReturnType()) {
+    throw std::runtime_error("Function has conflicting signatures");
+  }
 
   // Create the child context
   VariablesTable variables_table;
@@ -102,9 +111,9 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     context, SymbolTable({}, variables_table, {}), {});
 
   // Generate the function block's IR
-  std::shared_ptr<BasicBlock> function_block = BasicBlock::create();
-  BuildBlockStatementIR(*node.body, function_context, function_block);
-  function->SetBody(function_block);
+  std::shared_ptr<BasicBlock> first_block = BasicBlock::create();
+  BuildBlockStatementIR(*node.body, function_context, first_block);
+  function->SetBody(first_block);
 
   return function;
 }

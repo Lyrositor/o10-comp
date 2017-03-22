@@ -20,6 +20,10 @@ Parameter::Parameter(
 Parameter::~Parameter() {
 }
 
+bool Parameter::operator==(const Parameter &other) const {
+  return other.name_ == name_ && other.data_type_ == data_type_;
+}
+
 std::shared_ptr<const DataType> Parameter::GetDataType() const {
   return data_type_;
 }

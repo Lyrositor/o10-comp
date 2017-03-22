@@ -28,6 +28,15 @@ FunctionSymbol::FunctionSymbol(
 FunctionSymbol::~FunctionSymbol() {
 }
 
+std::shared_ptr<BasicBlock> FunctionSymbol::GetBody() const {
+  return body_;
+}
+
+std::vector<std::shared_ptr<const Parameter>> FunctionSymbol::GetParameters()
+const {
+  return parameters_;
+}
+
 std::shared_ptr<const DataType> FunctionSymbol::GetReturnType() const {
   return return_type_;
 }
