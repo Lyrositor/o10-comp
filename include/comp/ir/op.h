@@ -45,6 +45,7 @@ struct Op {
   enum class Type {
     Add,
     Copy,
+    Comp,
     NoOp
   };
 
@@ -77,6 +78,16 @@ struct Copy final : public Op {
 
   std::shared_ptr<VariableOperand> out;
   std::shared_ptr<Operand> in;
+};
+
+/**
+ * Compare value `val` to non-zero
+ */
+struct Comp final : public Op {
+  Comp(std::shared_ptr<Variable> val);
+  virtual ~Comp();
+
+  std::shared_ptr<Variable> val;
 };
 
 /*
