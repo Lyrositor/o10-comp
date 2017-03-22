@@ -20,10 +20,10 @@ enum class BinaryOperator {
   LessThanOrEqualTo, // left <= right
   LogicalAnd, // left && right
   LogicalOr, // left || right
-  RightShift, // left >> right
-  Subtraction, // left - right
   Multiplication, // left * right
   Remainder, // left % right
+  RightShift, // left >> right
+  Subtraction // left - right
 };
 
 /**

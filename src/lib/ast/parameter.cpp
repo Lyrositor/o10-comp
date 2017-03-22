@@ -3,7 +3,7 @@
 namespace comp {
 namespace ast {
 std::unique_ptr<Parameter> Parameter::Create(
-  std::shared_ptr<DataType> data_type,
+  std::shared_ptr<LiteralDataType> data_type,
   std::shared_ptr<Declarator> declarator,
   std::shared_ptr<SourceLocation> location
 ) {
@@ -12,7 +12,7 @@ std::unique_ptr<Parameter> Parameter::Create(
 }
 
 Parameter::Parameter(
-  std::shared_ptr<DataType> data_type,
+  std::shared_ptr<LiteralDataType> data_type,
   std::shared_ptr<Declarator> declarator,
   std::shared_ptr<SourceLocation> location
 ) :

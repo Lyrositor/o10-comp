@@ -34,9 +34,9 @@ struct AssignmentExpression final : public RExpression {
 
   ~AssignmentExpression();
 
+  const AssignmentOperator op;
   const std::shared_ptr<LExpression> lvalue;
   const std::shared_ptr<RExpression> rvalue;
-  const AssignmentOperator op;
 };
 }  // namespace ast
 }  // namespace comp
