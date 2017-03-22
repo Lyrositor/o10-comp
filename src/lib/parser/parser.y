@@ -27,6 +27,7 @@ void yy_scan_string(const char *str);
  char * s;
  comp::ast::RExpression *e;
  comp::ast::RExpression *expr;
+ comp::ast::LExpression *lvalue;
  comp::ast::Program *program;
  comp::ast::Function *function;
  comp::ast::Identifier *identifier;
@@ -40,11 +41,15 @@ void yy_scan_string(const char *str);
  comp::ast::BlockStatement *insideBlock;
  comp::ast::ReturnStatement *returnStatement;
  comp::ast::Statement *statement;
+ comp::ast::ExpressionStatement *expressionStatement;
+ comp::ast::Parameter *parameter;
  comp::ast::LiteralDataType *dataTypeLiteral;
  comp::ast::ArrayDataType *arrayDataType;
  comp::ast::VariableDeclaration *variable_declaration;
- comp::ast::VariableDeclarator *variable_declarator;
+ comp::ast::VariableDeclarator *declarator;
+ comp::ast::CallExpression *callExpression;
  std::vector<std::shared_ptr<comp::ast::Declaration>> *declarationsList;
+ std::vector<std::shared_ptr<comp::ast::Parameter>> *parametersList;
  std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> *variableDeclaratorsList;
 }
 
@@ -53,8 +58,9 @@ void yy_scan_string(const char *str);
 %token INEQUALITY_OPERATOR LEFTSHIFTASSIGNMENT_OPERATOR LEFTSHIFT_OPERATOR LITTERAL_EXPRESSION MULTIPLICATIONASSIGNMENT_OPERATOR
 %token NONIDENTITY_OPERATOR REMAINDREASSIGNMENT_OPERATOR RIGHTSHIFTASSIGNMENT_OPERATOR RIGHTSHIFT_OPERATOR SUBSTRACTIONASSIGNMENT_OPERATOR
 %token EQUAL_OPERATOR GREATERTHAN_OPERATOR GREATERTHANOREQUAL_OPERATOR LESSERTHAN_OPERATOR LESSERTHANOREQUAL_OPERATOR
-%token EQUALEQUAL_OPERATOR LOGICALAND_OPERATOR LOGICALOR_OPERATOR LOGICALNOT_OPERATOR XOR_OPERATOR
+%token EQUALEQUAL_OPERATOR LOGICALAND_OPERATOR LOGICALOR_OPERATOR LOGICALNOT_OPERATOR XOR_OPERATOR UNARYNEGATION_OPERATOR UNARYPLUS_OPERATOR
 %token SEMICOLON OPEN_BRACKET CLOSE_BRACKET INCREMENT_OPERATOR DECREMENT_OPERATOR OPEN_PAREN CLOSE_PAREN
+%token SUBSTRACTION_OPERATOR COMMA_OPERATOR_OPERATOR
 %token IF ELSE WHILE FOR RETURN OPEN_BRACE CLOSE_BRACE
 %token SIMPLE_ASSIGNMENT_OPERATOR COMMA_OPERATOR EQUALS_OPERATOR NOT_EQUAL_OPERATOR
 %token LESS_THAN_OPERATOR LESS_THAN_OR_EQUAL_OPERATOR GREATER_THAN_OPERATOR GREATER_THAN_OR_EQUAL_OPERATOR
@@ -65,7 +71,7 @@ void yy_scan_string(const char *str);
 %token BINARY_OR_OPERATOR BINARY_AND_OPERATOR BINARY_XOR_OPERATOR
 %token OR_OPERATOR AND_OPERATOR NOT_OPERATOR BINARY_ONES_COMPLEMENT_OPERATOR
 %token SIMPLE_QUOTE CONTROL_CHAR_ESCAPE HEX_CHAR_ESCAPE
-%token INT32_TYPE INT64_TYPE CHAR IDENTIFIER
+%token INT32_TYPE INT64_TYPE CHAR IDENTIFIER intLiteral
 
 
 %token <i> INTEGER_LITERAL
@@ -74,54 +80,57 @@ void yy_scan_string(const char *str);
 %token <uint8> OCTAL_ESCAPE_SEQUENCE
 %token <uint8> HEX_ESCAPE_SEQUENCE
 
-%type <e> charLiteral expr intLiteral expressionOrVoid literalExpr insideList
+%type <e>  expr  expressionOrVoid  op
 %type <uint8> charAtom
 %type <program> program root
 %type <function> function functionDeclaration functionDefinition
-%type <identifier> identifier initial_value
+%type <identifier> identifier
 %type <declarationsList> declarationsList
+%type <parametersList> parametersList functionCallParams
 %type <variableDeclaratorsList> variableDeclaratorsList
 %type <unaryExpression> unaryExpression varUpdate
 %type <dataType> dataType
-%type <variable_declarator> variable_declarator
-%type <variable_declaration> paramsDefinition paramsDeclaration variableDeclaration
-%type <dataTypeLiteral> dataTypeLiteral
+%type <declarator> declarator variable_declarator
+%type <variable_declaration> variableDeclaration
+%type <dataTypeLiteral> dataTypeLiteral hexIntegerLiteral charLiteral literalExpr
 %type <arrayDataType> arrayDataType
+%type <parameter> parameter
 %type <statement> statement
+%type <expressionStatement> expressionStatement
 %type <ifStatement> ifStatement
 %type <whileStatement> whileStatement
 %type <forStatement> forStatement
 %type <block_statement> insideBlock block
 %type <returnStatement> returnStatement
+%type <lvalue> LValue
+%type <callExpression> functionCall
 
 %left SUBTRACTION_OPERATOR ADDITION_OPERATOR
 %left MULTIPLICATION_OPERATOR DIVISION_OPERATOR
 %left REMAINDER_OPERATOR
 
 %%
-
 root:
-  program {
-    root = $1;
-  }
+    program {
+        root = $1;
+        }
 
 charLiteral:
-  SIMPLE_QUOTE charAtom SIMPLE_QUOTE {
-    $$ = new comp::ast::Uint8Literal($2, nullptr);
-  }
+    SIMPLE_QUOTE charAtom SIMPLE_QUOTE {
+        $$ = new comp::ast::Uint8Literal($2, nullptr);
+    }
 
-  charAtom:
-  SOURCE_CHAR {
-    $$ = $1;
-  }
-  | OCTAL_ESCAPE_SEQUENCE {
-    $$ = $1;
-  }
-  | HEX_ESCAPE_SEQUENCE {
-      $$ = $1;
-  }
+charAtom:
+    SOURCE_CHAR {
+        $$ = $1;
+    }
+    | OCTAL_ESCAPE_SEQUENCE {
+        $$ = $1;
+    }
+    | HEX_ESCAPE_SEQUENCE {
+        $$ = $1;
+    }
 
-/* Généralités */
 program:
     declarationsList {
         std::vector<std::shared_ptr<comp::ast::Declaration>> body(*$1);
@@ -130,11 +139,12 @@ program:
     }
 
 declarationsList:
-    /* declarationsList functionDeclaration{
+    /*declarationsList functionDeclaration{
         std::shared_ptr<comp::ast::Function> decl($2);
         $1->push_back(decl);
         $$ = $1;
     }
+
     | declarationsList functionDefinition {
         std::shared_ptr<comp::ast::Function> def($2);
         $1->push_back(def);
@@ -149,7 +159,6 @@ declarationsList:
         $$ = new std::vector<std::shared_ptr<comp::ast::Declaration>>();
     }
 
-/*
 functionDeclaration:
     dataType identifier OPEN_PAREN parametersList CLOSE_PAREN SEMICOLON{
         std::shared_ptr<comp::ast::DataType> type($1);
@@ -162,7 +171,6 @@ functionDeclaration:
         std::shared_ptr<comp::ast::Identifier> identifier($2);
         $$ = new comp::ast::Declaration(type, identifier);
     }
-*/
 
 dataType:
     dataTypeLiteral {
@@ -190,12 +198,12 @@ identifier:
     IDENTIFIER {
         $$ = new comp::ast::Identifier($1);
     }
-/*
+
 parametersList:
     parametersList COMMA_OPERATOR parameter {
         std::shared_ptr<comp::ast::Parameter> paramslist($1);
-        std::shared_ptr<comp::ast::Parameter> parameter($3);
-        $$ = new comp::ast::Parameter(paramslist, parameter);
+        $1->push_back(parameter);
+        $$ = $1;
     }
     | parameter {
         std::shared_ptr<comp::ast::Parameter> parameter($1);
@@ -229,13 +237,13 @@ declarator:
 
 functionDefinition:
     dataType identifier OPEN_PAREN parametersList CLOSE_PAREN block {
+        std::shared_ptr<comp::ast::DataType> dataType($1);
         std::shared_ptr<comp::ast::Identifier> identifier($2);
         std::shared_ptr<comp::ast::Parameter> parametersList($4);
         std::shared_ptr<comp::ast::BlockStatement> block($6);
-        $$ = new comp::ast::Function(identifier, parametersList, block);
+        $$ = new comp::ast::Function(dataType, identifier, parametersList, block);
     }
 
-*/
 variableDeclaration :
     dataTypeLiteral variableDeclaratorsList SEMICOLON{
         std::shared_ptr<comp::ast::LiteralDataType> dataType($1);
@@ -249,33 +257,30 @@ variableDeclaratorsList:
         $1->push_back(variable_declarator);
         $$ = $1;
     }
-    /*
-    | variable_declarator {
-        $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator()>>;
+    /*| variable_declarator {
+        $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator>>;
         $$->push_back($1);
-    }
-    */
-/*to remove*/
+    }*/
+
 variable_declarator:
     SEMICOLON{
         $$ = new comp::ast::VariableDeclarator(nullptr, nullptr) ;
     }
 
-/*
 LValue:
     identifier {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
-        $$ = new comp::ast::Expression(identifier);
+        $$ = new comp::ast::LExpression(identifier);
     }
-    | identifier OPEN_BRACKET expr CLOSE_BRACKET {
+    | identifier OPEN_BRACE expr CLOSE_BRACKET {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
         std::shared_ptr<comp::ast::Expression> expr($3);
-        $$ = new comp::ast::Expression(identifier, expr);
+        $$ = new comp::ast::LExpression(identifier, expr);
     }
     | functionCall OPEN_BRACKET expr CLOSE_BRACKET {
         std::shared_ptr<comp::ast::Identifier> functionCall($1);
         std::shared_ptr<comp::ast::Expression> expr($3);
-        $$ = new comp::ast::Expression(identifier, expr);
+        $$ = new comp::ast::LExpression(identifier, expr);
     }
 
 varUpdate:
@@ -315,11 +320,11 @@ functionCallParams:
     functionCallParams COMMA_OPERATOR expr {
         std::shared_ptr<comp::ast::Identifier> functionCallParams($1);
         std::shared_ptr<comp::ast::Expression> expr($3);
-        $$ = new comp::ast::FunctionCallParams(functionCallParams, expr);
+        $$ = new comp::ast::Parameter(functionCallParams, expr);
     }
     | expr {
         std::shared_ptr<comp::ast::Expression> expr($1);
-        $$ = new comp::ast::FunctionCallParams(expr);
+        $$ = new comp::ast::Parameter(expr);
     }
 
 statement:
@@ -335,15 +340,15 @@ statement:
         std::shared_ptr<comp::ast::BlockStatement> block($1);
         $$ = new comp::ast::Statement(block);
     }
-    | if_statement {
+    | ifStatement {
         std::shared_ptr<comp::ast::IfStatement> if_statement($1);
         $$ = new comp::ast::Statement(if_statement);
     }
-    | while_statement {
+    | whileStatement {
         std::shared_ptr<comp::ast::WhileStatement> while_statement($1);
         $$ = new comp::ast::Statement(while_statement);
     }
-    | for_statement {
+    | forStatement {
         std::shared_ptr<comp::ast::ForStatement> for_statement($1);
         $$ = new comp::ast::Statement(for_statement);
     }
@@ -391,11 +396,11 @@ forStatement:
         std::shared_ptr<comp::ast::RExpression> body($9);
         $$ = new comp::ast::ForStatement(initialization, condition, iteration, body);
     }
-    | FOR OPEN_PAREN varDec expressionOrVoid SEMICOLON expressionOrVoid CLOSE_PAREN statement {
+    | FOR OPEN_PAREN variableDeclaration expressionOrVoid SEMICOLON expressionOrVoid CLOSE_PAREN statement {
         std::shared_ptr<comp::ast::RExpression> initialization($3);
-        std::shared_ptr<comp::ast::RExpression> condition($5);
-        std::shared_ptr<comp::ast::RExpression> iteration($7);
-        std::shared_ptr<comp::ast::RExpression> body($9);
+        std::shared_ptr<comp::ast::RExpression> condition($4);
+        std::shared_ptr<comp::ast::RExpression> iteration($6);
+        std::shared_ptr<comp::ast::RExpression> body($8);
         $$ = new comp::ast::ForStatement(initialization, condition, iteration, body);
     }
 
@@ -404,7 +409,7 @@ block:
         std::shared_ptr<comp::ast::BlockStatement> insideBlock($2);
         $$ = new comp::ast::BlockStatement(insideBlock);
     }
-    | OPEN_BRACE CLOSE_BRACE {
+    | OPEN_BRACE CLOSE_BRACE {
         $$ = new comp::ast::BlockStatement();
     }
 
@@ -414,10 +419,10 @@ insideBlock:
         std::shared_ptr<comp::ast::Statement> statement($2);
         $$ = new comp::ast::BlockStatement(insideBlock, instr);
     }
-    | insideBlock varDec  {
+    | insideBlock variable_declarator  {
         std::shared_ptr<comp::ast::BlockStatement> insideBlock($1);
-        std::shared_ptr<comp::ast::VariableDeclarator> varDec($2);
-        $$ = new comp::ast::BlockStatement(insideBlock, varDec);
+        std::shared_ptr<comp::ast::VariableDeclarator> variable_declarator($2);
+        $$ = new comp::ast::BlockStatement(insideBlock, variable_declarator);
     }
 
 expressionOrVoid:
@@ -430,17 +435,25 @@ expressionOrVoid:
     }
 
 literalExpr:
-    integerLiteral {
+    INTEGER_LITERAL {
         std::shared_ptr<comp::ast::Int64Literal> int($1);
         $$ = new comp::ast::RExpression(int);
     }
+    /*
     | hexIntegerLiteral {
         std::shared_ptr<comp::ast::Literal> hex($1);
         $$ = new comp::ast::RExpression(hex);
     }
+
     | charLiteral {
         std::shared_ptr<comp::ast::Literal> char($1);
         $$ = new comp::ast::RExpression(char);
+    }
+    */
+
+op:
+    {
+    $$ = '2';
     }
 
 expr:
@@ -496,7 +509,7 @@ expr:
         std::shared_ptr<comp::ast::Identifier> identifier($1);
         $$ = new comp::ast::RExpression(identifier);
     }
-    | LITTERAL_EXPRESSION {
+    | literalExpr {
         $$ = new comp::ast::Int64Literal($1, nullptr);
     }
     | expr ADDITION_OPERATOR expr {
@@ -653,8 +666,8 @@ expr:
         std::shared_ptr<comp::ast::RExpression> left($1);
         std::shared_ptr<comp::ast::RExpression> right($3);
         $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Rightshift, left, right, nullptr);
-    }*/
-    /*
+    }
+
     | expr LOGICALNOT_OPERATOR {
       std::shared_ptr<comp::ast::RExpression> left($1);
       $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Greaterthan, left, nullptr);
@@ -667,6 +680,7 @@ expr:
       std::shared_ptr<comp::ast::RExpression> left($1);
       $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Decrement, left, nullptr);
     }
+    /*
     | UNARYNEGATION_OPERATOR expr {
       std::shared_ptr<comp::ast::RExpression> left($1);
       $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Unarynegation, left, nullptr);
@@ -674,6 +688,7 @@ expr:
     | UNARYPLUS_OPERATOR expr {
       std::shared_ptr<comp::ast::RExpression> left($1);
       $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Unaryplus, left, nullptr);
-    }*/
+    }
+    */
 
 %%
