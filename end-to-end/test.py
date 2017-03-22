@@ -13,6 +13,7 @@ END_TO_END_ROOT = os.path.dirname(os.path.realpath(__file__))
 CONFIG_FILE = "test.json"
 GCC_PATH = "gcc"
 CLANG_PATH = "clang"
+COMP_PATH = os.path.join(END_TO_END_ROOT, "..", "build", "comp_main")
 
 
 for test_dir_name in os.listdir(END_TO_END_ROOT):
@@ -35,6 +36,20 @@ for test_dir_name in os.listdir(END_TO_END_ROOT):
         should_error = "error" in config_data and config_data["error"]
 
         abs_source_path = os.path.join(test_dir_path, source_path)
+
+        if "expected-ast" in config_data:
+            expected_ast_path = os.path.join(test_dir_path, config_data["expected-ast"])
+            completed_process = subprocess.run([COMP_PATH, abs_source_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            # TODO: use sys.stout.encoding
+            actual_ast = json.loads(completed_process.stdout.decode('utf-8'))
+            with open(expected_ast_path, "r") as expected_ast_file:
+                expected_ast = json.loads(expected_ast_file.read())
+                if expected_ast != actual_ast:
+                    print("EXPECT AST:")
+                    print(expected_ast)
+                    print("ACTUAL AST:")
+                    print(actual_ast)
+                    raise Exception("Unexpected AST!")
 
         if abs_source_path not in files:
             raise Exception("File not found: {}".format(abs_source_path))

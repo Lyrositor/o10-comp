@@ -1,0 +1,28 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "VariableDeclaration",
+      "data_type": {
+        "node_type": "LiteralDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "int64_t"
+        }
+      },
+      "declarators": [
+        {
+          "node_type": "VariableDeclarator",
+          "declarator": {
+            "node_type": "IdentifierDeclarator",
+            "identifier": {
+              "node_type": "Identifier",
+              "name": "a"
+            }
+          },
+          "initial_value": null
+        }
+      ]
+    }
+  ]
+}
