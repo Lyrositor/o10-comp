@@ -44,7 +44,6 @@ void yy_scan_string(const char *str);
  comp::ast::VariableDeclaration *variable_declaration;
  comp::ast::VariableDeclarator *variable_declarator;
  comp::ast::WhileStatement *while_statement;
- comp::ast::LiteralDataType *literal_data_type;
  std::vector<std::shared_ptr<comp::ast::Declaration>> *declarationsList;
  std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> *variableDeclaratorsList;
 }
@@ -66,7 +65,7 @@ void yy_scan_string(const char *str);
 %token BINARY_OR_OPERATOR BINARY_AND_OPERATOR BINARY_XOR_OPERATOR
 %token OR_OPERATOR AND_OPERATOR NOT_OPERATOR BINARY_ONES_COMPLEMENT_OPERATOR
 %token SIMPLE_QUOTE CONTROL_CHAR_ESCAPE HEX_CHAR_ESCAPE
-%token INT32_TYPE INT64_TYPE CHAR
+%token INT32_TYPE INT64_TYPE CHAR IDENTIFIER
 %token block expr function insideBlock insideList intLiteral literalExpr op statement suite
 %token unaryExpression varDec test def decl initial_value
 
@@ -80,16 +79,16 @@ void yy_scan_string(const char *str);
 %type <uint8> charAtom
 %type <program> program root
 %type <function> function functionDeclaration functionDefinition
-%type <identifier> identifier  varIdentifier varIdentifierTabLiteral initial_value parametersList
+%type <identifier> identifier varIdentifier varIdentifierTabLiteral initial_value parametersList
 %type <declarationsList> declarationsList
 %type <variableDeclaratorsList> variableDeclaratorsList
 %type <unaryExpression> unaryExpression varUpdate
 %type <datatype> datatype
-%type <variable_declarator> varDecAff suite suiteDecAff suiteDecAffLitteral varDec variableDeclarator
+%type <variable_declarator> varDecAff suite suiteDecAff suiteDecAffLitteral varDec variable_declarator
 %type <variable_declaration> varAff varDecAffLitteral paramsDefinition paramsDeclaration variableDeclaration
 %type <statement> statement
 %type <if_statement> if_statement
-%type <literal_data_type> dataTypeLiteral
+%type <literal_data_type> literal_data_type
 %type <while_statement> while_statement
 %type <for_statement> for_statement
 %type <block_statement> block_statement insideBlock block
@@ -150,10 +149,10 @@ declarationsList:
         $$ = new std::vector<std::shared_ptr<comp::ast::Declaration>>();
     }
 
-dataTypeLiteral:
+literal_data_type:
     identifier {
-        std::shared_ptr<comp::ast::Identifier> type($1);
-        $$ = new comp::ast::dataTypeLiteral(type);
+        std::shared_ptr<comp::ast::Identifier> identifier($1);
+        $$ = new comp::ast::LiteralDataType(identifier);
     }
     /*INT32_TYPE {
     }
@@ -169,31 +168,31 @@ identifier:
 
 /* Déclaration, affectation de variables */
 variableDeclaration :
-    dataTypeLiteral variableDeclaratorsList SEMICOLON{
-        std::shared_ptr<compt::ast::LiteralDataType> datatype($1);
-        std::vector<std::shared_ptr<VariableDeclarator>> declarators($2);
+    literal_data_type variableDeclaratorsList SEMICOLON{
+        std::shared_ptr<comp::ast::LiteralDataType> datatype($1);
+        std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> declarators($2);
         $$ = new comp::ast::VariableDeclaration(datatype, declarators);
     }
 
 variableDeclaratorsList:
-    variableDeclaratorsList COMMA_OPERATOR variableDeclarator{
-        std::shared_ptr<compt::ast::VariableDeclarator> variable_declarator($3);
+    variableDeclaratorsList COMMA_OPERATOR variable_declarator{
+        std::shared_ptr<comp::ast::VariableDeclarator> variable_declarator($3);
         $1->push_back(variable_declarator);
         $$ = $1;
     }
-    | variableDeclarator {
-        variableDec = new std::vector<std::shared_ptr<VariableDeclarator>>();
-        variableDec->push_back($1);
-        $$ = variableDec;
+    /*
+    | variable_declarator {
+        $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator()>>;
+        $$->push_back($1);
 
 
-        /*std::shared_ptr<comp::ast::VariableDeclaration> variable_declaration($2);
+        std::shared_ptr<comp::ast::VariableDeclaration> variable_declaration($2);
         $1->push_back(variable_declaration);
-        $$ = $1;*/
+        $$ = $1;
     }
-
+    */
 /*to remove*/
-variableDeclarator:
+variable_declarator:
     SEMICOLON{
         $$ = new comp::ast::VariableDeclarator(nullptr, nullptr) ;
     }
