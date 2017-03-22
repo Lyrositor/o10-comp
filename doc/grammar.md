@@ -98,17 +98,17 @@ Moreover, comments are treated as a white-space characters:
 
 - _[dataType]_ _[identifier]_ `(` _[parametersList]_ `)` _[bloc]_
 
-## bloc
-[bloc]: #bloc
+## block
+[block]: #block
 
-- `{` insideBloc `}`
+- `{` insideBlock `}`
 - `{` `}`
 
-## insideBloc
-[insideBloc]: #insidebloc
+## insideBlock
+[insideBlock]: #insideblock
 
-- _[insideBloc]_ _[variableDeclaration]_
-- _[insideBloc]_ _[statement]_
+- _[insideBlock]_ _[variableDeclaration]_
+- _[insideBlock]_ _[statement]_
 
 
 ## variableDeclaration
@@ -231,19 +231,19 @@ op | prec | assoc
 - `return` _[expression]_ `;`
 - `return` `;`
 
-## if
-[if]: #if
+## ifStatement
+[ifStatement]: #ifStatement
 
 - `if` `(` _[expression]_ `)` _[statement]_  `else` _[statement]_
 - `if` `(` _[expression]_ `)` _[statement]_
 
-## while
-[while]: #while
+## whileStatement
+[whileStatement]: #whileStatement
 
 - `while` `(` _[expression]_ `)` _[statement]_
 
-## for
-[for]: #for
+## forStatement
+[forStatement]: #forStatement
 
 - `for` `(` _[expressionOrVoid]_ `;`  _[expressionOrVoid]_  `;` _[expressionOrVoid]_ `)` _[statement]_
 - `for` `(` _[variableDeclaration]_ _[expressionOrVoid]_  `;` _[expressionOrVoid]_ `)` _[statement]_
