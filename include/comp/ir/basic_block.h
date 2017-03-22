@@ -22,6 +22,7 @@ class BasicBlock {
  private:
   std::vector<std::shared_ptr<Op>> ops_;
   std::weak_ptr<BasicBlock> branch_if_true_;
+  /* nullptr if it is a simple jump */
   std::weak_ptr<BasicBlock> branch_if_false_;
 };
 }  // namespace ir
