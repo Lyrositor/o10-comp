@@ -5,12 +5,15 @@
 ## Choices of conception :
 
 - trigraphs are not implemented
-- break and continue are not implemented
+- break, continue and goto are not implemented
+- do..while and switch..case are not implemented
+- inline and volatile are not implemented
 - we should use a number/constant to make a global affectation (e.g int a = 3 works but int a = 3 + 3 doesn't )
 - The %-alternate forms are not implemented (<% %: ...)
-- multidimensional arrays
+- no multidimensional arrays
 - 3 types, no operator overloading, struct, typeof ...
 
+// TODO HEX
 
 ## white-space characters
 
@@ -26,7 +29,7 @@ White-space characters are the following :
 
 Moreover, comments are treated as a white-space characters:
 
-- `\/\*.*\*\/`
+- `\/\*[\s\S]*\*\/`
 - `\/\/[^\n]+`
 - `(^|\n)#[^\n]+`
 
@@ -38,73 +41,62 @@ Moreover, comments are treated as a white-space characters:
 ## declarationsList
 [declarationsList]: #declarationslist
 
-- _[declarationsList]_ _[fonctionDeclaration]_
-- _[declarationsList]_ _[variableDeclarationOrAffectationLitteral]_ `;`
+- _[declarationsList]_ _[functionDeclaration]_
+- _[declarationsList]_ _[variableDeclaration]_
 - _[declarationsList]_ _[functionDefinition]_
 - ε
 
-## fonctionDeclaration
-[fonctionDeclaration]: #fonctionDeclaration
+## functionDeclaration
+[functionDeclaration]: #functionDeclaration
 
-- _[dataType]_ _[identifier]_ `(` _[declarationParametersList]_ `)` `;`
+- _[dataType]_ _[identifier]_ `(` _[parametersList]_ `)` `;`
+- _[dataType]_ _[identifier]_ `(` `)` `;`
 
 DataType = ArrayDataType | LiteralDataType
 ArrayDataType = DataType "[" IntegerLiteral "]"
 
 ## dataType
-[dataType]: #datatype
+[dataType]: #dataType
+
+- _[dataTypeLiteral]_
+- _[arrayDataType]_
+
+## dataTypeLiteral
+[dataTypeLiteral]: #dataTypeLiteral
 
 - `int32_t`
 - `int64_t`
 - `char`
+
+## arrayDataType
+[arrayDataType]: #arrayDataType
+
+- _[dataTypeLiteral]_ `[` `]`
 
 ## identifier
 [identifier]: #identifier
 
 - `[a-zA-Z_$][a-zA-Z_$0-9]*`
 
-## declarationParametersList
-[declarationParametersList]: #declarationParametersList
+## parametersList
+[parametersList]: #parametersList
 
-- _[nonEmptyDeclarationParametersList]_
-- ε
+- _[parametersList]_ `,` _[parameters]_
+- _[parameter]_
 
-## nonEmptyDeclarationParametersList
-[nonEmptyDeclarationParametersList]: #nonEmptyDeclarationParametersList
+## parameter
+[parameter]: #parameter
 
-- _[nonEmptyDeclarationParametersList]_ `,` _[declarationParameters]_
-- _[declarationParameters]_
-
-## declarationParameters
-[declarationParameters]: #declarationParameters
-
-- _[definitionParameters]_
+- _[dataTypeLiteral]_ _[declarator]_
 - _[dataType]_
-- _[dataType]_  `[` `]`
 
-## definitionParameters
-[definitionParameters]: #definitionParameters
-
-- _[dataType]_ _[identifier]_
-- _[dataType]_ _[identifier]_ `[` `]`
-
-## variableDeclarationOrAffectationLitteral
-[variableDeclarationOrAffectationLitteral]: #variableDeclarationOrAffectationLitteral
-
-- _[variableDeclarationOrAffectationLitteral]_ `,` _[restOfVarDecAffLitteral]_
-- _[dataType]_ _[restOfVarDecAffLitteral]_
-
-## restOfVarDecAffLitteral
-[restOfVarDecAffLitteral]: #restOfVarDecAffLitteral
-
-- _[variableIdentifierArrayLiteral]_
-- _[identifier]_ `=` _[LiteralExpression]_
-
-## variableIdentifierArrayLiteral
-[variableIdentifierArrayLiteral]: #variableIdentifierArrayLiteral
+## declarator
+[declarator]: #declarator
 
 - _[identifier]_
-- _[identifier]_ `[` _[integerLiteral]_ `]`
+- _[identifier]_ `[` `]`
+- _[identifier]_ `[` _[literalExpression]_ `]`
+// TODO 3+3
 
 ## integerLiteral
 [integerLiteral]: #integerLiteral
@@ -159,56 +151,44 @@ ArrayDataType = DataType "[" IntegerLiteral "]"
 ## functionDefinition
 [functionDefinition]: #functionDefinition
 
-- _[dataType]_ _[identifier]_ `(` _[definitionParametersList]_ `)` _[bloc]_
-
-## definitionParametersList
-[definitionParametersList]: #definitionParametersList
-
-- _[nonEmptyDefinitionParametersList]_
-- ε
-
-## nonEmptyDefinitionParametersList
-[nonEmptyDefinitionParametersList]: #nonEmptyDefinitionParametersList
-
-- _[nonEmptyDefinitionParametersList]_ `,` _[definitionParameters]_
-- _[definitionParameters]_
+- _[dataType]_ _[identifier]_ `(` _[parametersList]_ `)` _[bloc]_
 
 ## bloc
 [bloc]: #bloc
 
-- `{`insideBloc`}`
+- `{` insideBloc `}`
 
 ## insideBloc
 [insideBloc]: #insidebloc
 
-- _[insideBloc]_ _[variableDeclarationOrAffectation]_ `;`
+- _[insideBloc]_ _[variableDeclaration]_
 - _[insideBloc]_ _[return]_
 - _[insideBloc]_ _[instruction]_
 - ε
 
-## variableDeclarationOrAffectation
-[variableDeclarationOrAffectation]: #variableDeclarationOrAffectation
 
-- _[variableDeclarationOrAffectation]_ `,` _[restOfVarDecAff]_
-- _[dataType]_ _[restOfVarDecAff]_
+## variableDeclaration
+[variableDeclaration]: #variableDeclaration
 
-## restOfVarDecAff
-[restOfVarDecAff]: #restOfVarDecAff
+- _[dataTypeLiteral]_ _[variableDeclaratorsList]_ `;`
 
-- _[variableIdentifierArrayLiteral]_
-- _[identifier]_ `=` _[expression]_
+## variableDeclaratorsList
+[variableDeclaratorsList]: #variableDeclaratorsList
 
+- _[variableDeclaratorsList]_ `,` _[variableDeclarator]_
+- _[variableDeclarator]_
+
+## variableDeclarator
+[variableDeclarator]: #variableDeclarator
+
+- _[declarator]_
+- _[declarator]_ `=` _[expression]_
 
 ## return
 [return]: #return
 
-- `return` _[expressionOrVoid]_ `;`
-
-## expressionOrVoid
-[expressionOrVoid]: #expressionOrVoid
-
-- _[expression]_
-- ε 
+- `return` _[expression]_ `;`
+- `return` `;`
 
 ## expression
 [expression]: #expression
@@ -229,36 +209,38 @@ ArrayDataType = DataType "[" IntegerLiteral "]"
 ## op
 [op]: #op
 
-- `==`
-- `!=`
-- `<`
-- `<=`
-- `>`
-- `>=`
-- `<<`
-- `>>`
-- `=`
-- `+`
-- `-`
-- `*`
-- `/`
-- `%`
-- `+=`
-- `-=`
-- `*=`
-- `/=`
-- `%=`
-- `<<=`
-- `>>=`
-- `&=`
-- `^=`
-- `|=`
-- `|`
-- `^`
-- `&`
-- `||`
-- `&&`
-- `,`
+op | prec | assoc
+---| ---- | -----
+, |  0   | right
+= |  1   | right
+*=|  1   | right
+/=|  1   | right
+%=|  1   | right
++=|  1   | right
+-=|  1   | right
+<<=|  1   | right
+>>=|  1   | right
+&=|  1   | right
+^=|  1   | right
+|=|  1   | right
+&#124;&#124; | 2 | left
+&& | 3 | left
+&#124; | 4 | left
+^ | 5 | left
+& | 6 | left
+== | 7 | left
+!= | 8 | left
+< | 9 | left
+&#62; | 9 | left
+<= | 9 | left
+>= | 9 | left
+<< | 10 | left
+&#62;&#62; | 10 | left
++ | 11 | left
+- | 11 | left
+* | 12 | left
+/ | 12 | left
+% | 12 | left
 
 ## variableAffectation
 [variableAffectation]: #variableAffectation
@@ -318,19 +300,17 @@ ArrayDataType = DataType "[" IntegerLiteral "]"
 
 - `while` `(` _[expression]_ `)` _[instruction]_
 
+
 ## for
 [for]: #for
 
 - `for` `(`  _[expressionOrVoid]_ `;` _[expressionOrVoid]_  `;` _[expressionOrVoid]_ `)` _[instruction]_
 
+## expressionOrVoid
+[expressionOrVoid]: #expressionOrVoid
 
-
-
-
-
-
-
-
+- _[expression]_
+- ε
 
 
 
