@@ -55,11 +55,11 @@ TEST(comp__ir__build_ir, buildFunctionIR) {
     ast::Parameter::Create(
       ast::LiteralDataType::Create(
         ast::Identifier::Create("int32_t")),
-      ast::Identifier::Create("bar1")),
+      ast::IdentifierDeclarator::Create(ast::Identifier::Create("bar1"))),
     ast::Parameter::Create(
       ast::LiteralDataType::Create(
         ast::Identifier::Create("int32_t")),
-      ast::Identifier::Create("bar2"))
+      ast::IdentifierDeclarator::Create(ast::Identifier::Create("bar2")))
   };
   std::shared_ptr<ast::DataType> return_type = ast::LiteralDataType::Create(
     ast::Identifier::Create("int64_t"));

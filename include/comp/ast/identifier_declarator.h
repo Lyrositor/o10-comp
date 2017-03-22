@@ -18,9 +18,8 @@ struct IdentifierDeclarator final : public Declarator {
 
   ~IdentifierDeclarator();
 
-  /**
-   * `size` is the `nullptr` if the size is unknown.
-   */
+  std::string GetName() override;
+
   const std::shared_ptr<Identifier> identifier;
 };
 }  // namespace ast

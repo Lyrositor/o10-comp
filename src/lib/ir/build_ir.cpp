@@ -1,6 +1,7 @@
 #include <comp/ir/build_ir.h>
 
 #include <comp/ir/builtins.h>
+#include <comp/ir/parameter.h>
 #include <comp/ir/op.h>
 
 namespace comp {
@@ -52,7 +53,7 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
       }
     }
     parameters.emplace_back(
-      new Parameter(data_type, parameter->identifier->name));
+      new Parameter(data_type, parameter->declarator->GetName()));
   }
 
   // Create the IR of the function's return type
