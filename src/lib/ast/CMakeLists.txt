@@ -31,5 +31,6 @@ add_library(
   uint8_literal.cpp
   unary_expression.cpp
   variable_declaration.cpp
+  variable_declarator.cpp
   while_statement.cpp
 )
