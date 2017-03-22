@@ -15,6 +15,22 @@ void BasicBlock::Push(std::shared_ptr<Op> op) {
   this->ops_.push_back(op);
 }
 
+std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfTrue() {
+  this->branchIfTrue_;
+}
+
+void BasicBlock::SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue) {
+  this->branchIfTrue_ = branchIfTrue;
+}
+
+std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() {
+  this->branchIfFalse_;
+}
+
+void BasicBlock::SetBranchIfFalse(std::shared_ptr<BasicBlock> branchIfFalse) {
+  this->branchIfFalse_ = branchIfFalse;
+}
+
 BasicBlock::~BasicBlock() {
 }
 }  // namespace ir
