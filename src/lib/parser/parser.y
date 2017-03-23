@@ -138,13 +138,13 @@ program:
 
 declarationsList:
     /*declarationsList functionDeclaration{
-        std::shared_ptr<comp::ast::Function> decl($2);
-        $1->push_back(decl);
+        std::shared_ptr<comp::ast::Function> functionDeclaration($2);
+        $1->push_back(functionDeclaration);
         $$ = $1;
     }
     | declarationsList functionDefinition {
-        std::shared_ptr<comp::ast::Function> def($2);
-        $1->push_back(def);
+        std::shared_ptr<comp::ast::Function> functionDefinition($2);
+        $1->push_back(functionDefinition);
         $$ = $1;
     } */
     |  declarationsList variableDeclaration {
@@ -161,12 +161,12 @@ functionDeclaration:
         std::shared_ptr<comp::ast::DataType> dataType($1);
         std::shared_ptr<comp::ast::Identifier> identifier($2);
         std::shared_ptr<comp::ast::Parameter> parametersList($4);
-        $$ = new comp::ast::Declaration(dataType, identifier, parametersList);
+        $$ = new comp::ast::Function(dataType, identifier, parametersList);
     }
     | dataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON{
         std::shared_ptr<comp::ast::DataType> dataType($1);
         std::shared_ptr<comp::ast::Identifier> identifier($2);
-        $$ = new comp::ast::Declaration(dataType, identifier);
+        $$ = new comp::ast::Function(dataType, identifier);
     }
 
 dataType:
@@ -257,7 +257,7 @@ variableDeclaratorsList:
     }
     /*| variableDeclarator {
         std::shared_ptr<comp::ast::VariableDeclarator> variableDeclarator($1);
-        $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator>>($1);
+        $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator>>;
         $$->push_back($1);
     }*/
 
@@ -285,7 +285,7 @@ LValue:
     | functionCall OPEN_BRACKET expr CLOSE_BRACKET {
         std::shared_ptr<comp::ast::CallExpression> functionCall($1);
         std::shared_ptr<comp::ast::Expression> expr($3);
-        $$ = new comp::ast::LExpression(identifier, expr);
+        $$ = new comp::ast::LExpression(functionCall, expr);
     }
 
 varUpdate:
@@ -302,7 +302,7 @@ varUpdate:
     | INCREMENT_OPERATOR LValue {
         comp::ast::UnaryOperator op = comp::ast::UnaryOperator::PrefixIncrement;
         std::shared_ptr<comp::ast::Identifier> LValue($2);
-        $$ = new comp::ast::UnaryExpression(op, identifier);
+        $$ = new comp::ast::UnaryExpression(op, LValue);
     }
     | DECREMENT_OPERATOR LValue{
         comp::ast::UnaryOperator op = comp::ast::UnaryOperator::PrefixDecrement;
@@ -689,5 +689,4 @@ expr:
       std::shared_ptr<comp::ast::RExpression> left($2);
       $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Unaryplus, left, nullptr);
     }
-
 %%
