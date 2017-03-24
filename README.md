@@ -7,6 +7,16 @@ The test dependencies are required for unit tests, coverage analysis and memory 
 
 The project is continuously tested with [this docker image](https://raw.githubusercontent.com/demurgos/docker-cpp/master/insa/Dockerfile).
 
+You can get start a session with the environment of the Docker image above by running
+the following command in an empty directory:
+
+```shell
+# Run as a normal user
+docker run --interactive --tty --volume "$(pwd):$(pwd)" demurgos/cpp:insa-gcc-5 /bin/bash
+```
+
+Then, you can get the project (`git clone <repo_uri>`) and follow the build steps.
+
 ### Build dependencies
 
 - _CMake_ 2.8
@@ -19,6 +29,7 @@ The project is continuously tested with [this docker image](https://raw.githubus
 - _lcov_
 - _Python_ 3
 - _valgrind_
+- _clang_
 
 ## Configure and build
 
@@ -27,16 +38,41 @@ To do so, specify the `BISON_EXECUTABLE` `FLEX_EXECUTABLE` variables when runnin
 
 ```shell
 # Run as a normal user
+# Install the dependencies
+make prepare
+# Build all the targets of the project
 make
-# You can also run it manually:
-# make prepare && make build
 ```
+
+You will get the following artifacts:
+
+- **build/comp_main**: The compiler executable
+- **build/comp_test**: The executable that runs the unit-tests
+- **build/src/lib/libcomp.so**: The compiler library, the headers are in **include/**
 
 ## Test
 
 ```shell
 # Run as a normal user
 make test
+```
+
+This will run the unit-tests once, then run them again with _Valgring_ and then build
+the main executable and run the end-to-end tests.
+
+You can run each step individually with the following commands:
+
+```shell
+# Run as a normal user
+make test.unit
+make test.memory
+make test.end-to-end
+```
+
+Finally, you can also run the unit tests with test coverage analysis with:
+
+```shell
+make coverage
 ```
 
 ## License
