@@ -17,15 +17,15 @@ ArrayDeclarator::ArrayDeclarator(
   std::shared_ptr<SourceLocation> location
 ) :
   Declarator(Type::ArrayDeclarator, location),
-  declarator_(declarator),
-  size_(size) {
+  declarator(declarator),
+  size(size) {
 }
 
 ArrayDeclarator::~ArrayDeclarator() {
 }
 
 std::string ArrayDeclarator::GetName() {
-  return declarator_->GetName();
+  return declarator->GetName();
 }
 }  // namespace ast
 }  // namespace comp

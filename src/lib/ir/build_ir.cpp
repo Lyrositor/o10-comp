@@ -1,8 +1,8 @@
 #include <comp/ir/build_ir.h>
 
 #include <comp/ir/builtins.h>
-#include <comp/ir/op.h>
 #include <comp/ir/parameter.h>
+#include <comp/ir/op.h>
 
 namespace comp {
 namespace ir {
@@ -79,7 +79,6 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     variables_table[parameter->GetName()] = Variable::Create(
       parameter->GetDataType());
   }
-  // TODO(Lyrositor) Handle `variables` parameter properly
   ChildContext function_context(
     context, SymbolTable({}, variables_table, {}), {});
 
@@ -87,6 +86,7 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   std::shared_ptr<BasicBlock> first_block = BasicBlock::create();
   BuildBlockStatementIR(*node.body, function_context, first_block);
   function->SetBody(first_block);
+  function->SetLocalVariables(function_context.GetVariables());
 
   return function;
 }
@@ -98,7 +98,34 @@ std::shared_ptr<const DataType> BuildDataTypeIR(
   std::shared_ptr<const DataType> data_type;
   switch (data_type_node->node_type) {
     case ast::Node::Type::ArrayDataType: {
-      // TODO(Lyrositor) Handle arrays
+      std::shared_ptr<ast::ArrayDataType>
+        e = std::static_pointer_cast<ast::ArrayDataType>(data_type_node);
+
+      // Check if the array size was specified
+      // If it was specified, view this as a segment of contiguous memory (an
+      // array); if not, view it as an ordinary pointer.
+      if (e->size != nullptr) {
+        size_t size;
+        switch (e->size->node_type) {
+          case ast::Node::Type::Int64Literal:
+            size = static_cast<size_t>(
+              std::static_pointer_cast<ast::Int64Literal>(e->size)->value);
+            break;
+          case ast::Node::Type::Uint8Literal:
+            size = static_cast<size_t>(
+              std::static_pointer_cast<ast::Uint8Literal>(e->size)->value);
+            break;
+          default:
+            // Currently, we only support literals to specify array size
+            throw std::runtime_error("Array length not a literal");
+        }
+        data_type = ArrayDataType::Create(
+          BuildDataTypeIR(context, e->item_type),
+          size);
+      } else {
+        data_type = PointerDataType::Create(
+          BuildDataTypeIR(context, e->item_type));
+      }
       break;
     }
     case ast::Node::Type::LiteralDataType: {

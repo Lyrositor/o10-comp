@@ -41,5 +41,21 @@ size_t ArrayDataType::GetSize() const {
 
 ArrayDataType::~ArrayDataType() {
 }
+
+std::unique_ptr<PointerDataType> PointerDataType::Create(
+  std::shared_ptr<const DataType> pointed_type) {
+  return std::unique_ptr<PointerDataType>(new PointerDataType(pointed_type));
+}
+
+PointerDataType::PointerDataType(std::shared_ptr<const DataType> pointed_type) :
+  pointed_type_(pointed_type) {
+}
+
+PointerDataType::~PointerDataType() {
+}
+
+size_t PointerDataType::GetSize() const {
+  return sizeof(uint64_t);  // TODO(Lyrositor) Remove this
+}
 }  // namespace ir
 }  // namespace comp

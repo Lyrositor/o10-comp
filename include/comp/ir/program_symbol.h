@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <set>
 #include <vector>
 
 #include "comp/ir/basic_block.h"
@@ -43,12 +44,17 @@ class FunctionSymbol final : public ProgramSymbol {
 
   std::shared_ptr<const DataType> GetReturnType() const;
 
+  std::set<std::shared_ptr<Variable>> GetLocalVariables() const;
+
   void SetBody(std::shared_ptr<BasicBlock> body);
+
+  void SetLocalVariables(std::set<std::shared_ptr<Variable>> local_variables);
 
  private:
   std::vector<std::shared_ptr<const Parameter>> parameters_;
   const std::shared_ptr<const DataType> return_type_;
   std::shared_ptr<BasicBlock> body_;
+  std::set<std::shared_ptr<Variable>> local_variables_;
 };
 }  // namespace ir
 }  // namespace comp

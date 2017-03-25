@@ -22,7 +22,7 @@ struct ArrayDeclarator final : public Declarator {
 
   std::string GetName() override;
 
-  std::shared_ptr<Declarator> declarator_;
+  std::shared_ptr<Declarator> declarator;
 
   /**
    * `size` is the `nullptr` if the size is unknown.

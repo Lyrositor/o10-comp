@@ -1,4 +1,5 @@
 #include <comp/ir/program_symbol.h>
+#include <set>
 
 namespace comp {
 namespace ir {
@@ -41,8 +42,17 @@ std::shared_ptr<const DataType> FunctionSymbol::GetReturnType() const {
   return return_type_;
 }
 
+std::set<std::shared_ptr<Variable>> FunctionSymbol::GetLocalVariables() const {
+  return local_variables_;
+}
+
 void FunctionSymbol::SetBody(std::shared_ptr<BasicBlock> body) {
   body_ = body;
+}
+
+void FunctionSymbol::SetLocalVariables(
+  std::set<std::shared_ptr<Variable>> local_variables) {
+  local_variables_ = local_variables;
 }
 }  // namespace ir
 }  // namespace comp

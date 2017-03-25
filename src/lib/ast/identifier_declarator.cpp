@@ -13,14 +13,14 @@ std::unique_ptr<IdentifierDeclarator> IdentifierDeclarator::Create(
 IdentifierDeclarator::IdentifierDeclarator(
   std::shared_ptr<Identifier> identifier,
   std::shared_ptr<SourceLocation> location
-) : Declarator(Type::IdentifierDeclarator, location), identifier_(identifier) {
+) : Declarator(Type::IdentifierDeclarator, location), identifier(identifier) {
 }
 
 IdentifierDeclarator::~IdentifierDeclarator() {
 }
 
 std::string IdentifierDeclarator::GetName() {
-  return identifier_->name;
+  return identifier->name;
 }
 }  // namespace ast
 }  // namespace comp

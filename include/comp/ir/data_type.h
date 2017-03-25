@@ -36,5 +36,19 @@ class ArrayDataType final : public DataType {
   const std::shared_ptr<const DataType> item_type_;
   const size_t length_;
 };
+
+class PointerDataType final : public DataType {
+ public:
+  static std::unique_ptr<PointerDataType> Create(
+    std::shared_ptr<const DataType> pointed_type);
+
+  PointerDataType(std::shared_ptr<const DataType> pointed_type);
+
+  ~PointerDataType();
+
+  size_t GetSize() const;
+ private:
+  const std::shared_ptr<const DataType> pointed_type_;
+};
 }  // namespace ir
 }  // namespace comp
