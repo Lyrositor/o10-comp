@@ -13,6 +13,10 @@ std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node);
 std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   const ast::Function &node, Context &context);
 
+std::shared_ptr<const DataType> BuildDataTypeIR(
+  const Context & context,
+  std::shared_ptr<ast::DataType> data_type_node);
+
 // Statements
 void BuildStatementIR(
   const ast::Statement &node,

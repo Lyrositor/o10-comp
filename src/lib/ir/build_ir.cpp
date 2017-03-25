@@ -1,8 +1,8 @@
 #include <comp/ir/build_ir.h>
 
 #include <comp/ir/builtins.h>
-#include <comp/ir/parameter.h>
 #include <comp/ir/op.h>
+#include <comp/ir/parameter.h>
 
 namespace comp {
 namespace ir {
@@ -35,44 +35,17 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   // Create the IR of the function's parameters
   std::vector<std::shared_ptr<const Parameter>> parameters;
   for (auto parameter : node.parameters) {
-    std::shared_ptr<const DataType> data_type;
-    switch (parameter->data_type->node_type) {
-      case ast::Node::Type::ArrayDataType: {
-        // TODO(Lyrositor) Handle arrays
-        break;
-      }
-      case ast::Node::Type::LiteralDataType: {
-        std::shared_ptr<ast::LiteralDataType>
-          e = std::static_pointer_cast<ast::LiteralDataType>(
-          parameter->data_type);
-        data_type = context.ResolveDataType(e->identifier->name);
-        break;
-      }
-      default: {
-        throw std::domain_error("Unexpected data type for parameter");
-      }
-    }
+    std::shared_ptr<const DataType> data_type = BuildDataTypeIR(
+      context,
+      parameter->data_type);
     parameters.emplace_back(
       new Parameter(data_type, parameter->declarator->GetName()));
   }
 
   // Create the IR of the function's return type
-  std::shared_ptr<const DataType> return_type;
-  switch (node.return_type->node_type) {
-    case ast::Node::Type::ArrayDataType: {
-      // TODO(Lyrositor) Handle arrays
-      break;
-    }
-    case ast::Node::Type::LiteralDataType: {
-      std::shared_ptr<ast::LiteralDataType>
-        e = std::static_pointer_cast<ast::LiteralDataType>(node.return_type);
-      return_type = context.ResolveDataType(e->identifier->name);
-      break;
-    }
-    default: {
-      throw std::domain_error("Unexpected data type for parameter");
-    }
-  }
+  std::shared_ptr<const DataType> return_type = BuildDataTypeIR(
+    context,
+    node.return_type);
 
   // Add declaration to context, if it hasn't already been done
   std::shared_ptr<FunctionSymbol> function;
@@ -80,8 +53,7 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     function = context.ResolveFunction(node.identifier->name);
   } catch (std::runtime_error &) {
     // Register the function's symbol (without a body initially)
-    function = FunctionSymbol::Create(
-      parameters, return_type);
+    function = FunctionSymbol::Create(parameters, return_type);
     context.RegisterFunction(node.identifier->name, function);
     if (node.body == nullptr) {
       return nullptr;
@@ -117,6 +89,29 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   function->SetBody(first_block);
 
   return function;
+}
+
+std::shared_ptr<const DataType> BuildDataTypeIR(
+  const Context & context,
+  std::shared_ptr<ast::DataType> data_type_node
+) {
+  std::shared_ptr<const DataType> data_type;
+  switch (data_type_node->node_type) {
+    case ast::Node::Type::ArrayDataType: {
+      // TODO(Lyrositor) Handle arrays
+      break;
+    }
+    case ast::Node::Type::LiteralDataType: {
+      std::shared_ptr<ast::LiteralDataType>
+        e = std::static_pointer_cast<ast::LiteralDataType>(data_type_node);
+      data_type = context.ResolveDataType(e->identifier->name);
+      break;
+    }
+    default: {
+      throw std::domain_error("Unexpected data type");
+    }
+  }
+  return data_type;
 }
 
 void BuildStatementIR(
