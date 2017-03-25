@@ -2,11 +2,11 @@
 
 namespace comp {
 namespace ast {
-std::shared_ptr<Int64Literal> Int64Literal::Create(
+std::unique_ptr<Int64Literal> Int64Literal::Create(
   int64_t value,
   std::shared_ptr<SourceLocation> location
 ) {
-  return std::shared_ptr<Int64Literal>(new Int64Literal(value, location));
+  return std::unique_ptr<Int64Literal>(new Int64Literal(value, location));
 }
 
 Int64Literal::Int64Literal(

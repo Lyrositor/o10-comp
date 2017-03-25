@@ -9,7 +9,7 @@ class ArrayDataType extends DataType {
 }
 
 class ArrayDeclarator extends Declarator {
-  +std::shared_ptr<RExpression> size
+  +const std::shared_ptr<RExpression> size
   {static} +std::unique_ptr<ArrayDeclarator> Create()
 }
 
@@ -69,7 +69,7 @@ class BlockStatement extends Statement {
 }
 
 class CallExpression extends RExpression {
-  +std::shared_ptr<RExpression> callee
+  +const std::shared_ptr<RExpression> callee
   +std::vector<std::shared_ptr<RExpression>> arguments
   {static} +std::unique_ptr<CallExpression> Create()
 }
@@ -105,7 +105,7 @@ class Identifier extends LExpression {
 }
 
 class IdentifierDeclarator extends Declarator {
-  +std::shared_ptr<Identifier> identifier
+  +const std::shared_ptr<Identifier> identifier
   {static} +std::unique_ptr<IdentifierDeclarator> Create()
 }
 
@@ -118,7 +118,7 @@ class IfStatement extends Statement {
 
 class Int64Literal extends Literal {
   +const int64_t value
-  {static} +std::shared_ptr<Int64Literal> Create()
+  {static} +std::unique_ptr<Int64Literal> Create()
 }
 
 abstract class LExpression extends RExpression {
@@ -202,8 +202,8 @@ abstract class Statement extends Node {
 }
 
 class SubscriptExpression extends LExpression {
-  +std::shared_ptr<RExpression> array
-  +std::shared_ptr<RExpression> index
+  +const std::shared_ptr<RExpression> array
+  +const std::shared_ptr<RExpression> index
   {static} +std::unique_ptr<SubscriptExpression> Create()
 }
 

@@ -21,7 +21,7 @@ struct ArrayDeclarator final : public Declarator {
   /**
    * `size` is the `nullptr` if the size is unknown.
    */
-  std::shared_ptr<RExpression> size;
+  const std::shared_ptr<RExpression> size;
 };
 }  // namespace ast
 }  // namespace comp

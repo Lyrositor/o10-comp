@@ -19,8 +19,8 @@ struct SubscriptExpression final : public LExpression {
 
   ~SubscriptExpression();
 
-  std::shared_ptr<RExpression> array;
-  std::shared_ptr<RExpression> index;
+  const std::shared_ptr<RExpression> array;
+  const std::shared_ptr<RExpression> index;
 };
 }  // namespace ast
 }  // namespace comp

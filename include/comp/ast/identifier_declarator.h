@@ -21,7 +21,7 @@ struct IdentifierDeclarator final : public Declarator {
   /**
    * `size` is the `nullptr` if the size is unknown.
    */
-  std::shared_ptr<Identifier> identifier;
+  const std::shared_ptr<Identifier> identifier;
 };
 }  // namespace ast
 }  // namespace comp

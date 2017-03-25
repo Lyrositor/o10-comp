@@ -7,7 +7,7 @@
 namespace comp {
 namespace ast {
 struct Int64Literal final : public Literal {
-  static std::shared_ptr<Int64Literal> Create(
+  static std::unique_ptr<Int64Literal> Create(
     int64_t value,
     std::shared_ptr<SourceLocation> location = nullptr);
 

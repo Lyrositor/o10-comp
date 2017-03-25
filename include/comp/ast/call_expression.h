@@ -19,7 +19,7 @@ struct CallExpression final : public RExpression {
 
   ~CallExpression();
 
-  std::shared_ptr<RExpression> callee;
+  const std::shared_ptr<RExpression> callee;
   std::vector<std::shared_ptr<RExpression>> arguments;
 };
 }  // namespace ast
