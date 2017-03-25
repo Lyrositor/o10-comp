@@ -1,113 +1,253 @@
 @startuml
 
+namespace comp.ast {
+
+class ArrayDataType extends DataType {
+  +const std::shared_ptr<DataType> item_type
+  +const std::shared_ptr<RExpression> size
+  {static} +std::unique_ptr<ArrayDataType> Create()
+}
+
+class ArrayDeclarator extends Declarator {
+  +std::shared_ptr<RExpression> size
+  {static} +std::unique_ptr<ArrayDeclarator> Create()
+}
+
+class AssignmentExpression extends RExpression {
+  +AssignmentOperator op
+  +LExpression lvalue
+  +RExpression lvalue
+  {static} +std::unique_ptr<AssignmentExpression> Create()
+}
+
+enum AssignmentOperator {
+  Addition
+  BitwiseAnd
+  BitwiseOr
+  BitwiseXor
+  Division
+  LeftShift
+  Multiplication
+  Remainder
+  RightShift
+  Simple
+  Subtraction
+}
+
+class BinaryExpression extends RExpression {
+  +const BinaryOperator op
+  +const std::shared_ptr<RExpression> left
+  +const std::shared_ptr<RExpression> right
+  {static} +std::unique_ptr<BinaryExpression> Create()
+}
+
+enum BinaryOperator {
+  Addition
+  BitwiseAnd
+  BitwiseOr
+  BitwiseXor
+  Comma
+  Division
+  Equality
+  GreaterThan,
+  GreaterThanOrEqual
+  Inequality
+  LeftShift
+  LessThan
+  LessThanOrEqualTo
+  LogicalAnd
+  LogicalOr
+  Multiplication
+  Remainder
+  RightShift
+  Subtraction
+}
+
+class BlockStatement extends Statement {
+  +const std::vector<std::shared_ptr<Statement>> body
+  {static} +std::unique_ptr<BlockStatement> Create()
+}
+
+class CallExpression extends RExpression {
+  +std::shared_ptr<RExpression> callee
+  +std::vector<std::shared_ptr<RExpression>> arguments
+  {static} +std::unique_ptr<CallExpression> Create()
+}
+
+abstract class DataType extends Node {
+}
+
+abstract class Declaration extends Statement {
+}
+
+abstract class Declarator extends Node {
+}
+
+class ForStatement extends Statement {
+  +const std::shared_ptr<Statement> initialization
+  +const std::shared_ptr<Statement> condition
+  +const std::shared_ptr<Statement> iteration
+  +const std::shared_ptr<Statement> body
+  {static} +std::unique_ptr<ForStatement> Create()
+}
+
+class Function extends Declaration {
+  +const std::shared_ptr<Identifier> identifier
+  +const std::vector<std::shared_ptr<Parameter>> parameters
+  +const std::shared_ptr<DataType> return_type
+  +const std::shared_ptr<BlockStatement> body
+  {static} +std::unique_ptr<Function> Create()
+}
+
+class Identifier extends LExpression {
+  +const std::string name
+  {static} +std::unique_ptr<Identifier> Create()
+}
+
+class IdentifierDeclarator extends Declarator {
+  +std::shared_ptr<Identifier> identifier
+  {static} +std::unique_ptr<IdentifierDeclarator> Create()
+}
+
+class IfStatement extends Statement {
+  +const std::shared_ptr<RExpression> test
+  +const std::shared_ptr<Statement> consequence
+  +const std::shared_ptr<Statement> alternative
+  {static} +std::unique_ptr<IfStatement> Create()
+}
+
+class Int64Literal extends Literal {
+  +const int64_t value
+  {static} +std::shared_ptr<Int64Literal> Create()
+}
+
+abstract class LExpression extends RExpression {
+}
+
+abstract class Literal extends RExpression {
+}
+
+class LiteralDataType extends DataType {
+  +const std::shared_ptr<Identifier> identifier
+  {static} +std::unique_ptr<LiteralDataType> Create()
+}
+
+abstract class Node {
+  +const Type node_type
+  +const std::shared_ptr<SourceLocation> location
+}
+
+enum Node::Type {
+ArrayDataType
+    ArrayDeclarator
+    AssignmentExpression
+    BinaryExpression
+    BlockStatement
+    CallExpression
+    ExpressionStatement
+    ForStatement
+    Function
+    Identifier
+    IdentifierDeclarator
+    IfStatement
+    Int64Literal
+    LiteralDataType
+    NullStatement
+    Parameter
+    Program
+    ReturnStatement,
+    SubscriptExpression
+    Uint8Literal
+    UnaryExpression
+    VariableDeclaration
+    VariableDeclarator
+    WhileStatement
+}
+
+class NullStatement extends Statement {
+  {static} +std::unique_ptr<NullStatement> Create()
+}
+
+class Parameter extends Node {
+  +const std::shared_ptr<LiteralDataType> data_type
+  +const std::shared_ptr<Declarator> declarator
+  {static} +std::unique_ptr<Parameter> Create()
+}
+
 class Position {
-  +index: usize_t
-  +line: usize_t
-  +column: usize_t
+  +const size_t index
+  +const size_t line
+  +const size_t column
+}
+
+class Program extends Node {
+  +const std::vector<std::shared_ptr<Declaration>> body
+  {static} +std::unique_ptr<Program> Create()
+}
+
+class ReturnStatement extends Statement {
+  +const std::shared_ptr<RExpression> expression
+  {static} +std::unique_ptr<ReturnStatement> Create()
+}
+
+abstract class RExpression extends Node {
 }
 
 class SourceLocation {
-  +start: Position
-  +end: Position
-  +file_path: string
+  +const Position start
+  +const Position end
 }
 
-class Node {
-  +type: NodeType
-  +location: SourceLocation
+abstract class Statement extends Node {
 }
 
-class Program {
-  +body: Declaration[]
+class SubscriptExpression extends LExpression {
+  +std::shared_ptr<RExpression> array
+  +std::shared_ptr<RExpression> index
+  {static} +std::unique_ptr<SubscriptExpression> Create()
 }
 
-class Expression {
-
+class Uint8Literal extends Literal {
+  +const uint8_t value
+  {static} +std::unique_ptr<Uint8Literal> Create()
 }
 
-class Statement {
-
+class UnaryExpression extends RExpression {
+  +const UnaryOperator op
+  +const std::shared_ptr<RExpression> expression
+  {static} +std::unique_ptr<UnaryExpression> Create()
 }
 
-class BlockStatement {
-  +body: Statement[]
+enum UnaryOperator {
+  Address
+  BitwiseComplement
+  Indirection
+  LogicalNegation
+  PostfixDecrement
+  PostfixIncrement
+  PrefixDecrement
+  PrefixIncrement
+  UnaryMinus
+  UnaryPlus
 }
 
-class Declaration {
-
+class VariableDeclaration extends Declaration {
+  +const std::shared_ptr<DataType> data_type
+  +const std::vector<std::shared_ptr<VariableDeclarator>> declarators
+  {static} +std::unique_ptr<VariableDeclaration> Create()
 }
 
-
-class DataType {
-
+class VariableDeclarator extends Node {
+  +const std::shared_ptr<Declarator> declarator
+  +const std::shared_ptr<RExpression> initial_value
+  {static} +std::unique_ptr<VariableDeclarator> Create()
 }
 
-class LiteralDataType {
-  identifier: Identifier
+class WhileStatement extends Statement {
+  +const std::shared_ptr<RExpression> condition
+  +const std::shared_ptr<Statement> body
+  {static} +std::unique_ptr<WhileStatement> Create()
 }
-
-class ArrayDataType {
-  itemType: Type
 }
-
-
-class VariableDeclaration {
-  +type: Type;
-  +declarations: VariableDeclarator[];
-}
-
-class VariableDeclarator {
-  +identifier: Identifier | Array...;
-  +initialValue: nullptr | Expression *;
-}
-
-class Function {
-  +identifier: Identifier;
-  +parameters: FunctionParameter[];
-  +body: nullptr | BlockStatement *;
-}
-
-class Parameter {
-  +type: Type;
-  +identifier: Identifier;
-}
-
-class ExpressionStatement {
-  +expression: Expression *
-}
-
-
-class IfStatement {
-  +test: Expression *
-  +consequence: Statement *
-  +alternative: nullptr | Statement *
-}
-
-class Identifier {
-  +name: string
-}
-
-class BinaryExpression {
-  +op
-  +left: Expression
-  +right: Expression
-}
-
-Program --> Node
-Expression --> Node
-Declaration --> Statement
-VariableDeclaration --> Declaration
-Function --> Declaration
-VariableDeclarator --> Node
-Statement --> Node
-BlockStatement --> Statement
-ExpressionStatement --> Statement
-IfStatement --> Statement
-Identifier --> Expression
-Parameter --> Node
-BinaryExpression --> Expression
-DataType --> Node
-LiteralDataType --> DataType
-ArrayDataType --> DataType
 
 @enduml
