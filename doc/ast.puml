@@ -1,19 +1,24 @@
 @startuml
 
-namespace comp.ast {
+hide empty fields
+hide empty methods
+set namespaceSeparator ::
+skinparam linetype polyline
 
-class ArrayDataType extends DataType {
+namespace comp::ast {
+
+class ArrayDataType << (S,#ffbb33) >> extends DataType {
   +const std::shared_ptr<DataType> item_type
   +const std::shared_ptr<RExpression> size
   {static} +std::unique_ptr<ArrayDataType> Create()
 }
 
-class ArrayDeclarator extends Declarator {
+class ArrayDeclarator << (S,#ffbb33) >>  extends Declarator {
   +const std::shared_ptr<RExpression> size
   {static} +std::unique_ptr<ArrayDeclarator> Create()
 }
 
-class AssignmentExpression extends RExpression {
+class AssignmentExpression << (S,#ffbb33) >>  extends RExpression {
   +AssignmentOperator op
   +LExpression lvalue
   +RExpression lvalue
@@ -34,7 +39,7 @@ enum AssignmentOperator {
   Subtraction
 }
 
-class BinaryExpression extends RExpression {
+class BinaryExpression << (S,#ffbb33) >>  extends RExpression {
   +const BinaryOperator op
   +const std::shared_ptr<RExpression> left
   +const std::shared_ptr<RExpression> right
@@ -63,12 +68,12 @@ enum BinaryOperator {
   Subtraction
 }
 
-class BlockStatement extends Statement {
+class BlockStatement << (S,#ffbb33) >>  extends Statement {
   +const std::vector<std::shared_ptr<Statement>> body
   {static} +std::unique_ptr<BlockStatement> Create()
 }
 
-class CallExpression extends RExpression {
+class CallExpression << (S,#ffbb33) >>  extends RExpression {
   +const std::shared_ptr<RExpression> callee
   +std::vector<std::shared_ptr<RExpression>> arguments
   {static} +std::unique_ptr<CallExpression> Create()
@@ -83,7 +88,7 @@ abstract class Declaration extends Statement {
 abstract class Declarator extends Node {
 }
 
-class ForStatement extends Statement {
+class ForStatement << (S,#ffbb33) >>  extends Statement {
   +const std::shared_ptr<Statement> initialization
   +const std::shared_ptr<Statement> condition
   +const std::shared_ptr<Statement> iteration
@@ -91,7 +96,7 @@ class ForStatement extends Statement {
   {static} +std::unique_ptr<ForStatement> Create()
 }
 
-class Function extends Declaration {
+class Function << (S,#ffbb33) >>  extends Declaration {
   +const std::shared_ptr<Identifier> identifier
   +const std::vector<std::shared_ptr<Parameter>> parameters
   +const std::shared_ptr<DataType> return_type
@@ -99,24 +104,24 @@ class Function extends Declaration {
   {static} +std::unique_ptr<Function> Create()
 }
 
-class Identifier extends LExpression {
+class Identifier << (S,#ffbb33) >>  extends LExpression {
   +const std::string name
   {static} +std::unique_ptr<Identifier> Create()
 }
 
-class IdentifierDeclarator extends Declarator {
+class IdentifierDeclarator << (S,#ffbb33) >>  extends Declarator {
   +const std::shared_ptr<Identifier> identifier
   {static} +std::unique_ptr<IdentifierDeclarator> Create()
 }
 
-class IfStatement extends Statement {
+class IfStatement << (S,#ffbb33) >>  extends Statement {
   +const std::shared_ptr<RExpression> test
   +const std::shared_ptr<Statement> consequence
   +const std::shared_ptr<Statement> alternative
   {static} +std::unique_ptr<IfStatement> Create()
 }
 
-class Int64Literal extends Literal {
+class Int64Literal << (S,#ffbb33) >>  extends Literal {
   +const int64_t value
   {static} +std::unique_ptr<Int64Literal> Create()
 }
@@ -127,7 +132,7 @@ abstract class LExpression extends RExpression {
 abstract class Literal extends RExpression {
 }
 
-class LiteralDataType extends DataType {
+class LiteralDataType << (S,#ffbb33) >>  extends DataType {
   +const std::shared_ptr<Identifier> identifier
   {static} +std::unique_ptr<LiteralDataType> Create()
 }
@@ -137,7 +142,7 @@ abstract class Node {
   +const std::shared_ptr<SourceLocation> location
 }
 
-enum Node::Type {
+enum comp::ast::Node::Type {
 ArrayDataType
     ArrayDeclarator
     AssignmentExpression
@@ -164,28 +169,28 @@ ArrayDataType
     WhileStatement
 }
 
-class NullStatement extends Statement {
+class NullStatement << (S,#ffbb33) >> extends Statement {
   {static} +std::unique_ptr<NullStatement> Create()
 }
 
-class Parameter extends Node {
+class Parameter << (S,#ffbb33) >> extends Node {
   +const std::shared_ptr<LiteralDataType> data_type
   +const std::shared_ptr<Declarator> declarator
   {static} +std::unique_ptr<Parameter> Create()
 }
 
-class Position {
+class Position << (S,#ffbb33) >> {
   +const size_t index
   +const size_t line
   +const size_t column
 }
 
-class Program extends Node {
+class Program << (S,#ffbb33) >> extends Node {
   +const std::vector<std::shared_ptr<Declaration>> body
   {static} +std::unique_ptr<Program> Create()
 }
 
-class ReturnStatement extends Statement {
+class ReturnStatement << (S,#ffbb33) >> extends Statement {
   +const std::shared_ptr<RExpression> expression
   {static} +std::unique_ptr<ReturnStatement> Create()
 }
@@ -193,7 +198,7 @@ class ReturnStatement extends Statement {
 abstract class RExpression extends Node {
 }
 
-class SourceLocation {
+class SourceLocation << (S,#ffbb33) >> {
   +const Position start
   +const Position end
 }
@@ -201,18 +206,18 @@ class SourceLocation {
 abstract class Statement extends Node {
 }
 
-class SubscriptExpression extends LExpression {
+class SubscriptExpression << (S,#ffbb33) >> extends LExpression {
   +const std::shared_ptr<RExpression> array
   +const std::shared_ptr<RExpression> index
   {static} +std::unique_ptr<SubscriptExpression> Create()
 }
 
-class Uint8Literal extends Literal {
+class Uint8Literal << (S,#ffbb33) >> extends Literal {
   +const uint8_t value
   {static} +std::unique_ptr<Uint8Literal> Create()
 }
 
-class UnaryExpression extends RExpression {
+class UnaryExpression << (S,#ffbb33) >> extends RExpression {
   +const UnaryOperator op
   +const std::shared_ptr<RExpression> expression
   {static} +std::unique_ptr<UnaryExpression> Create()
@@ -231,23 +236,29 @@ enum UnaryOperator {
   UnaryPlus
 }
 
-class VariableDeclaration extends Declaration {
+class VariableDeclaration << (S,#ffbb33) >> extends Declaration {
   +const std::shared_ptr<DataType> data_type
   +const std::vector<std::shared_ptr<VariableDeclarator>> declarators
   {static} +std::unique_ptr<VariableDeclaration> Create()
 }
 
-class VariableDeclarator extends Node {
+class VariableDeclarator << (S,#ffbb33) >> extends Node {
   +const std::shared_ptr<Declarator> declarator
   +const std::shared_ptr<RExpression> initial_value
   {static} +std::unique_ptr<VariableDeclarator> Create()
 }
 
-class WhileStatement extends Statement {
+class WhileStatement << (S,#ffbb33) >> extends Statement {
   +const std::shared_ptr<RExpression> condition
   +const std::shared_ptr<Statement> body
   {static} +std::unique_ptr<WhileStatement> Create()
 }
+
+DataType -[hidden]down- Declarator
+RExpression -[hidden]up- DataType
+Statement -[hidden]down- DataType
+VariableDeclarator -[hidden]right- Statement
+CallExpression -[hidden]right- Literal
 }
 
 @enduml
