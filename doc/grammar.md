@@ -27,294 +27,307 @@ White-space characters are the following :
 - `vertical tab ('\v')`
 
 Moreover, comments are treated as a white-space characters:
+They correspond to the following regular expressions (using PCRE notation):
 
-- `\/\*[\s\S]*\*\/`
-- `\/\/[^\n]+`
+- `/\*[\s\S]*\*/`
+- `//[^\n]+`
 - `(^|\n)#[^\n]+`
 
 ## Program
 [Program]: #program
 
-- _[declarationsList]_
+- _[DeclarationsList]_
 
-## declarationsList
-[declarationsList]: #declarationslist
+## DeclarationsList
+[DeclarationsList]: #declarationslist
 
-- _[declarationsList]_ _[functionDeclaration]_
-- _[declarationsList]_ _[variableDeclaration]_
-- _[declarationsList]_ _[functionDefinition]_
+- _[DeclarationsList]_ _[FunctionDeclaration]_
+- _[DeclarationsList]_ _[VariableDeclaration]_
+- _[DeclarationsList]_ _[FunctionDefinition]_
 - ε
 
-## functionDeclaration
-[functionDeclaration]: #functionDeclaration
+## FunctionDeclaration
+[FunctionDeclaration]: #functiondeclaration
 
-- _[dataType]_ _[identifier]_ `(` _[parametersList]_ `)` `;`
-- _[dataType]_ _[identifier]_ `(` `)` `;`
+- _[DataType]_ _[Identifier]_ `(` _[ParametersList]_ `)` `;`
+- _[DataType]_ _[Identifier]_ `(` `)` `;`
 
-## dataType
-[dataType]: #dataType
+## DataType
+[DataType]: #datatype
 
-- _[dataTypeLiteral]_
-- _[arrayDataType]_
+- _[DataTypeLiteral]_
+- _[ArrayDataType]_
 
-## dataTypeLiteral
-[dataTypeLiteral]: #dataTypeLiteral
+## DataTypeLiteral
+[DataTypeLiteral]: #datatypeliteral
 
 - `int32_t`
 - `int64_t`
 - `char`
 
-## arrayDataType
-[arrayDataType]: #arrayDataType
+## ArrayDataType
+[ArrayDataType]: #ArrayDataType
 
-- _[dataTypeLiteral]_ `[` `]`
+- _[DataTypeLiteral]_ `[` `]`
 
-## identifier
-[identifier]: #identifier
+## Identifier
+[Identifier]: #identifier
 
-- `[a-zA-Z_$][a-zA-Z_$0-9]*`
+- PCRE Regular Expression: `[a-zA-Z_$][a-zA-Z_$0-9]*`
 
-## parametersList
-[parametersList]: #parametersList
+## ParametersList
+[ParametersList]: #parameterslist
 
-- _[parametersList]_ `,` _[parameter]_
-- _[parameter]_
+- _[ParametersList]_ `,` _[Parameter]_
+- _[Parameter]_
 
-## parameter
-[parameter]: #parameter
+## Parameter
+[Parameter]: #parameter
 
-- _[dataTypeLiteral]_ _[declarator]_
-- _[dataType]_
+- _[DataTypeLiteral]_ _[Declarator]_
+- _[DataType]_
 
-## declarator
-[declarator]: #declarator
+It means that there are two kinds of parameters: named and anonymous parameters.
+For example, you can have the following function definition:
 
-- _[identifier]_
-- _[identifier]_ `[` `]`
-- _[identifier]_ `[` _[expression]_ `]`
+```c
+void foo(int a[], int[]) {
+  // ...
+}
+```
 
-## functionDefinition
-[functionDefinition]: #functionDefinition
+This functions takes two array pointers as parameters but only the first parameter is
+used so the second one is an anonymous parameter. This can be used to implement to have
+a given function signature without producing "unused variable" warnings.
 
-- _[dataType]_ _[identifier]_ `(` _[parametersList]_ `)` _[bloc]_
+## Declarator
+[Declarator]: #Declarator
 
-## block
-[block]: #block
+- _[Identifier]_
+- _[Identifier]_ `[` `]`
+- _[Identifier]_ `[` _[Expression]_ `]`
 
-- `{` insideBlock `}`
+For the fixed-size array declaration (third rule), the size can be any const expression.
+We keep it as this in the grammar but using anything but a literal will throw a semantic error.
+
+## FunctionDefinition
+[FunctionDefinition]: #FunctionDefinition
+
+- _[DataTypeLiteral]_ _[Identifier]_ `(` _[ParametersList]_ `)` _[Block]_
+
+In the standard C, the return type can be any _[DataType]_ (such as `int`, `int *` or `struct {}`)
+except for an array type with fixed or unknown array size (such as `int[]`, `int[5]`).
+
+Since our language is a subset of C, only with a few primitive types and array types, it means
+that the return type can be restricted to only _[DataTypeLiteral]_.
+
+## Block
+[Block]: #Block
+
+- `{` _[BlockContent]_ `}`
 - `{` `}`
 
-## insideBlock
-[insideBlock]: #insideblock
+## BlockContent
+[BlockContent]: #blockcontent
 
-- _[insideBlock]_ _[variableDeclaration]_
-- _[insideBlock]_ _[statement]_
+- _[BlockContent]_ _[VariableDeclaration]_
+- _[BlockContent]_ _[Statement]_
+- _[VariableDeclaration]_
+- _[Statement]_
 
+## VariableDeclaration
+[VariableDeclaration]: #variabledeclaration
 
-## variableDeclaration
-[variableDeclaration]: #variableDeclaration
+- _[DataTypeLiteral]_ _[VariableDeclaratorsList]_ `;`
 
-- _[dataTypeLiteral]_ _[variableDeclaratorsList]_ `;`
+## VariableDeclaratorsList
+[VariableDeclaratorsList]: #variabledeclaratorslist
 
-## variableDeclaratorsList
-[variableDeclaratorsList]: #variableDeclaratorsList
+- _[VariableDeclaratorsList]_ `,` _[VariableDeclarator]_
+- _[VariableDeclarator]_
 
-- _[variableDeclaratorsList]_ `,` _[variableDeclarator]_
-- _[variableDeclarator]_
+## VariableDeclarator
+[VariableDeclarator]: #variabledeclarator
 
-## variableDeclarator
-[variableDeclarator]: #variableDeclarator
+- _[Declarator]_
+- _[Declarator]_ `=` _[Expression]_
 
-- _[declarator]_
-- _[declarator]_ `=` _[expression]_
+## Expression
+[Expression]: #Expression
 
-## expression
-[expression]: #expression
-
-- _[expression]_ _[OP]_ _[expression]_
-- _[varUpdate]_
+- _[Expression]_ _[Op]_ _[Expression]_
+- _[VarUpdate]_
 - _[LValue]_
-- `(` _[expression]_ `)`
-- `-` _[expression]_
-- `+` _[expression]_
-- `!` _[expression]_
-- `~` _[expression]_
-- _[functionCall]_
-- _[identifier]_ `(` `)`
+- `(` _[Expression]_ `)`
+- `-` _[Expression]_
+- `+` _[Expression]_
+- `!` _[Expression]_
+- `~` _[Expression]_
+- _[FunctionCall]_
+- _[Identifier]_ `(` `)`
 - _[LiteralExpression]_
 
-// TODO lvalue
+## Op
+[Op]: #Op
 
-## op
-[op]: #op
+- One of: `,` `=` `*=` `/=` `%=` `+=` `-=` `<<=` `>>=` `&=` `^=` `|=` `||` `&&`
+  `|` `^` `&` `==` `!=` `!=` `<` `>` `<=` `>=` `<<` `>>` `+` `-` `*` `/` `%`
 
-op | prec | assoc
----| ---- | -----
-, |  0   | left
-= |  1   | right
-*=|  1   | right
-/=|  1   | right
-%=|  1   | right
-+=|  1   | right
--=|  1   | right
-<<=|  1   | right
->>=|  1   | right
-&=|  1   | right
-^=|  1   | right
-|=|  1   | right
-&#124;&#124; | 2 | left
-&& | 3 | left
-&#124; | 4 | left
-^ | 5 | left
-& | 6 | left
-== | 7 | left
-!= | 8 | left
-< | 9 | left
-&#62; | 9 | left
-<= | 9 | left
->= | 9 | left
-<< | 10 | left
-&#62;&#62; | 10 | left
-+ | 11 | left
-- | 11 | left
-* | 12 | left
-/ | 12 | left
-% | 12 | left
+Here is a table describing the properties of the various operators:
 
-// TODO tout commence par maj
+Operator                  | Name                      | Precedence | Associativity
+--------------------------|---------------------------|------------|--------------
+`,`                       | Sequence                  | 0          | left
+`=`                       | Simple Assignment         | 1          | right
+`*=`                      | Multiplication Assignment | 1          | right
+`/=`                      | Division Assignment       | 1          | right
+`%=`                      | Remainder Assignment      | 1          | right
+`+=`                      | Addition Assignment       | 1          | right
+`-=`                      | Subtraction Assignment    | 1          | right
+`<<=`                     | Left Shift Assignment     | 1          | right
+`>>=`                     | Right Shift Assignment    | 1          | right
+`&=`                      | Bitwise And Assignment    | 1          | right
+`^=`                      | Bitwise Xor Assignment    | 1          | right
+<code>&#124;=</code>      | Bitwise Or Assignment     | 1          | right
+<code>&#124;&#124;</code> | Logical Or                | 2          | left
+`&&`                      | Logical And               | 3          | left
+<code>&#124;</code>       | Bitwise Or                | 4          | left
+`^`                       | Bitwise Xor               | 5          | left
+`&`                       | Bitwise And               | 6          | left
+`==`                      | Equality                  | 7          | left
+`!=`                      | Inequality                | 8          | left
+`<`                       | LessThan                  | 9          | left
+`>`                       | GreaterThan               | 9          | left
+`<=`                      | LessThanOrEqualTo         | 9          | left
+`>=`                      | GreaterThanOrEqual        | 9          | left
+`<<`                      | Left Shift                | 10         | left
+`>>`                      | Right Shift               | 10         | left
+`+`                       | Addition                  | 11         | left
+`-`                       | Subtraction               | 11         | left
+`*`                       | Multiplication            | 12         | left
+`/`                       | Division                  | 12         | left
+`%`                       | Remainder                 | 12         | left
+
 ## LValue
-[LValue]: #LValue
+[LValue]: #lvalue
 
-- _[identifier]_
-- _[identifier]_ `[` _[expression]_ `]`
-- _[functionCall]_ `[` _[expression]_ `]`
+- _[Identifier]_
+- _[Identifier]_ `[` _[Expression]_ `]`
+- _[FunctionCall]_ `[` _[Expression]_ `]`
 
-## varUpdate
-[varUpdate]: #varupdate
+## VarUpdate
+[VarUpdate]: #varupdate
 
 - _[LValue]_ `++`
 - _[LValue]_ `--`
 - `++` _[LValue]_
 - `--` _[LValue]_
 
-## functionCall
-[functionCall]: #functioncall
+## FunctionCall
+[FunctionCall]: #functioncall
 
-- _[identifier]_ `(` _[functionCallParams]_ `)`
-- _[identifier]_ `(` `)`
+- _[Identifier]_ `(` _[FunctionCallParams]_ `)`
+- _[Identifier]_ `(` `)`
 
-## functionCallParams
-[functionCallParams]: #functioncallparams
+## FunctionCallParams
+[FunctionCallParams]: #functioncallparams
 
-- _[functionCallParams]_ `,` _[expression]_
-- _[expression]_
+- _[FunctionCallParams]_ `,` _[Expression]_
+- _[Expression]_
 
-## statement
-[statement]: #statement
+## Statement
+[Statement]: #Statement
 
-- _[expressionStatement]_
-- _[returnStatement]_
-- _[bloc]_
-- _[if]_
-- _[while]_
-- _[for]_
+- _[ExpressionStatement]_
+- _[ReturnStatement]_
+- _[Block]_
+- _[IfStatement]_
+- _[WhileStatement]_
+- _[ForStatement]_
 - `;`
 
-## expressionStatement
-[expressionStatement]: #expressionStatement
+## ExpressionStatement
+[ExpressionStatement]: #expressionstatement
 
-- _[expression]_ `;`
+- _[Expression]_ `;`
 
-## returnStatement
-[returnStatement]: #returnStatement
+## ReturnStatement
+[ReturnStatement]: #returnstatement
 
-- `return` _[expression]_ `;`
+- `return` _[Expression]_ `;`
 - `return` `;`
 
-## ifStatement
-[ifStatement]: #ifStatement
+## IfStatement
+[IfStatement]: #ifstatement
 
-- `if` `(` _[expression]_ `)` _[statement]_  `else` _[statement]_
-- `if` `(` _[expression]_ `)` _[statement]_
+- `if` `(` _[Expression]_ `)` _[Statement]_  `else` _[Statement]_
+- `if` `(` _[Expression]_ `)` _[Statement]_
 
-## whileStatement
-[whileStatement]: #whileStatement
+## WhileStatement
+[WhileStatement]: #whilestatement
 
-- `while` `(` _[expression]_ `)` _[statement]_
+- `while` `(` _[Expression]_ `)` _[Statement]_
 
-## forStatement
-[forStatement]: #forStatement
+## ForStatement
+[ForStatement]: #forstatement
 
-- `for` `(` _[expressionOrVoid]_ `;`  _[expressionOrVoid]_  `;` _[expressionOrVoid]_ `)` _[statement]_
-- `for` `(` _[variableDeclaration]_ _[expressionOrVoid]_  `;` _[expressionOrVoid]_ `)` _[statement]_
+- `for` `(` _[ExpressionOrVoid]_ `;`  _[ExpressionOrVoid]_  `;` _[ExpressionOrVoid]_ `)` _[Statement]_
+- `for` `(` _[VariableDeclaration]_ _[ExpressionOrVoid]_  `;` _[ExpressionOrVoid]_ `)` _[Statement]_
 
-## expressionOrVoid
-[expressionOrVoid]: #expressionOrVoid
+## ExpressionOrVoid
+[ExpressionOrVoid]: #expressionorvoid
 
-- _[expression]_
+- _[Expression]_
 - ε
-
-
 
 ## LiteralExpression
 [LiteralExpression]: #LiteralExpression
 
-- _[integerLiteral]_
-- _[hexIntegerLiteral]_
-- _[charLiteral]_
+- _[IntegerLiteral]_
+- _[CharLiteral]_
 
-## integerLiteral
-[integerLiteral]: #integerLiteral
+## IntegerLiteral
+[IntegerLiteral]: #IntegerLiteral
 
-- `[0-9]+`
+- PCRE Regular Expression: `[0-9]+`
+- PCRE Regular Expression: `0[xX][0-9A-Fa-f]+`
 
-## hexIntegerLiteral
-[hexIntegerLiteral]: #hexIntegerLiteral
+## CharLiteral
+[CharLiteral]: #charliteral
 
-- `0x[0-9A-Fa-f]+`
+-  `'` _[CharAtom]_ `'`
 
-## charLiteral
-[charLiteral]: #charliteral
+## CharAtom
+[CharAtom]: #charatom
 
--  `'` _[atomicChar]_ `'`
+- _[SourceChar]_
+- <code>&#92;</code> _[EscapeSequence]_
 
-## atomicChar
-[atomicChar]: #atomicChar
+## SourceChar
+[SourceChar]: #SourceChar
 
-- _[sourceChar]_
-- <code>&#92;</code> _[escapeSequence]_
+- PCRE Regular Expression: `[^\\'\n]`
 
-## sourceChar
-[sourceChar]: #sourcechar
+## EscapeSequence
+[EscapeSequence]: #escapesequence
 
-- `[^\\'\n]`
+- _[OctalEscape]_
+- `x` _[HexEscape]_
+- `X` _[HexEscape]_
+- _[ControlChar]_
 
-## escapeSequence
-[escapeSequence]: #escapesequence
+## OctalEscape
+[OctalEscape]: #octalescape
 
-- _[octalEscape]_
-- `x` _[hexEscape]_
-- _[escapeChar]_
+- PCRE Regular Expression: `[0-3][0-7]{2}`
+- PCRE Regular Expression: `[0-7]{1,2}`
 
-## octalEscape
-[octalEscape]: #octalescape
-
-- `[0-3][0-7]{2}`
-- `[0-7]{1,2}`
-
-## hexEscape
-[hexEscape]: #hexescape
+## HexEscape
+[HexEscape]: #hexescape
 
 - `[0-9a-fA-F]{2}`
 
-## escapeChar
-[escapeChar]: #escapechar
+## ControlChar
+[ControlChar]: #controlchar
 
-- `[abfnrtv\\'"?]`
-
-
-
-
-
-
-
+- One of: `a` `b` `f` `n` `r` `t` `v` <code>&#92;</code> `'` `"` `?`
