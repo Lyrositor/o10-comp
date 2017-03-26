@@ -14,9 +14,9 @@ std::unique_ptr<ForStatement> ForStatement::Create(
 }
 
 ForStatement::ForStatement(
-  std::shared_ptr<Statement> initialization,
-  std::shared_ptr<Statement> condition,
-  std::shared_ptr<Statement> iteration,
+  std::shared_ptr<RExpression> initialization,
+  std::shared_ptr<RExpression> condition,
+  std::shared_ptr<RExpression> iteration,
   std::shared_ptr<Statement> body,
   std::shared_ptr<SourceLocation> location
 ) :

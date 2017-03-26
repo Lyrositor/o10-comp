@@ -383,6 +383,7 @@ std::shared_ptr<Variable> BuildWhileStatementIR(
     BuildExpressionRValueIR(*node.condition, context, condition);
     BuildStatementIR(*node.body, context, body);
     // Branching
+    current_block->SetBranchIfTrue(condition);
     condition->SetBranchIfTrue(body);
     condition->SetBranchIfFalse(next);
     body->SetBranchIfTrue(condition);
@@ -399,6 +400,7 @@ std::shared_ptr<Variable> BuildForStatementIR(
     auto initialization = BasicBlock::create();
     auto condition = BasicBlock::create();
     auto iteration = BasicBlock::create();
+    auto body = BasicBlock::create();
     auto next = BasicBlock::create();
     // Building
     BuildExpressionRValueIR(*node.initialization, context, initialization);
@@ -406,6 +408,7 @@ std::shared_ptr<Variable> BuildForStatementIR(
     BuildExpressionRValueIR(*node.iteration, context, iteration);
     BuildStatementIR(*node.body, context, body);
     // Branching
+    current_block->SetBranchIfTrue(initialization);
     initialization->SetBranchIfTrue(condition);
     condition->SetBranchIfTrue(body);
     condition->SetBranchIfFalse(next);
@@ -423,17 +426,20 @@ std::shared_ptr<Variable> BuildIfStatementIR(
     // Init
     auto test = BasicBlock::create();
     auto consequence = BasicBlock::create();
-    auto alternative = BasicBlock::create();
     auto next = BasicBlock::create();
     // Building
     BuildExpressionRValueIR(*node.test, context, test);
     BuildStatementIR(*node.consequence, context, consequence);
-    BuildStatementIR(*node.alternative, context, alternative);
     // Branching
+    current_block->SetBranchIfTrue(test);
     test->SetBranchIfTrue(consequence);
-    test->SetBranchIfFalse(alternative);
     consequence->SetBranchIfTrue(next);
-    alternative->SetBranchIfTrue(next);
+    if (*node.alternative !== nullptr) {
+      auto alternative = BasicBlock::create();
+      BuildStatementIR(*node.alternative, context, alternative);
+      test->SetBranchIfFalse(alternative);
+      alternative->SetBranchIfTrue(next);
+    }
     // Ending
     current_block = next;
 }
