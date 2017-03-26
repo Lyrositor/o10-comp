@@ -11,7 +11,7 @@
 - we should use a number/constant to make a global affectation (e.g int a = 3 works but int a = 3 + 3 doesn't )
 - The %-alternate forms are not implemented (<% %: ...)
 - no multidimensional arrays
-- sizeof
+- no sizeof
 - 3 types, no struct, typeof ...
 
 ## white-space characters
@@ -64,6 +64,7 @@ They correspond to the following regular expressions (using PCRE notation):
 - `int32_t`
 - `int64_t`
 - `char`
+- `void`
 
 ## ArrayDataType
 [ArrayDataType]: #ArrayDataType
@@ -155,65 +156,133 @@ that the return type can be restricted to only _[DataTypeLiteral]_.
 ## Expression
 [Expression]: #Expression
 
-- _[Expression]_ _[Op]_ _[Expression]_
-- _[VarUpdate]_
-- _[LValue]_
-- `(` _[Expression]_ `)`
-- `-` _[Expression]_
-- `+` _[Expression]_
-- `!` _[Expression]_
-- `~` _[Expression]_
-- _[FunctionCall]_
-- _[Identifier]_ `(` `)`
-- _[LiteralExpression]_
+- _[Expression]_ `,` _[Expression]_
+- _[AssignmentExpression]_
 
-## Op
-[Op]: #Op
+## AssignmentExpression
+[AssignmentExpression]: #AssignmentExpression
 
-- One of: `,` `=` `*=` `/=` `%=` `+=` `-=` `<<=` `>>=` `&=` `^=` `|=` `||` `&&`
-  `|` `^` `&` `==` `!=` `!=` `<` `>` `<=` `>=` `<<` `>>` `+` `-` `*` `/` `%`
-
-Here is a table describing the properties of the various operators:
-
-Operator                  | Name                      | Precedence | Associativity
---------------------------|---------------------------|------------|--------------
-`,`                       | Sequence                  | 0          | left
-`=`                       | Simple Assignment         | 1          | right
-`*=`                      | Multiplication Assignment | 1          | right
-`/=`                      | Division Assignment       | 1          | right
-`%=`                      | Remainder Assignment      | 1          | right
-`+=`                      | Addition Assignment       | 1          | right
-`-=`                      | Subtraction Assignment    | 1          | right
-`<<=`                     | Left Shift Assignment     | 1          | right
-`>>=`                     | Right Shift Assignment    | 1          | right
-`&=`                      | Bitwise And Assignment    | 1          | right
-`^=`                      | Bitwise Xor Assignment    | 1          | right
-<code>&#124;=</code>      | Bitwise Or Assignment     | 1          | right
-<code>&#124;&#124;</code> | Logical Or                | 2          | left
-`&&`                      | Logical And               | 3          | left
-<code>&#124;</code>       | Bitwise Or                | 4          | left
-`^`                       | Bitwise Xor               | 5          | left
-`&`                       | Bitwise And               | 6          | left
-`==`                      | Equality                  | 7          | left
-`!=`                      | Inequality                | 8          | left
-`<`                       | LessThan                  | 9          | left
-`>`                       | GreaterThan               | 9          | left
-`<=`                      | LessThanOrEqualTo         | 9          | left
-`>=`                      | GreaterThanOrEqual        | 9          | left
-`<<`                      | Left Shift                | 10         | left
-`>>`                      | Right Shift               | 10         | left
-`+`                       | Addition                  | 11         | left
-`-`                       | Subtraction               | 11         | left
-`*`                       | Multiplication            | 12         | left
-`/`                       | Division                  | 12         | left
-`%`                       | Remainder                 | 12         | left
+- _[Lvalue]_ `=` _[AssignmentExpression]_
+- _[Lvalue]_ `*=` _[AssignmentExpression]_
+- _[Lvalue]_ `/=` _[AssignmentExpression]_
+- _[Lvalue]_ `%=` _[AssignmentExpression]_
+- _[Lvalue]_ `+=` _[AssignmentExpression]_
+- _[Lvalue]_ `-=` _[AssignmentExpression]_
+- _[Lvalue]_ `<<=` _[AssignmentExpression]_
+- _[Lvalue]_ `>>=` _[AssignmentExpression]_
+- _[Lvalue]_ `&=` _[AssignmentExpression]_
+- _[Lvalue]_ `^=` _[AssignmentExpression]_
+- _[Lvalue]_ <code>&#124;=</code> _[AssignmentExpression]_
+- _[ConditionalExpression]_
 
 ## LValue
 [LValue]: #lvalue
 
 - _[Identifier]_
 - _[Identifier]_ `[` _[Expression]_ `]`
-- _[FunctionCall]_ `[` _[Expression]_ `]`
+- `(` _[LValue]_ `)`
+
+## ConditionalExpression
+[ConditionalExpression]: #ConditionalExpression
+
+- _[LogicalORExpression]_ `?` _[expression]_ `:` _[ConditionalExpression]_
+- _[LogicalORExpression]_
+
+## LogicalORExpression
+[LogicalORExpression]: #LogicalORExpression
+
+- _[LogicalORExpression]_ `||` _[LogicalANDExpression]_
+- _[LogicalANDExpression]_
+
+## LogicalANDExpression
+[LogicalANDExpression]: #LogicalANDExpression
+
+- _[LogicalANDExpression]_ `&&` _[InclusiveORExpression]_
+- _[InclusiveORExpression]_
+
+## InclusiveORExpression
+[InclusiveORExpression]: #InclusiveORExpression
+
+- _[InclusiveORExpression]_ `|` _[ExclusiveORExpression]_
+- _[ExclusiveORExpression]_
+
+## ExclusiveORExpression
+[ExclusiveORExpression]: #ExclusiveORExpression
+
+- _[ExclusiveORExpression]_ `^` _[ANDExpression]_
+- _[ANDExpression]_
+
+## ANDExpression
+[ANDExpression]: #ANDExpression
+
+- _[ANDExpression]_ `&` _[EqualityExpression]_
+- _[EqualityExpression]_
+
+## EqualityExpression
+[EqualityExpression]: #EqualityExpression
+
+- _[EqualityExpression]_ `==` _[RelationalExpression]_
+- _[EqualityExpression]_ `!=` _[RelationalExpression]_
+- _[RelationalExpression]_
+
+## RelationalExpression
+[RelationalExpression]: #RelationalExpression
+
+- _[RelationalExpression]_ `>` _[ShiftExpression]_
+- _[RelationalExpression]_ `<` _[ShiftExpression]_
+- _[RelationalExpression]_ `>=` _[ShiftExpression]_
+- _[RelationalExpression]_ `<=` _[ShiftExpression]_
+- _[ShiftExpression]_
+
+## RelationalExpression
+[RelationalExpression]: #RelationalExpression
+
+- _[RelationalExpression]_ `>` _[ShiftExpression]_
+- _[RelationalExpression]_ `<` _[ShiftExpression]_
+- _[RelationalExpression]_ `>=` _[ShiftExpression]_
+- _[RelationalExpression]_ `<=` _[ShiftExpression]_
+- _[ShiftExpression]_
+
+## ShiftExpression
+[ShiftExpression]: #ShiftExpression
+
+- _[ShiftExpression]_ `>>` _[AdditiveExpression]_
+- _[ShiftExpression]_ `<<` _[AdditiveExpression]_
+- _[AdditiveExpression]_
+
+## AdditiveExpression
+[AdditiveExpression]: #AdditiveExpression
+
+- _[AdditiveExpression]_ `+` _[MultiplicativeExpression]_
+- _[AdditiveExpression]_ `-` _[MultiplicativeExpression]_
+- _[MultiplicativeExpression]_
+
+## MultiplicativeExpression
+[MultiplicativeExpression]: #MultiplicativeExpression
+
+- _[MultiplicativeExpression]_ `*` _[UnaryExpression]_
+- _[MultiplicativeExpression]_ `/` _[UnaryExpression]_
+- _[MultiplicativeExpression]_ `%` _[UnaryExpression]_
+- _[UnaryExpression]_
+
+## UnaryExpression
+[UnaryExpression]: #UnaryExpression
+
+
+- `+` _[UnaryExpression]_
+- `-` _[UnaryExpression]_
+- `~` _[UnaryExpression]_
+- `!` _[UnaryExpression]_
+- _[PrimaryExpression]_
+
+## PrimaryExpression
+[PrimaryExpression]: #PrimaryExpression
+
+- _[VarUpdate]_
+- _[FunctionCall]_
+- _[LValue]_
+- `(` _[Expression]_ `)`
+- _[LiteralExpression]_
 
 ## VarUpdate
 [VarUpdate]: #varupdate
