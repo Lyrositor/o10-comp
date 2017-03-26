@@ -87,14 +87,14 @@ void yy_scan_string(const char *str);
 %type <program> program root /*
 %type <rExpression> charLiteral
 %type <statement> */
-%type <parameter> parameter /*
+%type <parameter> parameter
 %type <variableDeclaration> variableDeclaration
-%type <variableDeclarator> variableDeclarator */
+%type <variableDeclarator> variableDeclarator
 
 /* Temporary vectors */
 %type <declarationsList> declarationsList
-%type <parametersList> parametersList /*
-%type <variableDeclaratorsList> */
+%type <parametersList> parametersList
+%type <variableDeclaratorsList> variableDeclaratorsList
 
 /*
 
@@ -141,18 +141,19 @@ declarationsList:
     std::shared_ptr<comp::ast::Declaration> function_declaration($2);
     $1->push_back(function_declaration);
     $$ = $1;
-  } /*
+  }
+/*
   | declarationsList functionDefinition {
     std::shared_ptr<comp::ast::Function> functionDefinition($2);
     $1->push_back(functionDefinition);
     $$ = $1;
   }
-  | variableDeclaration {
-    auto a = new std::vector<std::shared_ptr<comp::ast::Declaration>>();
-    std::shared_ptr<comp::ast::VariableDeclaration> variableDeclaration($1);
-    a->push_back(variableDeclaration);
+*/
+  | declarationsList variableDeclaration {
+    std::shared_ptr<comp::ast::Declaration> function_declaration($2);
+    $1->push_back(function_declaration);
     $$ = $1;
-  } */
+  }
   | {
     $$ = new std::vector<std::shared_ptr<comp::ast::Declaration>>();
   }
@@ -235,15 +236,16 @@ declarator:
   | identifier OPEN_BRACKET CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> declarator($1);
     $$ = new comp::ast::ArrayDeclarator(declarator, nullptr);
-  } /*
+  }
+/*
   | identifier OPEN_BRACKET expression CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> declarator($1);
     std::shared_ptr<comp::ast::Expression> size($3);
     $$ = new comp::ast::ArrayDeclarator(declarator, size);
-  } */
+  }
+*/
 
 /*
-
 functionDefinition:
     dataType identifier OPEN_PAREN parametersList CLOSE_PAREN block {
         std::shared_ptr<comp::ast::DataType> dataType($1);
@@ -252,37 +254,42 @@ functionDefinition:
         std::shared_ptr<comp::ast::BlockStatement> block($6);
         $$ = new comp::ast::Function(dataType, identifier, parametersList, block);
     }
+*/
 
 variableDeclaration:
-    identifierDataType variableDeclaratorsList SEMICOLON {
-        std::shared_ptr<comp::ast::IdentifierDataType> base_type($1);
-        std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> declarators($2);
-        $$ = new comp::ast::VariableDeclaration(base_type, declarators);
-    }
+  identifierDataType variableDeclaratorsList SEMICOLON {
+    std::shared_ptr<comp::ast::IdentifierDataType> base_type($1);
+    std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> declarators(*$2);
+    delete $2;
+    $$ = new comp::ast::VariableDeclaration(base_type, declarators);
+  }
 
 variableDeclaratorsList:
-    variableDeclaratorsList COMMA_OPERATOR variableDeclarator{
-        std::shared_ptr<comp::ast::VariableDeclarator> variableDeclarator($3);
-        $1->push_back(variableDeclarator);
-        $$ = $1;
-    }
-    | variableDeclarator {
-        std::shared_ptr<comp::ast::VariableDeclarator> variableDeclarator($1);
-        $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator>>;
-        $$->push_back($1);
-    }
+  variableDeclaratorsList COMMA_OPERATOR variableDeclarator {
+    std::shared_ptr<comp::ast::VariableDeclarator> variable_declarator($3);
+    $1->push_back(variable_declarator);
+    $$ = $1;
+  }
+  | variableDeclarator {
+    std::shared_ptr<comp::ast::VariableDeclarator> variable_declarator($1);
+    $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator>>;
+    $$->push_back(variable_declarator);
+  }
 
 variableDeclarator:
-    declarator {
-        std::shared_ptr<comp::ast::Declarator> decl($1);
-        $$ = new comp::ast::VariableDeclarator(decl);
-    }
-    | declarator EQUAL_OPERATOR declarator {
-        std::shared_ptr<comp::ast::Declarator> decl1($1);
-        std::shared_ptr<comp::ast::Declarator> decl2($3);
-        $$ = new comp::ast::VariableDeclarator(decl1, decl2);
-    }
+  declarator {
+      std::shared_ptr<comp::ast::Declarator> declarator($1);
+      $$ = new comp::ast::VariableDeclarator(declarator, nullptr);
+  }
+/*
+  | declarator EQUAL_OPERATOR declarator {
+      std::shared_ptr<comp::ast::Declarator> decl1($1);
+      std::shared_ptr<comp::ast::Declarator> decl2($3);
+      $$ = new comp::ast::VariableDeclarator(decl1, decl2);
+  }
+*/
 
+/*
 LValue:
     identifier {
         std::shared_ptr<comp::ast::Identifier> identifier($1);

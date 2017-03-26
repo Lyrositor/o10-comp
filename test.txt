@@ -1,1 +1,1 @@
-void main(char[], int64_t foo);
+int32_t b;
