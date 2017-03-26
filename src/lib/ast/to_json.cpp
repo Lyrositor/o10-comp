@@ -185,7 +185,15 @@ std::unique_ptr<rapidjson::Value> FunctionToJson(const Function &node, rapidjson
     parameters.PushBack(*ParameterToJson(*parameter, allocator), allocator);
   }
   result->AddMember("parameters", parameters, allocator);
-  result->AddMember("body", *BlockStatementToJson(*node.body, allocator), allocator);
+
+
+  rapidjson::Value body;
+  if (node.body == nullptr) {
+    body.SetNull();
+  } else {
+    body = *BlockStatementToJson(*node.body, allocator);
+  }
+  result->AddMember("body", body, allocator);
   return result;
 }
 

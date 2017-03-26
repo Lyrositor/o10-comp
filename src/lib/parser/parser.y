@@ -22,36 +22,33 @@ void yy_scan_string(const char *str);
 %parse-param {comp::ast::Program *&root}
 
 %union {
- uint8_t uint8;
- int64_t int64;
- char * s;
- comp::ast::RExpression *expr;
- comp::ast::LExpression *lvalue;
- comp::ast::Program *program;
- comp::ast::Function *function;
- comp::ast::Identifier *identifier;
- comp::ast::DataType *dataType;
- comp::ast::LiteralDataType *dataTypeLiteral;
- comp::ast::ArrayDataType *arrayDataType;
- comp::ast::UnaryOperator *unaryOperator;
- comp::ast::UnaryExpression *unaryExpression;
- comp::ast::Statement *statement;
- comp::ast::ForStatement *forStatement;
- comp::ast::IfStatement *ifStatement;
- comp::ast::WhileStatement *whileStatement;
- comp::ast::BlockStatement *block;
- comp::ast::ReturnStatement *returnStatement;
- comp::ast::ExpressionStatement *expressionStatement;
- comp::ast::Parameter *parameter;
- comp::ast::VariableDeclaration *variableDeclaration;
- comp::ast::VariableDeclarator *variableDeclarator;
- comp::ast::Declarator *declarator;
- comp::ast::CallExpression *callExpression;
- std::vector<std::shared_ptr<comp::ast::Declaration>> *declarationsList;
- std::vector<std::shared_ptr<comp::ast::Parameter>> *parametersList;
- std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> *variableDeclaratorsList;
+  /* Tokens */
+  uint8_t uint8;
+  int64_t int64;
+  char * cstring;
+  /* AST nodes */
+  comp::ast::ArrayDeclarator *arrayDeclarator;
+  comp::ast::BlockStatement *blockStatement;
+  comp::ast::CallExpression *callExpression;
+  comp::ast::DataType *dataType;
+  comp::ast::Declarator *declarator;
+  comp::ast::Function *function;
+  comp::ast::Identifier *identifier;
+  comp::ast::LExpression *lExpression;
+  comp::ast::LiteralDataType *literalDataType;
+  comp::ast::Program *program;
+  comp::ast::RExpression *rExpression;
+  comp::ast::Statement *statement;
+  comp::ast::Parameter *parameter;
+  comp::ast::VariableDeclaration *variableDeclaration;
+  comp::ast::VariableDeclarator *variableDeclarator;
+  /* Temporary vectors */
+  std::vector<std::shared_ptr<comp::ast::Declaration>> *declarationsList;
+  std::vector<std::shared_ptr<comp::ast::Parameter>> *parametersList;
+  std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> *variableDeclaratorsList;
 }
 
+/* Untyped tokens */
 %token ADDITIONASSIGNMENT_OPERATOR BITWISEANDASSIGNMENT_OPERATOR BITWISEORASSIGNMENT_OPERATOR BITWISEXORASSIGNMENT_OPERATOR
 %token DIVISIONASSIGNMENT_OPERATOR EQUALITY_OPERATOR EXPONENTIATIONASSIGNMENT_OPERATOR EXPONENTIATION_OPERATOR IDENTITY_OPERATOR
 %token INEQUALITY_OPERATOR LEFTSHIFTASSIGNMENT_OPERATOR LEFTSHIFT_OPERATOR LITTERAL_EXPRESSION MULTIPLICATIONASSIGNMENT_OPERATOR
@@ -69,28 +66,45 @@ void yy_scan_string(const char *str);
 %token LEFT_SHIFT_ASSIGN_OPERATOR RIGHT_SHIFT_ASSIGN_OPERATOR AND_ASSIGN_OPERATOR XOR_ASSIGN_OPERATOR OR_ASSIGN_OPERATOR
 %token BINARY_OR_OPERATOR BINARY_AND_OPERATOR BINARY_XOR_OPERATOR
 %token OR_OPERATOR AND_OPERATOR NOT_OPERATOR BINARY_ONES_COMPLEMENT_OPERATOR
-%token SIMPLE_QUOTE CONTROL_CHAR_ESCAPE HEX_CHAR_ESCAPE
-%token INT32_TYPE INT64_TYPE CHAR intLiteral
-%token <i> INTEGER_LITERAL
-%token <s> IDENTIFIER
-%token <uint8> SOURCE_CHAR
-%token <uint8> OCTAL_ESCAPE_SEQUENCE
-%token <uint8> HEX_ESCAPE_SEQUENCE
+%token SIMPLE_QUOTE
+%token CHAR_TYPE INT32_TYPE INT64_TYPE VOID_TYPE
 
-%type <e>  expr  expressionOrVoid op
-%type <uint8> charAtom
-%type <program> program root
-%type <function> function functionDeclaration functionDefinition
-%type <identifier> identifier
-%type <declarationsList> declarationsList
-%type <parametersList> parametersList functionCallParams
+/* Typed tokens */
+%token <uint8> CHAR_ATOM
+%token <int64> INTEGER_LITERAL
+%token <cstring> IDENTIFIER
+
+/* AST nodes */ /*
+%type <arrayDeclarator>
+%type <blockStatement>
+%type <callExpression> */
+%type <dataType> arrayDataType dataType dataTypeLiteral /*
+%type <declarator> declarator */
+%type <function> functionDeclaration
+%type <identifier> identifier /*
+%type <lExpression>
+%type <literalDataType> */
+%type <program> program root /*
+%type <rExpression> charLiteral
+%type <statement>
+%type <parameter>
+%type <variableDeclaration> variableDeclaration
+%type <variableDeclarator> variableDeclarator */
+
+/* Temporary vectors */
+%type <declarationsList> declarationsList /*
+%type <parametersList> parametersList
+%type <variableDeclaratorsList> */
+
+/*
+
+%type <declarationsList>
+%type <parametersList>  functionCallParams
 %type <variableDeclaratorsList> variableDeclaratorsList
 %type <unaryExpression> unaryExpression varUpdate
 %type <dataType> dataType
-%type <declarator> declarator
-%type <variableDeclarator> variableDeclarator
-%type <variableDeclaration> variableDeclaration
-%type <dataTypeLiteral> dataTypeLiteral charLiteral literalExpr
+%type <declarator>
+%type <dataTypeLiteral> dataTypeLiteral  literalExpr
 %type <arrayDataType> arrayDataType
 %type <parameter> parameter
 %type <statement> statement
@@ -107,95 +121,90 @@ void yy_scan_string(const char *str);
 %left MULTIPLICATION_OPERATOR DIVISION_OPERATOR
 %left REMAINDER_OPERATOR
 
+*/
+
 %%
 root:
-    program {
-        root = $1;
-        }
-
-charLiteral:
-    SIMPLE_QUOTE charAtom SIMPLE_QUOTE {
-        $$ = new comp::ast::Uint8Literal($2, nullptr);
-    }
-
-charAtom:
-    SOURCE_CHAR {
-        $$ = $1;
-    }
-    | OCTAL_ESCAPE_SEQUENCE {
-        $$ = $1;
-    }
-    | HEX_ESCAPE_SEQUENCE {
-        $$ = $1;
-    }
+  program {
+    root = $1;
+  }
 
 program:
-    declarationsList {
-        std::vector<std::shared_ptr<comp::ast::Declaration>> body(*$1);
-        delete $1;
-        $$ = new comp::ast::Program(body);
-    }
+  declarationsList {
+    std::vector<std::shared_ptr<comp::ast::Declaration>> body(*$1);
+    delete $1;
+    $$ = new comp::ast::Program(body);
+  }
 
 declarationsList:
-    /*declarationsList functionDeclaration{
-        std::shared_ptr<comp::ast::Function> functionDeclaration($2);
-        $1->push_back(functionDeclaration);
-        $$ = $1;
-    }
-    | declarationsList functionDefinition {
-        std::shared_ptr<comp::ast::Function> functionDefinition($2);
-        $1->push_back(functionDefinition);
-        $$ = $1;
-    } */
-    |  declarationsList variableDeclaration {
-        std::shared_ptr<comp::ast::VariableDeclaration> variableDeclaration($2);
-        $1->push_back(variableDeclaration);
-        $$ = $1;
-    }
-    | {
-        $$ = new std::vector<std::shared_ptr<comp::ast::Declaration>>();
-    }
+  declarationsList functionDeclaration {
+    std::shared_ptr<comp::ast::Declaration> function_declaration($2);
+    $1->push_back(function_declaration);
+    $$ = $1;
+  } /*
+  | declarationsList functionDefinition {
+    std::shared_ptr<comp::ast::Function> functionDefinition($2);
+    $1->push_back(functionDefinition);
+    $$ = $1;
+  }
+  | variableDeclaration {
+    auto a = new std::vector<std::shared_ptr<comp::ast::Declaration>>();
+    std::shared_ptr<comp::ast::VariableDeclaration> variableDeclaration($1);
+    a->push_back(variableDeclaration);
+    $$ = $1;
+  } */
+  | {
+    $$ = new std::vector<std::shared_ptr<comp::ast::Declaration>>();
+  }
 
 functionDeclaration:
-    dataType identifier OPEN_PAREN parametersList CLOSE_PAREN SEMICOLON {
-        std::shared_ptr<comp::ast::DataType> dataType($1);
-        std::shared_ptr<comp::ast::Identifier> identifier($2);
-        std::shared_ptr<comp::ast::Parameter> parametersList($4);
-        $$ = new comp::ast::Function(dataType, identifier, parametersList);
-    }
-    | dataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON{
-        std::shared_ptr<comp::ast::DataType> dataType($1);
-        std::shared_ptr<comp::ast::Identifier> identifier($2);
-        $$ = new comp::ast::Function(dataType, identifier);
-    }
+  /* dataType identifier OPEN_PAREN parametersList CLOSE_PAREN SEMICOLON {
+    std::shared_ptr<comp::ast::DataType> dataType($1);
+    std::shared_ptr<comp::ast::Identifier> identifier($2);
+    std::shared_ptr<comp::ast::Parameter> parameters_list($4);
+    $$ = new comp::ast::Function(dataType, identifier, parameters_list);
+  }
+  | */ dataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON {
+    std::shared_ptr<comp::ast::DataType> data_type($1);
+    std::shared_ptr<comp::ast::Identifier> identifier($2);
+    $$ = new comp::ast::Function(identifier, {}, data_type, nullptr);
+  }
 
 dataType:
-    dataTypeLiteral {
-        std::shared_ptr<comp::ast::LiteralDataType> type($1);
-        $$ = new comp::ast::DataType(type);
-    }
-    | arrayDataType {
-        std::shared_ptr<comp::ast::ArrayDataType> type($1);
-        $$ = new comp::ast::DataType(type);
-    }
+  dataTypeLiteral {
+    $$ = $1;
+  }
+  | arrayDataType {
+    $$ = $1;
+  }
 
 dataTypeLiteral:
-    identifier {
-        std::shared_ptr<comp::ast::Identifier> identifier($1);
-        $$ = new comp::ast::LiteralDataType(identifier);
-    }
+  CHAR_TYPE {
+    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("char"));
+  }
+  | INT32_TYPE {
+    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("int32_t"));
+  }
+  | INT64_TYPE {
+    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("int64_t"));
+  }
+  | VOID_TYPE {
+    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("void"));
+  }
 
 arrayDataType:
-    dataTypeLiteral OPEN_BRACKET CLOSE_BRACKET{
-        std::shared_ptr<comp::ast::LiteralDataType> type($1);
-        $$ = new comp::ast::ArrayDataType(type);
-    }
+  dataTypeLiteral OPEN_BRACKET CLOSE_BRACKET{
+    std::shared_ptr<comp::ast::DataType> item_type($1);
+    $$ = new comp::ast::ArrayDataType(item_type, nullptr);
+  }
 
 identifier:
-    IDENTIFIER {
-        $$ = new comp::ast::Identifier($1);
-    }
+  IDENTIFIER {
+    $$ = new comp::ast::Identifier($1);
+  }
 
+
+/*
 parametersList:
     parametersList COMMA_OPERATOR parameter {
         std::shared_ptr<comp::ast::Parameter> parametersList($1);
@@ -255,11 +264,11 @@ variableDeclaratorsList:
         $1->push_back(variableDeclarator);
         $$ = $1;
     }
-    /*| variableDeclarator {
+    | variableDeclarator {
         std::shared_ptr<comp::ast::VariableDeclarator> variableDeclarator($1);
         $$ = new std::vector<std::shared_ptr<comp::ast::VariableDeclarator>>;
         $$->push_back($1);
-    }*/
+    }
 
 variableDeclarator:
     declarator {
@@ -451,16 +460,14 @@ literalExpr:
         std::shared_ptr<comp::ast::Literal> char($1);
         $$ = new comp::ast::Uint8Literal(char, nullptr);
     }
-    /*
     | hexIntegerLiteral {
         std::shared_ptr<comp::ast::Literal> hex($1);
         $$ = new comp::ast::RExpression(hex);
     }
-    */
 
-op:
-    {
-    $$ = '2';
+charLiteral:
+    SIMPLE_QUOTE CHAR_ATOM SIMPLE_QUOTE {
+        $$ = new comp::ast::Uint8Literal($2, nullptr);
     }
 
 expr:
@@ -688,5 +695,5 @@ expr:
     | UNARYPLUS_OPERATOR expr {
       std::shared_ptr<comp::ast::RExpression> left($2);
       $$ = new comp::ast::UnaryExpression(comp::ast::UnaryOperator::Unaryplus, left, nullptr);
-    }
+    } */
 %%
