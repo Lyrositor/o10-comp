@@ -234,15 +234,6 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - _[RelationalExpression]_ `<=` _[ShiftExpression]_
 - _[ShiftExpression]_
 
-## RelationalExpression
-[RelationalExpression]: #RelationalExpression
-
-- _[RelationalExpression]_ `>` _[ShiftExpression]_
-- _[RelationalExpression]_ `<` _[ShiftExpression]_
-- _[RelationalExpression]_ `>=` _[ShiftExpression]_
-- _[RelationalExpression]_ `<=` _[ShiftExpression]_
-- _[ShiftExpression]_
-
 ## ShiftExpression
 [ShiftExpression]: #ShiftExpression
 
@@ -388,8 +379,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 ## OctalEscape
 [OctalEscape]: #octalescape
 
-- PCRE Regular Expression: `[0-3][0-7]{2}`
-- PCRE Regular Expression: `[0-7]{1,2}`
+- PCRE Regular Expression: `[1-7]?[0-7]|[1-3][0-7]{2}`
 
 ## HexEscape
 [HexEscape]: #hexescape
