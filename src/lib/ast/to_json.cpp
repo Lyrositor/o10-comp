@@ -18,6 +18,13 @@ std::unique_ptr<rapidjson::Value> create_object_value() {
   return result;
 }
 
+std::unique_ptr<rapidjson::Value> AnonymousParameterToJson(const AnonymousParameter &node, rapidjson::Document::AllocatorType &allocator) {
+  std::unique_ptr<rapidjson::Value> result = create_object_value();
+  result->AddMember("node_type", "AnonymousParameter", allocator);
+  result->AddMember("data_type", *DataTypeToJson(*node.data_type, allocator), allocator);
+  return result;
+}
+
 std::unique_ptr<rapidjson::Value> ArrayDataTypeToJson(const ArrayDataType &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "ArrayDataType", allocator);
@@ -182,10 +189,9 @@ std::unique_ptr<rapidjson::Value> FunctionToJson(const Function &node, rapidjson
   rapidjson::Value parameters = rapidjson::Value();
   parameters.SetArray();
   for (auto parameter : node.parameters) {
-    parameters.PushBack(*ParameterToJson(*parameter, allocator), allocator);
+    parameters.PushBack(*NodeToJson(*parameter, allocator), allocator);
   }
   result->AddMember("parameters", parameters, allocator);
-
 
   rapidjson::Value body;
   if (node.body == nullptr) {
@@ -250,6 +256,14 @@ std::unique_ptr<rapidjson::Value> LiteralDataTypeToJson(const LiteralDataType &n
   return result;
 }
 
+std::unique_ptr<rapidjson::Value> NamedParameterToJson(const NamedParameter &node, rapidjson::Document::AllocatorType &allocator) {
+  std::unique_ptr<rapidjson::Value> result = create_object_value();
+  result->AddMember("node_type", "NamedParameter", allocator);
+  result->AddMember("data_type", *LiteralDataTypeToJson(*node.data_type, allocator), allocator);
+  result->AddMember("declarator", *DeclaratorToJson(*node.declarator, allocator), allocator);
+  return result;
+}
+
 std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Document::AllocatorType &allocator) {
   switch (node.node_type) {
     case Node::Type::ArrayDataType: {
@@ -297,8 +311,11 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
     case Node::Type::NullStatement: {
       return NullStatementToJson(static_cast<const NullStatement &>(node), allocator);
     }
-    case Node::Type::Parameter: {
-      return ParameterToJson(static_cast<const Parameter &>(node), allocator);
+    case Node::Type::NamedParameter: {
+      return NamedParameterToJson(static_cast<const NamedParameter &>(node), allocator);
+    }
+    case Node::Type::AnonymousParameter: {
+      return AnonymousParameterToJson(static_cast<const AnonymousParameter &>(node), allocator);
     }
 //    case Node::Type::Program: {
 //      return ProgramToJson(static_cast<const Program &>(node), allocator);
@@ -333,14 +350,6 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
 std::unique_ptr<rapidjson::Value> NullStatementToJson(const NullStatement &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "NullStatementToJson", allocator);
-  return result;
-}
-
-std::unique_ptr<rapidjson::Value> ParameterToJson(const Parameter &node, rapidjson::Document::AllocatorType &allocator) {
-  std::unique_ptr<rapidjson::Value> result = create_object_value();
-  result->AddMember("node_type", "Parameter", allocator);
-  result->AddMember("data_type", *LiteralDataTypeToJson(*node.data_type, allocator), allocator);
-  result->AddMember("declarator", *DeclaratorToJson(*node.declarator, allocator), allocator);
   return result;
 }
 

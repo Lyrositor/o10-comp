@@ -6,6 +6,7 @@
 
 namespace comp {
 namespace ast {
+std::unique_ptr<rapidjson::Value> AnonymousParameterToJson(const AnonymousParameter &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> ArrayDataTypeToJson(const ArrayDataType &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> ArrayDeclaratorToJson(const ArrayDeclarator &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> AssignmentExpressionToJson(const AssignmentExpression &node, rapidjson::Document::AllocatorType &allocator);
@@ -25,9 +26,9 @@ std::unique_ptr<rapidjson::Value> Int64LiteralToJson(const Int64Literal &node, r
 std::unique_ptr<rapidjson::Value> LExpressionToJson(const LExpression &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> LiteralToJson(const Literal &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> LiteralDataTypeToJson(const LiteralDataType &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> NamedParameterToJson(const NamedParameter &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> NullStatementToJson(const NullStatement &node, rapidjson::Document::AllocatorType &allocator);
-std::unique_ptr<rapidjson::Value> ParameterToJson(const Parameter &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> PositionToJson(const Position &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Document> ProgramToJson(const Program &node);
 std::unique_ptr<rapidjson::Value> RExpressionToJson(const RExpression &node, rapidjson::Document::AllocatorType &allocator);

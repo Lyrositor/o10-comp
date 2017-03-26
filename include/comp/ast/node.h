@@ -8,6 +8,7 @@ namespace comp {
 namespace ast {
 struct Node {
   enum class Type {
+    AnonymousParameter,
     ArrayDataType,
     ArrayDeclarator,
     AssignmentExpression,
@@ -23,7 +24,7 @@ struct Node {
     Int64Literal,
     LiteralDataType,
     NullStatement,
-    Parameter,
+    NamedParameter,
     Program,
     ReturnStatement,
     SubscriptExpression,

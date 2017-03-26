@@ -78,22 +78,22 @@ void yy_scan_string(const char *str);
 %type <arrayDeclarator>
 %type <blockStatement>
 %type <callExpression> */
-%type <dataType> arrayDataType dataType dataTypeLiteral /*
-%type <declarator> declarator */
+%type <dataType> arrayDataType dataType
+%type <declarator> declarator
 %type <function> functionDeclaration
 %type <identifier> identifier /*
-%type <lExpression>
-%type <literalDataType> */
+%type <lExpression> */
+%type <literalDataType> dataTypeLiteral
 %type <program> program root /*
 %type <rExpression> charLiteral
-%type <statement>
-%type <parameter>
+%type <statement> */
+%type <parameter> parameter /*
 %type <variableDeclaration> variableDeclaration
 %type <variableDeclarator> variableDeclarator */
 
 /* Temporary vectors */
-%type <declarationsList> declarationsList /*
-%type <parametersList> parametersList
+%type <declarationsList> declarationsList
+%type <parametersList> parametersList /*
 %type <variableDeclaratorsList> */
 
 /*
@@ -158,16 +158,17 @@ declarationsList:
   }
 
 functionDeclaration:
-  /* dataType identifier OPEN_PAREN parametersList CLOSE_PAREN SEMICOLON {
-    std::shared_ptr<comp::ast::DataType> dataType($1);
+  dataType identifier OPEN_PAREN parametersList CLOSE_PAREN SEMICOLON {
+    std::shared_ptr<comp::ast::DataType> return_type($1);
     std::shared_ptr<comp::ast::Identifier> identifier($2);
-    std::shared_ptr<comp::ast::Parameter> parameters_list($4);
-    $$ = new comp::ast::Function(dataType, identifier, parameters_list);
+    std::vector<std::shared_ptr<comp::ast::Parameter>> parameters(*$4);
+    delete $4;
+    $$ = new comp::ast::Function(identifier, parameters, return_type, nullptr);
   }
-  | */ dataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON {
-    std::shared_ptr<comp::ast::DataType> data_type($1);
+  | dataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON {
+    std::shared_ptr<comp::ast::DataType> return_type($1);
     std::shared_ptr<comp::ast::Identifier> identifier($2);
-    $$ = new comp::ast::Function(identifier, {}, data_type, nullptr);
+    $$ = new comp::ast::Function(identifier, {}, return_type, nullptr);
   }
 
 dataType:
@@ -203,44 +204,45 @@ identifier:
     $$ = new comp::ast::Identifier($1);
   }
 
-
-/*
 parametersList:
-    parametersList COMMA_OPERATOR parameter {
-        std::shared_ptr<comp::ast::Parameter> parametersList($1);
-        $1->push_back(parameter);
-        $$ = $1;
-    }
-    | parameter {
-        std::shared_ptr<comp::ast::Parameter> parameter($1);
-        $$ = new std::vector<std::shared_ptr<comp::ast::Parameter>>($1);
-    }
+  parametersList COMMA_OPERATOR parameter {
+    std::shared_ptr<comp::ast::Parameter> parameter($3);
+    $1->push_back(parameter);
+    $$ = $1;
+  }
+  | parameter {
+    std::shared_ptr<comp::ast::Parameter> parameter($1);
+    $$ = new std::vector<std::shared_ptr<comp::ast::Parameter>>();
+    $$->push_back(parameter);
+  }
 
 parameter:
-    dataTypeLiteral declarator {
-        std::shared_ptr<comp::ast::LiteralDataType> dataTypeLiteral($1);
-        std::shared_ptr<comp::ast::Declarator> declarator($2);
-        $$ = new comp::ast::Parameter(dataTypeLiteral, declarator);
-    }
-    | dataType {
-        std::shared_ptr<comp::ast::DataType> dataType($1);
-        $$ = new comp::ast::Parameter(dataType);
-    }
+  dataTypeLiteral declarator {
+    std::shared_ptr<comp::ast::LiteralDataType> literal_data_type($1);
+    std::shared_ptr<comp::ast::Declarator> declarator($2);
+    $$ = new comp::ast::NamedParameter(literal_data_type, declarator);
+  }
+  | dataType {
+    std::shared_ptr<comp::ast::DataType> dataType($1);
+    $$ = new comp::ast::AnonymousParameter(dataType);
+  }
 
 declarator:
-    identifier {
-        std::shared_ptr<comp::ast::Identifier> identifier($1);
-        $$ = new comp::ast::Declarator(identifier);
-    }
-    | identifier OPEN_BRACKET CLOSE_BRACKET {
-        std::shared_ptr<comp::ast::Identifier> identifier($1);
-        $$ = new comp::ast::Declarator(identifier);
-    }
-    | identifier OPEN_BRACKET expr CLOSE_BRACKET {
-        std::shared_ptr<comp::ast::Identifier> identifier($1);
-        std::shared_ptr<comp::ast::Expression> expr($3);
-        $$ = new comp::ast::Declarator(identifier, expr);
-    }
+  identifier {
+    std::shared_ptr<comp::ast::Identifier> identifier($1);
+    $$ = new comp::ast::IdentifierDeclarator(identifier);
+  }
+  | identifier OPEN_BRACKET CLOSE_BRACKET {
+    std::shared_ptr<comp::ast::Identifier> declarator($1);
+    $$ = new comp::ast::ArrayDeclarator(declarator, nullptr);
+  } /*
+  | identifier OPEN_BRACKET expression CLOSE_BRACKET {
+    std::shared_ptr<comp::ast::Identifier> declarator($1);
+    std::shared_ptr<comp::ast::Expression> size($3);
+    $$ = new comp::ast::ArrayDeclarator(declarator, size);
+  } */
+
+/*
 
 functionDefinition:
     dataType identifier OPEN_PAREN parametersList CLOSE_PAREN block {

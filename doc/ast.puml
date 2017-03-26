@@ -143,39 +143,48 @@ abstract class Node {
 }
 
 enum comp::ast::Node::Type {
-ArrayDataType
-    ArrayDeclarator
-    AssignmentExpression
-    BinaryExpression
-    BlockStatement
-    CallExpression
-    ExpressionStatement
-    ForStatement
-    Function
-    Identifier
-    IdentifierDeclarator
-    IfStatement
-    Int64Literal
-    LiteralDataType
-    NullStatement
-    Parameter
-    Program
-    ReturnStatement,
-    SubscriptExpression
-    Uint8Literal
-    UnaryExpression
-    VariableDeclaration
-    VariableDeclarator
-    WhileStatement
+  AnonymousParameter
+  ArrayDataType
+  ArrayDeclarator
+  AssignmentExpression
+  BinaryExpression
+  BlockStatement
+  CallExpression
+  ExpressionStatement
+  ForStatement
+  Function
+  Identifier
+  IdentifierDeclarator
+  IfStatement
+  Int64Literal
+  LiteralDataType
+  NamedParameter
+  NullStatement
+  Program
+  ReturnStatement,
+  SubscriptExpression
+  Uint8Literal
+  UnaryExpression
+  VariableDeclaration
+  VariableDeclarator
+  WhileStatement
 }
 
 class NullStatement << (S,#ffbb33) >> extends Statement {
   {static} +std::unique_ptr<NullStatement> Create()
 }
 
-class Parameter << (S,#ffbb33) >> extends Node {
+abstract class Parameter extends Node {
+}
+
+class NamedParameter << (S,#ffbb33) >> extends Parameter {
   +const std::shared_ptr<LiteralDataType> data_type
   +const std::shared_ptr<Declarator> declarator
+  {static} +std::unique_ptr<Parameter> Create()
+}
+
+class AnonymousParameter << (S,#ffbb33) >> extends Parameter {
+  +const std::shared_ptr<DataType> data_type
   {static} +std::unique_ptr<Parameter> Create()
 }
 

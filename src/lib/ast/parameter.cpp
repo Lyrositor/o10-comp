@@ -2,26 +2,52 @@
 
 namespace comp {
 namespace ast {
-std::unique_ptr<Parameter> Parameter::Create(
+Parameter::Parameter(Type node_type, std::shared_ptr<SourceLocation> location) :
+  Node(node_type, location) {
+}
+
+Parameter::~Parameter() {
+}
+
+std::unique_ptr<NamedParameter> NamedParameter::Create(
   std::shared_ptr<LiteralDataType> data_type,
   std::shared_ptr<Declarator> declarator,
   std::shared_ptr<SourceLocation> location
 ) {
-  return std::unique_ptr<Parameter>(
-    new Parameter(data_type, declarator, location));
+  return std::unique_ptr<NamedParameter>(
+    new NamedParameter(data_type, declarator, location));
 }
 
-Parameter::Parameter(
+NamedParameter::NamedParameter(
   std::shared_ptr<LiteralDataType> data_type,
   std::shared_ptr<Declarator> declarator,
   std::shared_ptr<SourceLocation> location
 ) :
-  Node(Type::Parameter, location),
+  Parameter(Type::NamedParameter, location),
   data_type(data_type),
   declarator(declarator) {
 }
 
-Parameter::~Parameter() {
+NamedParameter::~NamedParameter() {
+}
+
+std::unique_ptr<AnonymousParameter> AnonymousParameter::Create(
+  std::shared_ptr<DataType> data_type,
+  std::shared_ptr<SourceLocation> location
+) {
+  return std::unique_ptr<AnonymousParameter>(
+    new AnonymousParameter(data_type, location));
+}
+
+AnonymousParameter::AnonymousParameter(
+  std::shared_ptr<DataType> data_type,
+  std::shared_ptr<SourceLocation> location
+) :
+  Parameter(Type::AnonymousParameter, location),
+  data_type(data_type) {
+}
+
+AnonymousParameter::~AnonymousParameter() {
 }
 }  // namespace ast
 }  // namespace comp

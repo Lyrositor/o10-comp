@@ -1,1 +1,1 @@
-void main();
+void main(char[], int64_t foo);
