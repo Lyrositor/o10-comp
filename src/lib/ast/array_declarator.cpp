@@ -24,7 +24,7 @@ ArrayDeclarator::ArrayDeclarator(
 ArrayDeclarator::~ArrayDeclarator() {
 }
 
-std::string ArrayDeclarator::GetName() {
+std::string ArrayDeclarator::GetName() const {
   return declarator->GetName();
 }
 }  // namespace ast

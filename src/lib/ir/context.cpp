@@ -7,12 +7,12 @@ namespace ir {
 // Context
 Context::Context() :
   symbols_(std::move(SymbolTable())),
-  variables_(std::move(std::set<std::shared_ptr<Variable>>())) {
+  variables_(std::move(std::set<std::shared_ptr<const Variable>>())) {
 }
 
 Context::Context(
   SymbolTable symbols,
-  std::set<std::shared_ptr<Variable>> variables
+  std::set<std::shared_ptr<const Variable>> variables
 ) : symbols_(std::move(symbols)), variables_(std::move(variables)) {
 }
 
@@ -26,7 +26,7 @@ void Context::RegisterDataType(
 }
 
 void Context::RegisterVariable(
-  const std::string name, std::shared_ptr<Variable> variable
+  const std::string name, std::shared_ptr<const Variable> variable
 ) {
   symbols_.variables[name] = variable;
   variables_.insert(variable);
@@ -38,16 +38,18 @@ void Context::RegisterFunction(
   symbols_.functions[name] = function;
 }
 
-std::shared_ptr<Variable> Context::CreateVariable(
-  std::shared_ptr<const DataType> data_type
+std::shared_ptr<const Variable> Context::CreateVariable(
+  std::shared_ptr<const DataType> data_type,
+  std::shared_ptr<const ast::Declarator> declarator
 ) {
-  std::shared_ptr<Variable> result = Variable::Create(data_type);
+  std::shared_ptr<const Variable> result = Variable::Create(
+    data_type, declarator);
   variables_.insert(result);
   return result;
 }
 
-std::set<std::shared_ptr<Variable>> Context::GetVariables() const {
-  return std::set<std::shared_ptr<Variable>>(variables_);
+std::set<std::shared_ptr<const Variable>> Context::GetVariables() const {
+  return std::set<std::shared_ptr<const Variable>>(variables_);
 }
 
 std::unique_ptr<ChildContext> Context::Fork() {
@@ -71,7 +73,7 @@ std::unique_ptr<RootContext> RootContext::Create() {
 
 std::unique_ptr<RootContext> RootContext::Create(
   SymbolTable symbols,
-  std::set<std::shared_ptr<Variable>> variables
+  std::set<std::shared_ptr<const Variable>> variables
 ) {
   return std::unique_ptr<RootContext>(
     new RootContext(std::move(symbols), std::move(variables))
@@ -83,7 +85,7 @@ RootContext::RootContext() : Context() {
 
 RootContext::RootContext(
   SymbolTable symbols,
-  std::set<std::shared_ptr<Variable>> variables
+  std::set<std::shared_ptr<const Variable>> variables
 ) : Context(std::move(symbols), std::move(variables)) {
 }
 
@@ -101,7 +103,7 @@ std::shared_ptr<const DataType> RootContext::ResolveDataType(
   }
 }
 
-std::shared_ptr<Variable> RootContext::ResolveVariable(
+std::shared_ptr<const Variable> RootContext::ResolveVariable(
   const std::string &name
 ) const {
   auto it = symbols_.variables.find(name);
@@ -131,7 +133,7 @@ std::unique_ptr<ChildContext> ChildContext::Create(Context &parentContext) {
 std::unique_ptr<ChildContext> ChildContext::Create(
   Context &parent_context,
   SymbolTable symbols,
-  std::set<std::shared_ptr<Variable>> variables
+  std::set<std::shared_ptr<const Variable>> variables
 ) {
   return std::unique_ptr<ChildContext>(
     new ChildContext(
@@ -149,7 +151,7 @@ ChildContext::ChildContext(Context &parentContext)
 ChildContext::ChildContext(
   Context &parentContext,
   SymbolTable symbols,
-  std::set<std::shared_ptr<Variable>> variables
+  std::set<std::shared_ptr<const Variable>> variables
 ) :
   Context(std::move(symbols), std::move(variables)),
   parent_context_(parentContext) {
@@ -169,7 +171,9 @@ std::shared_ptr<const DataType> ChildContext::ResolveDataType(
   }
 }
 
-std::shared_ptr<Variable> ChildContext::ResolveVariable(const std::string &name) const {
+std::shared_ptr<const Variable> ChildContext::ResolveVariable(
+  const std::string &name
+) const {
   auto it = symbols_.variables.find(name);
   if (it != symbols_.variables.end()) {
     return it->second;
@@ -178,7 +182,9 @@ std::shared_ptr<Variable> ChildContext::ResolveVariable(const std::string &name)
   }
 }
 
-std::shared_ptr<FunctionSymbol> ChildContext::ResolveFunction(const std::string &name) const {
+std::shared_ptr<FunctionSymbol> ChildContext::ResolveFunction(
+  const std::string &name
+) const {
   auto it = symbols_.functions.find(name);
   if (it != symbols_.functions.end()) {
     return it->second;

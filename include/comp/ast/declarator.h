@@ -12,7 +12,7 @@ struct Declarator : public Node {
 
   virtual ~Declarator() = 0;
 
-  virtual std::string GetName() = 0;
+  virtual std::string GetName() const = 0;
 };
 }  // namespace ast
 }  // namespace comp

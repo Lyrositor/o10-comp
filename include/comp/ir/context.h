@@ -21,7 +21,9 @@ class ChildContext;
 class Context {
  public:
   Context();
-  Context(SymbolTable symbols, std::set<std::shared_ptr<Variable>> variables);
+  Context(
+    SymbolTable symbols,
+    std::set<std::shared_ptr<const Variable>> variables);
 
   virtual ~Context() = 0;
 
@@ -30,17 +32,18 @@ class Context {
     std::shared_ptr<const DataType> data_type);
   void RegisterVariable(
     const std::string name,
-    std::shared_ptr<Variable> variable);
+    std::shared_ptr<const Variable> variable);
   void RegisterFunction(
     const std::string name,
     std::shared_ptr<FunctionSymbol> function);
-  std::shared_ptr<Variable> CreateVariable(
-    std::shared_ptr<const DataType> data_type);
+  std::shared_ptr<const Variable> CreateVariable(
+    std::shared_ptr<const DataType> data_type,
+    std::shared_ptr<const ast::Declarator> declarator);
 
   /**
    * @return The set of allocated variables
    */
-  std::set<std::shared_ptr<Variable>> GetVariables() const;
+  std::set<std::shared_ptr<const Variable>> GetVariables() const;
 
   /**
    * Resolve the `DataType` instance named `name` in the current context.
@@ -55,7 +58,7 @@ class Context {
     const std::string &name) const = 0;
   virtual std::shared_ptr<FunctionSymbol> ResolveFunction(
     const std::string &name) const = 0;
-  virtual std::shared_ptr<Variable> ResolveVariable(
+  virtual std::shared_ptr<const Variable> ResolveVariable(
     const std::string &name) const = 0;
 
   /**
@@ -88,7 +91,7 @@ class Context {
   /**
    * Shadowed and anonymous variables.
    */
-  std::set<std::shared_ptr<Variable>> variables_;
+  std::set<std::shared_ptr<const Variable>> variables_;
 };
 
 class RootContext final : public Context {
@@ -96,12 +99,12 @@ class RootContext final : public Context {
   static std::unique_ptr<RootContext> Create();
   static std::unique_ptr<RootContext> Create(
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables);
+    std::set<std::shared_ptr<const Variable>> variables);
 
   RootContext();
   RootContext(
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables);
+    std::set<std::shared_ptr<const Variable>> variables);
 
   ~RootContext();
 
@@ -109,7 +112,7 @@ class RootContext final : public Context {
     const std::string &name) const;
   std::shared_ptr<FunctionSymbol> ResolveFunction(
     const std::string &name) const;
-  std::shared_ptr<Variable> ResolveVariable(
+  std::shared_ptr<const Variable> ResolveVariable(
     const std::string &name) const;
 };
 
@@ -119,13 +122,13 @@ class ChildContext final : public Context {
   static std::unique_ptr<ChildContext> Create(
     Context &parent_context,
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables);
+    std::set<std::shared_ptr<const Variable>> variables);
 
   ChildContext(Context &parentContext);
   ChildContext(
     Context &parentContext,
     SymbolTable symbols,
-    std::set<std::shared_ptr<Variable>> variables);
+    std::set<std::shared_ptr<const Variable>> variables);
 
   ~ChildContext();
 
@@ -133,7 +136,7 @@ class ChildContext final : public Context {
     const std::string &name) const;
   std::shared_ptr<FunctionSymbol> ResolveFunction(
     const std::string &name) const;
-  std::shared_ptr<Variable> ResolveVariable(
+  std::shared_ptr<const Variable> ResolveVariable(
     const std::string &name) const;
 
  protected:

@@ -13,10 +13,10 @@ class Program {
 
   ~Program();
 
-  void AddSymbol(std::shared_ptr<ProgramSymbol> symbol);
+  void AddSymbol(std::shared_ptr<const ProgramSymbol> symbol);
 
  protected:
-  std::vector<std::shared_ptr<ProgramSymbol>> symbols_;
+  std::vector<std::shared_ptr<const ProgramSymbol>> symbols_;
 };
 }  // namespace ir
 }  // namespace comp

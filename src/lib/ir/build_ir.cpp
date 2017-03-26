@@ -1,7 +1,6 @@
 #include <comp/ir/build_ir.h>
 
 #include <comp/ir/builtins.h>
-#include <comp/ir/parameter.h>
 #include <comp/ir/op.h>
 
 namespace comp {
@@ -14,7 +13,8 @@ std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node) {
       case ast::Node::Type::Function: {
         std::shared_ptr<ast::Function>
           e = std::static_pointer_cast<ast::Function>(declaration);
-        std::shared_ptr<FunctionSymbol> function = BuildFunctionIR(*e, context);
+        std::shared_ptr<const FunctionSymbol> function = BuildFunctionIR(
+          *e, context);
         if (function != nullptr) {
           program->AddSymbol(function);
         }
@@ -33,13 +33,12 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   const ast::Function &node, Context &context
 ) {
   // Create the IR of the function's parameters
-  std::vector<std::shared_ptr<const Parameter>> parameters;
+  std::vector<std::shared_ptr<const Variable>> parameters;
   for (auto parameter : node.parameters) {
     std::shared_ptr<const DataType> data_type = BuildDataTypeIR(
       context,
       parameter->data_type);
-    parameters.emplace_back(
-      new Parameter(data_type, parameter->declarator->GetName()));
+    parameters.push_back(Variable::Create(data_type, parameter->declarator));
   }
 
   // Create the IR of the function's return type
@@ -68,16 +67,27 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     throw std::runtime_error("Function was already defined");
   }
 
-  if (parameters != function->GetParameters() ||
-    return_type != function->GetReturnType()) {
-    throw std::runtime_error("Function has conflicting signatures");
+  // Check that the function signatures match
+  if (parameters.size() != function->GetParameters().size()) {
+    throw std::runtime_error(
+      "Function's parameter list does not match declared parameter list");
+  }
+  if (return_type != function->GetReturnType()) {
+    throw std::runtime_error(
+      "Function's return type does not match declared type");
+  }
+  for (size_t i = 0; i < parameters.size(); i++) {
+    if (parameters[i]->GetDataType() !=
+      function->GetParameters()[i]->GetDataType()) {
+      throw std::runtime_error(
+        "Function parameter's type does not match declared type");
+    }
   }
 
   // Create the child context
   VariablesTable variables_table;
   for (auto parameter : parameters) {
-    variables_table[parameter->GetName()] = Variable::Create(
-      parameter->GetDataType());
+    variables_table[parameter->GetDeclarator()->GetName()] = parameter;
   }
   ChildContext function_context(
     context, SymbolTable({}, variables_table, {}), {});
@@ -187,7 +197,7 @@ void BuildExpressionStatementIR(
   BuildExpressionRValueIR(*node.expression, context, current_block);
 }
 
-std::shared_ptr<Variable> BuildExpressionRValueIR(
+std::shared_ptr<const Variable> BuildExpressionRValueIR(
   const ast::RExpression &node,
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
@@ -212,21 +222,23 @@ std::shared_ptr<Variable> BuildExpressionRValueIR(
 }
 
 // TODO(demurgos) handle mismatched types
-std::shared_ptr<Variable> BuildBinaryExpressionRValueIR(
+std::shared_ptr<const Variable> BuildBinaryExpressionRValueIR(
   const ast::BinaryExpression &node,
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  const std::shared_ptr<Variable> left =
+  const std::shared_ptr<const Variable> left =
     BuildExpressionRValueIR(*node.left, context, current_block);
-  const std::shared_ptr<Variable> right =
+  const std::shared_ptr<const Variable> right =
     BuildExpressionRValueIR(*node.right, context, current_block);
   const std::shared_ptr<const DataType> left_type = left->GetDataType();
   const std::shared_ptr<const DataType> right_type = right->GetDataType();
   if (left_type != right_type) {
     throw std::runtime_error("Mismatched types for left and right operands");
   }
-  const std::shared_ptr<Variable> r_value = context.CreateVariable(left_type);
+  const std::shared_ptr<const Variable> r_value = context.CreateVariable(
+    left_type,
+    left->GetDeclarator());
 
   switch (node.op) {
     case ast::BinaryOperator::Addition: {
@@ -244,14 +256,14 @@ std::shared_ptr<Variable> BuildBinaryExpressionRValueIR(
   return r_value;
 }
 
-std::shared_ptr<Variable> BuildIdentifierRValueIR(
+std::shared_ptr<const Variable> BuildIdentifierRValueIR(
   const ast::Identifier &node,
   Context &context
 ) {
   return context.ResolveVariable(node.name);
 }
 
-std::shared_ptr<Variable> BuildIdentifierLValueIR(
+std::shared_ptr<const Variable> BuildIdentifierLValueIR(
   const ast::Identifier &node,
   Context &context
 ) {

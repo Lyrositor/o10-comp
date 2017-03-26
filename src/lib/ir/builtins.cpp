@@ -20,14 +20,14 @@ static const std::shared_ptr<const PrimitiveDataType>
 
 static const std::shared_ptr<FunctionSymbol>
   kGetcharFunction = FunctionSymbol::Create(
-  std::vector<std::shared_ptr<const Parameter>>(),
+  std::vector<std::shared_ptr<const Variable>>(),
   kCharType
 );
 
 static const std::shared_ptr<FunctionSymbol>
   kPutcharFunction = FunctionSymbol::Create(
-  std::vector<std::shared_ptr<const Parameter>>(
-    {Parameter::Create(kCharType, "c")}),
+  std::vector<std::shared_ptr<const Variable>>(
+    {Variable::Create(kCharType, nullptr)}),
   kVoidType
 );
 

@@ -11,7 +11,7 @@ DataObjectSymbol::DataObjectSymbol() {
 }
 
 std::unique_ptr<FunctionSymbol> FunctionSymbol::Create(
-  std::vector<std::shared_ptr<const Parameter>> parameters,
+  std::vector<std::shared_ptr<const Variable>> parameters,
   std::shared_ptr<const DataType> return_type,
   std::shared_ptr<BasicBlock> body
 ) {
@@ -20,7 +20,7 @@ std::unique_ptr<FunctionSymbol> FunctionSymbol::Create(
 }
 
 FunctionSymbol::FunctionSymbol(
-  std::vector<std::shared_ptr<const Parameter>> parameters,
+  std::vector<std::shared_ptr<const Variable>> parameters,
   std::shared_ptr<const DataType> return_type,
   std::shared_ptr<BasicBlock> body
 ) : parameters_(parameters), return_type_(return_type), body_(body) {
@@ -33,7 +33,7 @@ std::shared_ptr<BasicBlock> FunctionSymbol::GetBody() const {
   return body_;
 }
 
-std::vector<std::shared_ptr<const Parameter>> FunctionSymbol::GetParameters()
+std::vector<std::shared_ptr<const Variable>> FunctionSymbol::GetParameters()
 const {
   return parameters_;
 }
@@ -42,7 +42,8 @@ std::shared_ptr<const DataType> FunctionSymbol::GetReturnType() const {
   return return_type_;
 }
 
-std::set<std::shared_ptr<Variable>> FunctionSymbol::GetLocalVariables() const {
+std::set<std::shared_ptr<const Variable>> FunctionSymbol::GetLocalVariables()
+const {
   return local_variables_;
 }
 
@@ -51,7 +52,7 @@ void FunctionSymbol::SetBody(std::shared_ptr<BasicBlock> body) {
 }
 
 void FunctionSymbol::SetLocalVariables(
-  std::set<std::shared_ptr<Variable>> local_variables) {
+  std::set<std::shared_ptr<const Variable>> local_variables) {
   local_variables_ = local_variables;
 }
 }  // namespace ir

@@ -8,7 +8,7 @@ Program::Program() {
 Program::~Program() {
 }
 
-void Program::AddSymbol(std::shared_ptr<ProgramSymbol> symbol) {
+void Program::AddSymbol(std::shared_ptr<const ProgramSymbol> symbol) {
   symbols_.push_back(symbol);
 }
 }  // namespace ir

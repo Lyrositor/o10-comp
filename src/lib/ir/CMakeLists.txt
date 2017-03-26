@@ -6,7 +6,6 @@ add_library(
   context.cpp
   data_type.cpp
   op.cpp
-  parameter.cpp
   program.cpp
   program_symbol.cpp
   symbol_table.cpp

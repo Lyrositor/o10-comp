@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "comp/ir/basic_block.h"
-#include "comp/ir/parameter.h"
+#include "comp/ir/variable.h"
 
 namespace comp {
 namespace ir {
@@ -27,12 +27,12 @@ class DataObjectSymbol final : public ProgramSymbol {
 class FunctionSymbol final : public ProgramSymbol {
  public:
   static std::unique_ptr<FunctionSymbol> Create(
-    std::vector<std::shared_ptr<const Parameter>> parameters,
+    std::vector<std::shared_ptr<const Variable>> parameters,
     std::shared_ptr<const DataType> return_type,
     std::shared_ptr<BasicBlock> body = nullptr);
 
   FunctionSymbol(
-    std::vector<std::shared_ptr<const Parameter>> parameters,
+    std::vector<std::shared_ptr<const Variable>> parameters,
     std::shared_ptr<const DataType> return_type,
     std::shared_ptr<BasicBlock> body = nullptr);
 
@@ -40,21 +40,22 @@ class FunctionSymbol final : public ProgramSymbol {
 
   std::shared_ptr<BasicBlock> GetBody() const;
 
-  std::vector<std::shared_ptr<const Parameter>> GetParameters() const;
+  std::vector<std::shared_ptr<const Variable>> GetParameters() const;
 
   std::shared_ptr<const DataType> GetReturnType() const;
 
-  std::set<std::shared_ptr<Variable>> GetLocalVariables() const;
+  std::set<std::shared_ptr<const Variable>> GetLocalVariables() const;
 
   void SetBody(std::shared_ptr<BasicBlock> body);
 
-  void SetLocalVariables(std::set<std::shared_ptr<Variable>> local_variables);
+  void SetLocalVariables(
+    std::set<std::shared_ptr<const Variable>> local_variables);
 
  private:
-  std::vector<std::shared_ptr<const Parameter>> parameters_;
+  std::vector<std::shared_ptr<const Variable>> parameters_;
   const std::shared_ptr<const DataType> return_type_;
   std::shared_ptr<BasicBlock> body_;
-  std::set<std::shared_ptr<Variable>> local_variables_;
+  std::set<std::shared_ptr<const Variable>> local_variables_;
 };
 }  // namespace ir
 }  // namespace comp

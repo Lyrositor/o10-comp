@@ -37,25 +37,25 @@ void BuildExpressionStatementIR(
 );
 
 // R-values
-std::shared_ptr<ir::Variable> BuildExpressionRValueIR(
+std::shared_ptr<const ir::Variable> BuildExpressionRValueIR(
   const ast::RExpression &node,
   ir::Context &context,
   std::shared_ptr<BasicBlock> &current_block
 );
 
-std::shared_ptr<ir::Variable> BuildIdentifierRValueIR(
+std::shared_ptr<const ir::Variable> BuildIdentifierRValueIR(
   const ast::Identifier &node,
   ir::Context &context
 );
 
-std::shared_ptr<ir::Variable> BuildBinaryExpressionRValueIR(
+std::shared_ptr<const ir::Variable> BuildBinaryExpressionRValueIR(
   const ast::BinaryExpression &node,
   ir::Context &context,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 // L-values
-std::shared_ptr<ir::Variable> BuildIdentifierLValueIR(
+std::shared_ptr<const ir::Variable> BuildIdentifierLValueIR(
   const ast::Identifier &node,
   ir::Context &context
 );

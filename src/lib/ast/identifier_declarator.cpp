@@ -19,7 +19,7 @@ IdentifierDeclarator::IdentifierDeclarator(
 IdentifierDeclarator::~IdentifierDeclarator() {
 }
 
-std::string IdentifierDeclarator::GetName() {
+std::string IdentifierDeclarator::GetName() const {
   return identifier->name;
 }
 }  // namespace ast

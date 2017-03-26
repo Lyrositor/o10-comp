@@ -18,7 +18,7 @@ struct IdentifierDeclarator final : public Declarator {
 
   ~IdentifierDeclarator();
 
-  std::string GetName() override;
+  std::string GetName() const override;
 
   const std::shared_ptr<Identifier> identifier;
 };

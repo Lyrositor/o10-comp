@@ -10,7 +10,7 @@
 namespace comp {
 namespace ir {
 typedef std::map<std::string, std::shared_ptr<const DataType>> DataTypesTable;
-typedef std::map<std::string, std::shared_ptr<Variable>> VariablesTable;
+typedef std::map<std::string, std::shared_ptr<const Variable>> VariablesTable;
 typedef std::map<std::string, std::shared_ptr<FunctionSymbol>> FunctionsTable;
 
 struct SymbolTable {
