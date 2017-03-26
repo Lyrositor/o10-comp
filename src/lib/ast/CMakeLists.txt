@@ -18,7 +18,7 @@ add_library(
   if_statement.cpp
   int64_literal.cpp
   literal.cpp
-  literal_data_type.cpp
+  identifier_data_type.cpp
   node.cpp
   null_statement.cpp
   parameter.cpp

@@ -132,9 +132,9 @@ abstract class LExpression extends RExpression {
 abstract class Literal extends RExpression {
 }
 
-class LiteralDataType << (S,#ffbb33) >>  extends DataType {
+class IdentifierDataType << (S,#ffbb33) >>  extends DataType {
   +const std::shared_ptr<Identifier> identifier
-  {static} +std::unique_ptr<LiteralDataType> Create()
+  {static} +std::unique_ptr<IdentifierDataType> Create()
 }
 
 abstract class Node {
@@ -157,7 +157,7 @@ enum comp::ast::Node::Type {
   IdentifierDeclarator
   IfStatement
   Int64Literal
-  LiteralDataType
+  IdentifierDataType
   NamedParameter
   NullStatement
   Program
@@ -178,7 +178,7 @@ abstract class Parameter extends Node {
 }
 
 class NamedParameter << (S,#ffbb33) >> extends Parameter {
-  +const std::shared_ptr<LiteralDataType> data_type
+  +const std::shared_ptr<IdentifierDataType> data_type
   +const std::shared_ptr<Declarator> declarator
   {static} +std::unique_ptr<Parameter> Create()
 }

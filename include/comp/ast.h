@@ -18,7 +18,7 @@
 #include "comp/ast/if_statement.h"
 #include "comp/ast/int64_literal.h"
 #include "comp/ast/literal.h"
-#include "comp/ast/literal_data_type.h"
+#include "comp/ast/identifier_data_type.h"
 #include "comp/ast/node.h"
 #include "comp/ast/null_statement.h"
 #include "comp/ast/parameter.h"

@@ -249,9 +249,9 @@ std::unique_ptr<rapidjson::Value> LiteralToJson(const Literal &node, rapidjson::
   return NodeToJson(node, allocator);
 }
 
-std::unique_ptr<rapidjson::Value> LiteralDataTypeToJson(const LiteralDataType &node, rapidjson::Document::AllocatorType &allocator) {
+std::unique_ptr<rapidjson::Value> LiteralDataTypeToJson(const IdentifierDataType &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
-  result->AddMember("node_type", "LiteralDataType", allocator);
+  result->AddMember("node_type", "IdentifierDataType", allocator);
   result->AddMember("identifier", *IdentifierToJson(*node.identifier, allocator), allocator);
   return result;
 }
@@ -305,8 +305,8 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
     case Node::Type::Int64Literal: {
       return Int64LiteralToJson(static_cast<const Int64Literal &>(node), allocator);
     }
-    case Node::Type::LiteralDataType: {
-      return LiteralDataTypeToJson(static_cast<const LiteralDataType &>(node), allocator);
+    case Node::Type::IdentifierDataType: {
+      return LiteralDataTypeToJson(static_cast<const IdentifierDataType &>(node), allocator);
     }
     case Node::Type::NullStatement: {
       return NullStatementToJson(static_cast<const NullStatement &>(node), allocator);

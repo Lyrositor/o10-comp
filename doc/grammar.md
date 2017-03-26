@@ -55,11 +55,11 @@ They correspond to the following regular expressions (using PCRE notation):
 ## DataType
 [DataType]: #datatype
 
-- _[DataTypeLiteral]_
+- _[IdentifierDataType]_
 - _[ArrayDataType]_
 
-## DataTypeLiteral
-[DataTypeLiteral]: #datatypeliteral
+## IdentifierDataType
+[IdentifierDataType]: #identifierdatatype
 
 - `int32_t`
 - `int64_t`
@@ -69,7 +69,7 @@ They correspond to the following regular expressions (using PCRE notation):
 ## ArrayDataType
 [ArrayDataType]: #ArrayDataType
 
-- _[DataTypeLiteral]_ `[` `]`
+- _[IdentifierDataType]_ `[` `]`
 
 ## Identifier
 [Identifier]: #identifier
@@ -85,7 +85,7 @@ They correspond to the following regular expressions (using PCRE notation):
 ## Parameter
 [Parameter]: #parameter
 
-- _[DataTypeLiteral]_ _[Declarator]_
+- _[IdentifierDataType]_ _[Declarator]_
 - _[DataType]_
 
 It means that there are two kinds of parameters: named and anonymous parameters.
@@ -114,13 +114,13 @@ We keep it as this in the grammar but using anything but a literal will throw a 
 ## FunctionDefinition
 [FunctionDefinition]: #FunctionDefinition
 
-- _[DataTypeLiteral]_ _[Identifier]_ `(` _[ParametersList]_ `)` _[Block]_
+- _[IdentifierDataType]_ _[Identifier]_ `(` _[ParametersList]_ `)` _[Block]_
 
 In the standard C, the return type can be any _[DataType]_ (such as `int`, `int *` or `struct {}`)
 except for an array type with fixed or unknown array size (such as `int[]`, `int[5]`).
 
 Since our language is a subset of C, only with a few primitive types and array types, it means
-that the return type can be restricted to only _[DataTypeLiteral]_.
+that the return type can be restricted to only _[IdentifierDataType]_.
 
 ## Block
 [Block]: #Block
@@ -139,7 +139,7 @@ that the return type can be restricted to only _[DataTypeLiteral]_.
 ## VariableDeclaration
 [VariableDeclaration]: #variabledeclaration
 
-- _[DataTypeLiteral]_ _[VariableDeclaratorsList]_ `;`
+- _[IdentifierDataType]_ _[VariableDeclaratorsList]_ `;`
 
 ## VariableDeclaratorsList
 [VariableDeclaratorsList]: #variabledeclaratorslist

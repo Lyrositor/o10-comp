@@ -26,7 +26,7 @@ TEST(comp__ast__to_json, EmptyMain) {
   program_body.push_back(Function::Create(
     Identifier::Create("main"),
     std::vector<std::shared_ptr<Parameter>>(),
-    LiteralDataType::Create(Identifier::Create("int64_t")),
+    IdentifierDataType::Create(Identifier::Create("int64_t")),
     BlockStatement::Create(std::vector<std::shared_ptr<Statement>>())
   ));
   std::unique_ptr<Program> program = Program::Create(program_body);
@@ -37,7 +37,7 @@ TEST(comp__ast__to_json, EmptyMain) {
   document->Accept(writer);
   std::string actual = buffer.GetString();
 
-  std::string expected = "{\"node_type\":\"Program\",\"body\":[{\"node_type\":\"Function\",\"return_type\":{\"node_type\":\"LiteralDataType\",\"identifier\":{\"node_type\":\"Identifier\",\"name\":\"int64_t\"}},\"parameters\":[],\"body\":{\"node_type\":\"BlockStatement\",\"body\":[]}}]}";
+  std::string expected = "{\"node_type\":\"Program\",\"body\":[{\"node_type\":\"Function\",\"return_type\":{\"node_type\":\"IdentifierDataType\",\"identifier\":{\"node_type\":\"Identifier\",\"name\":\"int64_t\"}},\"parameters\":[],\"body\":{\"node_type\":\"BlockStatement\",\"body\":[]}}]}";
 
   EXPECT_EQ(expected, actual);
 }

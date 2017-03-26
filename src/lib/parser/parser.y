@@ -35,7 +35,7 @@ void yy_scan_string(const char *str);
   comp::ast::Function *function;
   comp::ast::Identifier *identifier;
   comp::ast::LExpression *lExpression;
-  comp::ast::LiteralDataType *literalDataType;
+  comp::ast::IdentifierDataType *identifierDataType;
   comp::ast::Program *program;
   comp::ast::RExpression *rExpression;
   comp::ast::Statement *statement;
@@ -83,7 +83,7 @@ void yy_scan_string(const char *str);
 %type <function> functionDeclaration
 %type <identifier> identifier /*
 %type <lExpression> */
-%type <literalDataType> dataTypeLiteral
+%type <identifierDataType> identifierDataType
 %type <program> program root /*
 %type <rExpression> charLiteral
 %type <statement> */
@@ -104,7 +104,7 @@ void yy_scan_string(const char *str);
 %type <unaryExpression> unaryExpression varUpdate
 %type <dataType> dataType
 %type <declarator>
-%type <dataTypeLiteral> dataTypeLiteral  literalExpr
+%type <identifierDataType> identifierDataType  literalExpr
 %type <arrayDataType> arrayDataType
 %type <parameter> parameter
 %type <statement> statement
@@ -172,29 +172,29 @@ functionDeclaration:
   }
 
 dataType:
-  dataTypeLiteral {
+  identifierDataType {
     $$ = $1;
   }
   | arrayDataType {
     $$ = $1;
   }
 
-dataTypeLiteral:
+identifierDataType:
   CHAR_TYPE {
-    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("char"));
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("char"));
   }
   | INT32_TYPE {
-    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("int32_t"));
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("int32_t"));
   }
   | INT64_TYPE {
-    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("int64_t"));
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("int64_t"));
   }
   | VOID_TYPE {
-    $$ = new comp::ast::LiteralDataType(comp::ast::Identifier::Create("void"));
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("void"));
   }
 
 arrayDataType:
-  dataTypeLiteral OPEN_BRACKET CLOSE_BRACKET{
+  identifierDataType OPEN_BRACKET CLOSE_BRACKET{
     std::shared_ptr<comp::ast::DataType> item_type($1);
     $$ = new comp::ast::ArrayDataType(item_type, nullptr);
   }
@@ -217,8 +217,8 @@ parametersList:
   }
 
 parameter:
-  dataTypeLiteral declarator {
-    std::shared_ptr<comp::ast::LiteralDataType> literal_data_type($1);
+  identifierDataType declarator {
+    std::shared_ptr<comp::ast::IdentifierDataType> literal_data_type($1);
     std::shared_ptr<comp::ast::Declarator> declarator($2);
     $$ = new comp::ast::NamedParameter(literal_data_type, declarator);
   }
@@ -254,10 +254,10 @@ functionDefinition:
     }
 
 variableDeclaration:
-    dataTypeLiteral variableDeclaratorsList SEMICOLON {
-        std::shared_ptr<comp::ast::LiteralDataType> dataTypeLiteral($1);
+    identifierDataType variableDeclaratorsList SEMICOLON {
+        std::shared_ptr<comp::ast::IdentifierDataType> base_type($1);
         std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> declarators($2);
-        $$ = new comp::ast::VariableDeclaration(dataTypeLiteral, declarators);
+        $$ = new comp::ast::VariableDeclaration(base_type, declarators);
     }
 
 variableDeclaratorsList:

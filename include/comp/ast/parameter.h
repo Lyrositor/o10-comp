@@ -3,7 +3,7 @@
 #include "comp/ast/data_type.h"
 #include "comp/ast/declaration.h"
 #include "comp/ast/declarator.h"
-#include "comp/ast/literal_data_type.h"
+#include "comp/ast/identifier_data_type.h"
 
 namespace comp {
 namespace ast {
@@ -15,18 +15,18 @@ struct Parameter : public Node {
 
 struct NamedParameter final : public Parameter {
   static std::unique_ptr<NamedParameter> Create(
-    std::shared_ptr<LiteralDataType> data_type,
+    std::shared_ptr<IdentifierDataType> data_type,
     std::shared_ptr<Declarator> declarator,
     std::shared_ptr<SourceLocation> location = nullptr);
 
   NamedParameter(
-    std::shared_ptr<LiteralDataType> data_type,
+    std::shared_ptr<IdentifierDataType> data_type,
     std::shared_ptr<Declarator> declarator,
     std::shared_ptr<SourceLocation> location = nullptr);
 
   ~NamedParameter();
 
-  const std::shared_ptr<LiteralDataType> data_type;
+  const std::shared_ptr<IdentifierDataType> data_type;
   const std::shared_ptr<Declarator> declarator;
 };
 

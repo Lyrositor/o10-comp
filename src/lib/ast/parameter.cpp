@@ -10,7 +10,7 @@ Parameter::~Parameter() {
 }
 
 std::unique_ptr<NamedParameter> NamedParameter::Create(
-  std::shared_ptr<LiteralDataType> data_type,
+  std::shared_ptr<IdentifierDataType> data_type,
   std::shared_ptr<Declarator> declarator,
   std::shared_ptr<SourceLocation> location
 ) {
@@ -19,7 +19,7 @@ std::unique_ptr<NamedParameter> NamedParameter::Create(
 }
 
 NamedParameter::NamedParameter(
-  std::shared_ptr<LiteralDataType> data_type,
+  std::shared_ptr<IdentifierDataType> data_type,
   std::shared_ptr<Declarator> declarator,
   std::shared_ptr<SourceLocation> location
 ) :
