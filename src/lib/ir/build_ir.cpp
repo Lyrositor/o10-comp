@@ -434,7 +434,7 @@ void BuildIfStatementIR(
     current_block->SetBranchIfTrue(test);
     test->SetBranchIfTrue(consequence);
     consequence->SetBranchIfTrue(next);
-    if (*node.alternative) {
+    if (node.alternative != nullptr) {
       std::shared_ptr<BasicBlock> alternative = BasicBlock::create();
       BuildStatementIR(*node.alternative, context, alternative);
       test->SetBranchIfFalse(alternative);
