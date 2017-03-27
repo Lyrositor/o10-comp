@@ -6,7 +6,7 @@
 #include "lexer.yy.h"
 
 void yyerror(yyscan_t scanner, comp::ast::Program *res, const char *msg) {
-  printf("Syntax error : %s\n", msg);
+  throw std::runtime_error(std::string("Syntax error : %s\n") + msg);
 }
 
 namespace comp {
