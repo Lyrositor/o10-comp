@@ -15,6 +15,7 @@ struct Node {
     BinaryExpression,
     BlockStatement,
     CallExpression,
+    ConditionalExpression,
     ExpressionStatement,
     ForStatement,
     Function,

@@ -1,13 +1,10 @@
 %{
-
 #include <cstdio>
 #include <stdlib.h>
 #include <comp/ast.h>
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
-
 %}
-
 %option 8bit
 %option bison-bridge
 /* %option debug */
@@ -18,62 +15,57 @@
 %option noyywrap
 %option reentrant
 %option warn
-
 %x charLiteral
-
 %%
-
 [ \n\t]       {/* ignore */}
-
-
-";"                               {return SEMICOLON;}
-"["                               {return OPEN_BRACKET;}
-"]"                               {return CLOSE_BRACKET;}
-"++"                              {return INCREMENT_OPERATOR;}
-"--"                              {return DECREMENT_OPERATOR;}
-"("                               {return OPEN_PAREN;}
-")"                               {return CLOSE_PAREN;}
-"if"                              {return IF;}
-"else"                            {return ELSE;}
-"while"                           {return WHILE;}
-"for"                             {return FOR;}
-"return"                          {return RETURN;}
-"{"                               {return OPEN_BRACE;}
-"}"                               {return CLOSE_BRACE;}
-
-"="                               {return SIMPLE_ASSIGNMENT_OPERATOR;}
-","                               {return COMMA_OPERATOR;}
-"=="                              {return EQUALS_OPERATOR;}
-"!="                              {return NOT_EQUAL_OPERATOR;}
-"<"                               {return LESS_THAN_OPERATOR;}
-"<="                              {return LESS_THAN_OR_EQUAL_OPERATOR;}
-">"                               {return GREATER_THAN_OPERATOR;}
-">="                              {return GREATER_THAN_OR_EQUAL_OPERATOR;}
-"<<"                              {return LEFT_SHIFT_OPERATOR;}
-">>"                              {return RIGHT_SHIFT_OPERATOR;}
-"+"                               {return ADDITION_OPERATOR;}
-"-"                               {return SUBTRACTION_OPERATOR;}
-"/"                               {return DIVISION_OPERATOR;}
-"*"                               {return MULTIPLICATION_OPERATOR;}
-"%"                               {return REMAINDER_OPERATOR;}
-"+="                              {return ADD_ASSIGN_OPERATOR;}
-"-="                              {return MINUS_ASSIGN_OPERATOR;}
-"*="                              {return MULTP_ASSIGN_OPERATOR;}
-"/="                              {return DIV_ASSIGN_OPERATOR;}
-"%="                              {return REM_ASSIGN_OPERATOR;}
-"<<="                             {return LEFT_SHIFT_ASSIGN_OPERATOR;}
-">>="                             {return RIGHT_SHIFT_ASSIGN_OPERATOR;}
-"&="                              {return AND_ASSIGN_OPERATOR;}
-"^="                              {return XOR_ASSIGN_OPERATOR;}
-"|="                              {return OR_ASSIGN_OPERATOR;}
-"|"                               {return BINARY_OR_OPERATOR;}
-"&"                               {return BINARY_AND_OPERATOR;}
-"^"                               {return BINARY_XOR_OPERATOR;}
-"||"                              {return OR_OPERATOR;}
-"&&"                              {return AND_OPERATOR;}
-"!"                               {return NOT_OPERATOR;}
-"~"                               {return BINARY_ONES_COMPLEMENT_OPERATOR;}
-
+";"           {return SEMICOLON;}
+"["           {return OPEN_BRACKET;}
+"]"           {return CLOSE_BRACKET;}
+"("           {return OPEN_PAREN;}
+")"           {return CLOSE_PAREN;}
+"if"          {return IF;}
+"else"        {return ELSE;}
+"while"       {return WHILE;}
+"for"         {return FOR;}
+"return"      {return RETURN;}
+"{"           {return OPEN_BRACE;}
+"}"           {return CLOSE_BRACE;}
+"!="          {return NOT_EQUAL_OPERATOR;}
+"!"           {return NOT_OPERATOR;}
+"<<="         {return LEFT_SHIFT_ASSIGN_OPERATOR;}
+"<="          {return LESS_THAN_OR_EQUAL_OPERATOR;}
+"<<"          {return LEFT_SHIFT_OPERATOR;}
+"<"           {return LESS_THAN_OPERATOR;}
+">>="         {return RIGHT_SHIFT_ASSIGN_OPERATOR;}
+">="          {return GREATER_THAN_OR_EQUAL_OPERATOR;}
+">>"          {return RIGHT_SHIFT_OPERATOR;}
+">"           {return GREATER_THAN_OPERATOR;}
+"+="          {return ADD_ASSIGN_OPERATOR;}
+"++"          {return INCREMENT_OPERATOR;}
+"+"           {return ADDITION_OPERATOR;}
+"-="          {return MINUS_ASSIGN_OPERATOR;}
+"--"          {return DECREMENT_OPERATOR;}
+"-"           {return SUBTRACTION_OPERATOR;}
+"*="          {return MULTP_ASSIGN_OPERATOR;}
+"*"           {return MULTIPLICATION_OPERATOR;}
+"/="          {return DIV_ASSIGN_OPERATOR;}
+"/"           {return DIVISION_OPERATOR;}
+"%="          {return REM_ASSIGN_OPERATOR;}
+"%"           {return REMAINDER_OPERATOR;}
+"&="          {return AND_ASSIGN_OPERATOR;}
+"&&"          {return AND_OPERATOR;}
+"&"           {return BINARY_AND_OPERATOR;}
+"^="          {return XOR_ASSIGN_OPERATOR;}
+"^"           {return BINARY_XOR_OPERATOR;}
+"|="          {return OR_ASSIGN_OPERATOR;}
+"||"          {return OR_OPERATOR;}
+"|"           {return BINARY_OR_OPERATOR;}
+"=="          {return EQUALS_OPERATOR;}
+"="           {return SIMPLE_ASSIGNMENT_OPERATOR;}
+","           {return COMMA_OPERATOR;}
+"~"           {return BINARY_ONES_COMPLEMENT_OPERATOR;}
+"?"                               {return QUESTION_MARK;}
+"?"                               {return COLON;}
 "char"                            {return CHAR_TYPE;}
 "int32_t"                         {return INT32_TYPE;}
 "int64_t"                         {return INT64_TYPE;}
@@ -97,6 +89,5 @@
   "\\\\"                          {yylval->uint8 = 0x5c; return CHAR_ATOM;}
   "'"                             {BEGIN(INITIAL); return SIMPLE_QUOTE;}
 }
-
 ([0-9]+)                          {yylval->int64 = atoi(yytext); return INTEGER_LITERAL;}
 ([a-zA-Z_$][a-zA-Z_$0-9]*)        {yylval->cstring = yytext; return IDENTIFIER;}

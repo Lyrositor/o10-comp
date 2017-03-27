@@ -6,6 +6,7 @@ add_library(
   binary_expression.cpp
   block_statement.cpp
   call_expression.cpp
+  conditional_expression.cpp
   data_type.cpp
   declaration.cpp
   declarator.cpp
