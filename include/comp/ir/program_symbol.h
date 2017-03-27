@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "comp/ir/basic_block.h"
+#include "comp/ir/control_flow_graph.h"
 #include "comp/ir/variable.h"
 
 namespace comp {
@@ -29,16 +30,16 @@ class FunctionSymbol final : public ProgramSymbol {
   static std::unique_ptr<FunctionSymbol> Create(
     std::vector<std::shared_ptr<const Variable>> parameters,
     std::shared_ptr<const DataType> return_type,
-    std::shared_ptr<BasicBlock> body = nullptr);
+    std::shared_ptr<ControlFlowGraph> body = nullptr);
 
   FunctionSymbol(
     std::vector<std::shared_ptr<const Variable>> parameters,
     std::shared_ptr<const DataType> return_type,
-    std::shared_ptr<BasicBlock> body = nullptr);
+    std::shared_ptr<ControlFlowGraph> body = nullptr);
 
   virtual ~FunctionSymbol();
 
-  std::shared_ptr<BasicBlock> GetBody() const;
+  std::shared_ptr<ControlFlowGraph> GetBody() const;
 
   std::vector<std::shared_ptr<const Variable>> GetParameters() const;
 
@@ -46,7 +47,7 @@ class FunctionSymbol final : public ProgramSymbol {
 
   std::set<std::shared_ptr<const Variable>> GetLocalVariables() const;
 
-  void SetBody(std::shared_ptr<BasicBlock> body);
+  void SetBody(std::shared_ptr<ControlFlowGraph> body);
 
   void SetLocalVariables(
     std::set<std::shared_ptr<const Variable>> local_variables);
@@ -54,7 +55,7 @@ class FunctionSymbol final : public ProgramSymbol {
  private:
   std::vector<std::shared_ptr<const Variable>> parameters_;
   const std::shared_ptr<const DataType> return_type_;
-  std::shared_ptr<BasicBlock> body_;
+  std::shared_ptr<ControlFlowGraph> body_;
   std::set<std::shared_ptr<const Variable>> local_variables_;
 };
 }  // namespace ir

@@ -1,5 +1,4 @@
 #include <comp/ir/program_symbol.h>
-#include <set>
 
 namespace comp {
 namespace ir {
@@ -13,7 +12,7 @@ DataObjectSymbol::DataObjectSymbol() {
 std::unique_ptr<FunctionSymbol> FunctionSymbol::Create(
   std::vector<std::shared_ptr<const Variable>> parameters,
   std::shared_ptr<const DataType> return_type,
-  std::shared_ptr<BasicBlock> body
+  std::shared_ptr<ControlFlowGraph> body
 ) {
   return std::unique_ptr<FunctionSymbol>(
     new FunctionSymbol(parameters, return_type, body));
@@ -22,14 +21,14 @@ std::unique_ptr<FunctionSymbol> FunctionSymbol::Create(
 FunctionSymbol::FunctionSymbol(
   std::vector<std::shared_ptr<const Variable>> parameters,
   std::shared_ptr<const DataType> return_type,
-  std::shared_ptr<BasicBlock> body
+  std::shared_ptr<ControlFlowGraph> body
 ) : parameters_(parameters), return_type_(return_type), body_(body) {
 }
 
 FunctionSymbol::~FunctionSymbol() {
 }
 
-std::shared_ptr<BasicBlock> FunctionSymbol::GetBody() const {
+std::shared_ptr<ControlFlowGraph> FunctionSymbol::GetBody() const {
   return body_;
 }
 
@@ -47,7 +46,7 @@ const {
   return local_variables_;
 }
 
-void FunctionSymbol::SetBody(std::shared_ptr<BasicBlock> body) {
+void FunctionSymbol::SetBody(std::shared_ptr<ControlFlowGraph> body) {
   body_ = body;
 }
 

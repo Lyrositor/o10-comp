@@ -9,7 +9,7 @@ namespace comp {
 namespace ir {
 class BasicBlock {
  public:
-  static std::unique_ptr<BasicBlock> create(
+  static std::unique_ptr<BasicBlock> Create(
     std::vector<std::shared_ptr<Op>> ops = std::vector<std::shared_ptr<Op>>());
 
   BasicBlock(
@@ -21,8 +21,8 @@ class BasicBlock {
 
  private:
   std::vector<std::shared_ptr<Op>> ops_;
-  std::shared_ptr<BasicBlock> branch_if_true_;
-  std::shared_ptr<BasicBlock> branch_if_false_;
+  std::weak_ptr<BasicBlock> branch_if_true_;
+  std::weak_ptr<BasicBlock> branch_if_false_;
 };
 }  // namespace ir
 }  // namespace comp

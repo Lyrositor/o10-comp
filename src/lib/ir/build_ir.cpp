@@ -1,6 +1,7 @@
 #include <comp/ir/build_ir.h>
 
 #include <comp/ir/builtins.h>
+#include <comp/ir/control_flow_graph.h>
 #include <comp/ir/op.h>
 
 namespace comp {
@@ -110,11 +111,11 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   ChildContext function_context(
     context, SymbolTable({}, variables_table, {}), {});
 
-  // Generate the function block's IR
-  // TODO(Lyrositor) Create a proper structure to store basic blocks
-  std::shared_ptr<BasicBlock> first_block = BasicBlock::create();
-  BuildBlockStatementIR(*node.body, function_context, first_block);
-  function->SetBody(first_block);
+  // Generate the function's control flow graph
+  std::shared_ptr<ControlFlowGraph> cfg = ControlFlowGraph::Create();
+  std::shared_ptr<BasicBlock> first_block = cfg->CreateBasicBlock();
+  BuildBlockStatementIR(*node.body, function_context, cfg, first_block);
+  function->SetBody(cfg);
   function->SetLocalVariables(function_context.GetVariables());
 
   return function;
@@ -173,6 +174,7 @@ std::shared_ptr<const DataType> BuildDataTypeIR(
 void BuildStatementIR(
   const ast::Statement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
   switch (node.node_type) {
@@ -180,6 +182,7 @@ void BuildStatementIR(
       BuildBlockStatementIR(
         static_cast<const ast::BlockStatement &>(node),
         context,
+        cfg,
         current_block);
       break;
     }
@@ -187,6 +190,7 @@ void BuildStatementIR(
       BuildExpressionStatementIR(
         static_cast<const ast::ExpressionStatement &>(node),
         context,
+        cfg,
         current_block);
       break;
     }
@@ -199,11 +203,12 @@ void BuildStatementIR(
 void BuildBlockStatementIR(
   const ast::BlockStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
   std::unique_ptr<ChildContext> childContext = context.Fork();
   for (auto statement : node.body) {
-    BuildStatementIR(*statement, *childContext, current_block);
+    BuildStatementIR(*statement, *childContext, cfg, current_block);
   }
   context.Join(std::move(childContext));
 }
@@ -211,14 +216,16 @@ void BuildBlockStatementIR(
 void BuildExpressionStatementIR(
   const ast::ExpressionStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  BuildExpressionRValueIR(*node.expression, context, current_block);
+  BuildExpressionRValueIR(*node.expression, context, cfg, current_block);
 }
 
 std::shared_ptr<const Variable> BuildExpressionRValueIR(
   const ast::RExpression &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
   switch (node.node_type) {
@@ -231,6 +238,7 @@ std::shared_ptr<const Variable> BuildExpressionRValueIR(
       return BuildBinaryExpressionRValueIR(
         static_cast<const ast::BinaryExpression &>(node),
         context,
+        cfg,
         current_block);
     }
     default: {
@@ -244,12 +252,13 @@ std::shared_ptr<const Variable> BuildExpressionRValueIR(
 std::shared_ptr<const Variable> BuildBinaryExpressionRValueIR(
   const ast::BinaryExpression &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
   const std::shared_ptr<const Variable> left =
-    BuildExpressionRValueIR(*node.left, context, current_block);
+    BuildExpressionRValueIR(*node.left, context, cfg, current_block);
   const std::shared_ptr<const Variable> right =
-    BuildExpressionRValueIR(*node.right, context, current_block);
+    BuildExpressionRValueIR(*node.right, context, cfg, current_block);
   const std::shared_ptr<const DataType> left_type = left->GetDataType();
   const std::shared_ptr<const DataType> right_type = right->GetDataType();
   if (left_type != right_type) {

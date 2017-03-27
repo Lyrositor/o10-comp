@@ -2,7 +2,7 @@
 
 namespace comp {
 namespace ir {
-std::unique_ptr<BasicBlock> BasicBlock::create(
+std::unique_ptr<BasicBlock> BasicBlock::Create(
   std::vector<std::shared_ptr<Op>> ops) {
   return std::unique_ptr<BasicBlock>(new BasicBlock(std::move(ops)));
 }

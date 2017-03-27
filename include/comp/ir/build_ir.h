@@ -11,7 +11,8 @@ namespace ir {
 std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node);
 
 std::shared_ptr<FunctionSymbol> BuildFunctionIR(
-  const ast::Function &node, Context &context);
+  const ast::Function &node,
+  Context &context);
 
 std::shared_ptr<const DataType> BuildDataTypeIR(
   const Context & context,
@@ -21,18 +22,21 @@ std::shared_ptr<const DataType> BuildDataTypeIR(
 void BuildStatementIR(
   const ast::Statement &node,
   ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 void BuildBlockStatementIR(
   const ast::BlockStatement &node,
   ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 void BuildExpressionStatementIR(
   const ast::ExpressionStatement &node,
   ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
@@ -40,18 +44,20 @@ void BuildExpressionStatementIR(
 std::shared_ptr<const ir::Variable> BuildExpressionRValueIR(
   const ast::RExpression &node,
   ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+);
+
+std::shared_ptr<const ir::Variable> BuildBinaryExpressionRValueIR(
+  const ast::BinaryExpression &node,
+  ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 std::shared_ptr<const ir::Variable> BuildIdentifierRValueIR(
   const ast::Identifier &node,
   ir::Context &context
-);
-
-std::shared_ptr<const ir::Variable> BuildBinaryExpressionRValueIR(
-  const ast::BinaryExpression &node,
-  ir::Context &context,
-  std::shared_ptr<BasicBlock> &current_block
 );
 
 // L-values

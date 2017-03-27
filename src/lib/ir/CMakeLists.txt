@@ -4,6 +4,7 @@ add_library(
   build_ir.cpp
   builtins.cpp
   context.cpp
+  control_flow_graph.cpp
   data_type.cpp
   op.cpp
   program.cpp
