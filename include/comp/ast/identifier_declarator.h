@@ -18,8 +18,6 @@ struct IdentifierDeclarator final : public Declarator {
 
   ~IdentifierDeclarator();
 
-  std::string GetName() const override;
-
   const std::shared_ptr<Identifier> identifier;
 };
 }  // namespace ast

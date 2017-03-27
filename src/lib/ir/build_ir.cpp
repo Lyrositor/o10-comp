@@ -36,34 +36,13 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   // Create the IR of the function's parameters
   std::vector<std::shared_ptr<const Variable>> parameters;
   for (auto parameter : node.parameters) {
-    std::shared_ptr<const DataType> data_type;
-    switch (parameter->node_type) {
-      case ast::Node::Type::NamedParameter: {
-        std::shared_ptr<ast::NamedParameter>
-          p = std::static_pointer_cast<ast::NamedParameter>(
-          parameter);
-        std::shared_ptr<ast::IdentifierDeclarator>
-          i = std::static_pointer_cast<ast::IdentifierDeclarator>(
-          p->declarator);
-        data_type =
-          context.ResolveDataType("void");  // TODO(Lyrositor) Get the actual type
-        parameters.push_back(
-          Variable::Create(data_type, p->declarator));
-        break;
-      }
-      case ast::Node::Type::AnonymousParameter: {
-        // TODO(Lyrositor) Handle anonymous parameters
-        break;
-      }
-      default:
-        throw std::runtime_error("Unexpected parameter node type");
-    }
+    std::shared_ptr<const DataType> data_type = ResolveParameterType(*parameter, context);
+    std::string name = ResolveParameterName(*parameter);
+    parameters.push_back(Variable::Create(data_type, nullptr)); // TODO: parameter
   }
 
   // Create the IR of the function's return type
-  std::shared_ptr<const DataType> return_type = BuildDataTypeIR(
-    context,
-    node.return_type);
+  std::shared_ptr<const DataType> return_type = ResolveDataTypeType(*node.return_type, context);
 
   // Add declaration to context, if it hasn't already been done
   std::shared_ptr<FunctionSymbol> function;
@@ -102,14 +81,17 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
         "Function parameter's type does not match declared type");
     }
   }
-
   // Create the child context
   VariablesTable variables_table;
-  for (auto parameter : parameters) {
-    variables_table[parameter->GetDeclarator()->GetName()] = parameter;
+  std::set<std::shared_ptr<const Variable>> variables_set;
+  for (size_t i = 0; i < node.parameters.size(); i++) {
+    std::string parameter_name = ResolveParameterName(*node.parameters[i]);
+    if (parameter_name != "") {
+      variables_table[parameter_name] = parameters[i];
+    }
+    variables_set.insert(parameters[i]);
   }
-  ChildContext function_context(
-    context, SymbolTable({}, variables_table, {}), {});
+  ChildContext function_context(context, SymbolTable({}, variables_table, {}), variables_set);
 
   // Generate the function's control flow graph
   std::shared_ptr<ControlFlowGraph> cfg = ControlFlowGraph::Create();
@@ -121,54 +103,104 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   return function;
 }
 
-std::shared_ptr<const DataType> BuildDataTypeIR(
-  const Context & context,
-  std::shared_ptr<ast::DataType> data_type_node
-) {
-  std::shared_ptr<const DataType> data_type;
-  switch (data_type_node->node_type) {
+std::shared_ptr<const DataType> ResolveDataTypeType(const ast::DataType &data_type, const Context &context) {
+  switch (data_type.node_type) {
     case ast::Node::Type::ArrayDataType: {
-      std::shared_ptr<ast::ArrayDataType>
-        e = std::static_pointer_cast<ast::ArrayDataType>(data_type_node);
-
-      // Check if the array size was specified
-      // If it was specified, view this as a segment of contiguous memory (an
-      // array); if not, view it as an ordinary pointer.
-      if (e->size != nullptr) {
+      const ast::ArrayDataType &arrayDataType = static_cast<const ast::ArrayDataType &>(data_type);
+      if (arrayDataType.size != nullptr) {
         size_t size;
-        switch (e->size->node_type) {
+        switch (arrayDataType.size->node_type) {
           case ast::Node::Type::Int64Literal:
-            size = static_cast<size_t>(
-              std::static_pointer_cast<ast::Int64Literal>(e->size)->value);
+            size = std::static_pointer_cast<ast::Int64Literal>(arrayDataType.size)->value;
             break;
           case ast::Node::Type::Uint8Literal:
-            size = static_cast<size_t>(
-              std::static_pointer_cast<ast::Uint8Literal>(e->size)->value);
+            size = std::static_pointer_cast<ast::Uint8Literal>(arrayDataType.size)->value;
             break;
           default:
             // Currently, we only support literals to specify array size
             throw std::runtime_error("Array length not a literal");
         }
-        data_type = ArrayDataType::Create(
-          BuildDataTypeIR(context, e->item_type),
-          size);
+        return ArrayDataType::Create(ResolveDataTypeType(*arrayDataType.item_type, context), size);
       } else {
-        data_type = PointerDataType::Create(
-          BuildDataTypeIR(context, e->item_type));
+        return PointerDataType::Create(ResolveDataTypeType(*arrayDataType.item_type, context));
       }
-      break;
     }
     case ast::Node::Type::IdentifierDataType: {
-      std::shared_ptr<ast::IdentifierDataType>
-        e = std::static_pointer_cast<ast::IdentifierDataType>(data_type_node);
-      data_type = context.ResolveDataType(e->identifier->name);
-      break;
+      const ast::IdentifierDataType &identifierDeclarator = static_cast<const ast::IdentifierDataType &>(data_type);
+      return context.ResolveDataType(identifierDeclarator.identifier->name);
     }
     default: {
-      throw std::domain_error("Unexpected data type");
+      throw std::runtime_error("Unexpected node type");
     }
   }
-  return data_type;
+}
+
+std::shared_ptr<const DataType> ResolveDeclaratorType(const std::shared_ptr<const DataType> base_type,
+                                                      const ast::Declarator &declarator) {
+  switch (declarator.node_type) {
+    case ast::Node::Type::ArrayDeclarator: {
+      const ast::ArrayDeclarator &arrayDeclarator = static_cast<const ast::ArrayDeclarator &>(declarator);
+      std::shared_ptr<const DataType> item_type = ResolveDeclaratorType(base_type, *arrayDeclarator.declarator);
+      if (arrayDeclarator.size == nullptr) {
+        return PointerDataType::Create(item_type);
+      } else {
+        throw std::runtime_error("Cannot specify size");
+      }
+    }
+    case ast::Node::Type::IdentifierDeclarator: {
+      return base_type;
+    }
+    default: {
+      throw std::runtime_error("Unexpected node type");
+    }
+  }
+}
+
+std::shared_ptr<const DataType> ResolveParameterType(const ast::Parameter &parameter, const Context &context) {
+  switch (parameter.node_type) {
+    case ast::Node::Type::NamedParameter: {
+      const ast::NamedParameter &namedParameter = static_cast<const ast::NamedParameter &>(parameter);
+      return ResolveDeclaratorType(ResolveDataTypeType(*namedParameter.data_type, context), *namedParameter.declarator);
+    }
+    case ast::Node::Type::AnonymousParameter: {
+      const ast::AnonymousParameter &anonymousParameter = static_cast<const ast::AnonymousParameter &>(parameter);
+      return ResolveDataTypeType(*anonymousParameter.data_type, context);
+    }
+    default: {
+      throw std::runtime_error("Unexpected node type");
+    }
+  }
+}
+
+std::string ResolveDeclaratorName(const ast::Declarator &declarator) {
+  switch (declarator.node_type) {
+    case ast::Node::Type::ArrayDeclarator: {
+      return ResolveDeclaratorName(declarator);
+    }
+    case ast::Node::Type::IdentifierDeclarator: {
+      const ast::IdentifierDeclarator
+        &identifierDeclarator = static_cast<const ast::IdentifierDeclarator &>(declarator);
+      return identifierDeclarator.identifier->name;
+    }
+    default: {
+      throw std::runtime_error("Unexpected node type");
+    }
+  }
+}
+
+std::string ResolveParameterName(const ast::Parameter &parameter) {
+  switch (parameter.node_type) {
+    case ast::Node::Type::NamedParameter: {
+      const ast::NamedParameter &namedParameter = static_cast<const ast::NamedParameter &>(parameter);
+      return ResolveDeclaratorName(*namedParameter.declarator);
+    }
+    case ast::Node::Type::AnonymousParameter: {
+      return "";
+    }
+    default: {
+      throw std::runtime_error("Unexpected node type");
+    }
+  }
 }
 
 void BuildStatementIR(

@@ -1,5 +1,1 @@
-void main(char[], int64_t foo);
-
-int64_t b;
-
-int64_t c[];
+void ;

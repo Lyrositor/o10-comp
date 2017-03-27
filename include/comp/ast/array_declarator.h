@@ -20,8 +20,6 @@ struct ArrayDeclarator final : public Declarator {
 
   ~ArrayDeclarator();
 
-  std::string GetName() const override;
-
   std::shared_ptr<Declarator> declarator;
 
   /**

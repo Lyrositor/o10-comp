@@ -14,9 +14,11 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   const ast::Function &node,
   Context &context);
 
-std::shared_ptr<const DataType> BuildDataTypeIR(
-  const Context & context,
-  std::shared_ptr<ast::DataType> data_type_node);
+std::shared_ptr<const DataType> ResolveDataTypeType(const ast::DataType &data_type, const Context &context);
+std::shared_ptr<const DataType> ResolveDeclaratorType (const std::shared_ptr<const DataType> base_type, const ast::Declarator &declarator);
+std::shared_ptr<const DataType> ResolveParameterType (const ast::Parameter &parameter, const Context & context);
+std::string ResolveDeclaratorName (const ast::Declarator &declarator);
+std::string ResolveParameterName (const ast::Parameter &parameter);
 
 // Statements
 void BuildStatementIR(
