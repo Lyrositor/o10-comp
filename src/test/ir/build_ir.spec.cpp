@@ -9,14 +9,14 @@ TEST(comp__ir__build_ir, buildProgramIR) {
   std::shared_ptr<ast::Function> function_decl_node = ast::Function::Create(
     ast::Identifier::Create("foo"),
     {},
-    ast::LiteralDataType::Create(ast::Identifier::Create("void")),
+    ast::IdentifierDataType::Create(ast::Identifier::Create("void")),
     nullptr);
 
   // Create a function definition matching the declaration's signature
   std::shared_ptr<ast::Function> function_def_node = ast::Function::Create(
     ast::Identifier::Create("foo"),
     {},
-    ast::LiteralDataType::Create(ast::Identifier::Create("void")),
+    ast::IdentifierDataType::Create(ast::Identifier::Create("void")),
     ast::BlockStatement::Create({}));
 
   // Create a function definition which does not match the declaration's
@@ -24,7 +24,7 @@ TEST(comp__ir__build_ir, buildProgramIR) {
   std::shared_ptr<ast::Function> function_def_node_bad = ast::Function::Create(
     ast::Identifier::Create("foo"),
     {},
-    ast::LiteralDataType::Create(ast::Identifier::Create("int64_t")),
+    ast::IdentifierDataType::Create(ast::Identifier::Create("int64_t")),
     ast::BlockStatement::Create({}));
 
   // Create the various program variations
@@ -52,16 +52,14 @@ TEST(comp__ir__build_ir, buildProgramIR) {
 TEST(comp__ir__build_ir, buildFunctionIR) {
   std::shared_ptr<ast::Identifier> identifier = ast::Identifier::Create("foo");
   std::vector<std::shared_ptr<ast::Parameter>> parameters = {
-    ast::Parameter::Create(
-      ast::LiteralDataType::Create(
-        ast::Identifier::Create("int32_t")),
+    ast::NamedParameter::Create(
+      ast::IdentifierDataType::Create(ast::Identifier::Create("int32_t")),
       ast::IdentifierDeclarator::Create(ast::Identifier::Create("bar1"))),
-    ast::Parameter::Create(
-      ast::LiteralDataType::Create(
-        ast::Identifier::Create("int32_t")),
+    ast::NamedParameter::Create(
+      ast::IdentifierDataType::Create(ast::Identifier::Create("int32_t")),
       ast::IdentifierDeclarator::Create(ast::Identifier::Create("bar2")))
   };
-  std::shared_ptr<ast::DataType> return_type = ast::LiteralDataType::Create(
+  std::shared_ptr<ast::DataType> return_type = ast::IdentifierDataType::Create(
     ast::Identifier::Create("int64_t"));
 
   std::shared_ptr<ast::BlockStatement> body = ast::BlockStatement::Create(

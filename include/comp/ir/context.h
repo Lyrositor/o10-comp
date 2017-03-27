@@ -38,7 +38,7 @@ class Context {
     std::shared_ptr<FunctionSymbol> function);
   std::shared_ptr<const Variable> CreateVariable(
     std::shared_ptr<const DataType> data_type,
-    std::shared_ptr<const ast::Declarator> declarator);
+    std::shared_ptr<const ast::Declarator> declarator = nullptr);
 
   /**
    * @return The set of allocated variables

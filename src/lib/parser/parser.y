@@ -233,11 +233,10 @@ declarator:
     std::shared_ptr<comp::ast::Identifier> identifier($1);
     $$ = new comp::ast::IdentifierDeclarator(identifier);
   }
-  | identifier OPEN_BRACKET CLOSE_BRACKET {
+/*  | identifier OPEN_BRACKET CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> declarator($1);
     $$ = new comp::ast::ArrayDeclarator(declarator, nullptr);
   }
-/*
   | identifier OPEN_BRACKET expression CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> declarator($1);
     std::shared_ptr<comp::ast::Expression> size($3);

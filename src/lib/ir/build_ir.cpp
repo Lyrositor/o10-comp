@@ -35,10 +35,28 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   // Create the IR of the function's parameters
   std::vector<std::shared_ptr<const Variable>> parameters;
   for (auto parameter : node.parameters) {
-    std::shared_ptr<const DataType> data_type = BuildDataTypeIR(
-      context,
-      parameter->data_type);
-    parameters.push_back(Variable::Create(data_type, parameter->declarator));
+    std::shared_ptr<const DataType> data_type;
+    switch (parameter->node_type) {
+      case ast::Node::Type::NamedParameter: {
+        std::shared_ptr<ast::NamedParameter>
+          p = std::static_pointer_cast<ast::NamedParameter>(
+          parameter);
+        std::shared_ptr<ast::IdentifierDeclarator>
+          i = std::static_pointer_cast<ast::IdentifierDeclarator>(
+          p->declarator);
+        data_type =
+          context.ResolveDataType("void");  // TODO(Lyrositor) Get the actual type
+        parameters.push_back(
+          Variable::Create(data_type, p->declarator));
+        break;
+      }
+      case ast::Node::Type::AnonymousParameter: {
+        // TODO(Lyrositor) Handle anonymous parameters
+        break;
+      }
+      default:
+        throw std::runtime_error("Unexpected parameter node type");
+    }
   }
 
   // Create the IR of the function's return type
@@ -93,6 +111,7 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     context, SymbolTable({}, variables_table, {}), {});
 
   // Generate the function block's IR
+  // TODO(Lyrositor) Create a proper structure to store basic blocks
   std::shared_ptr<BasicBlock> first_block = BasicBlock::create();
   BuildBlockStatementIR(*node.body, function_context, first_block);
   function->SetBody(first_block);
@@ -138,9 +157,9 @@ std::shared_ptr<const DataType> BuildDataTypeIR(
       }
       break;
     }
-    case ast::Node::Type::LiteralDataType: {
-      std::shared_ptr<ast::LiteralDataType>
-        e = std::static_pointer_cast<ast::LiteralDataType>(data_type_node);
+    case ast::Node::Type::IdentifierDataType: {
+      std::shared_ptr<ast::IdentifierDataType>
+        e = std::static_pointer_cast<ast::IdentifierDataType>(data_type_node);
       data_type = context.ResolveDataType(e->identifier->name);
       break;
     }

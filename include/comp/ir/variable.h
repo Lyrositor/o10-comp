@@ -16,11 +16,11 @@ class Variable {
  public:
   static std::unique_ptr<Variable> Create(
     std::shared_ptr<const DataType> data_type,
-    std::shared_ptr<const ast::Declarator> declarator);
+    std::shared_ptr<const ast::Declarator> declarator = nullptr);
 
   Variable(
     std::shared_ptr<const DataType> data_type,
-    std::shared_ptr<const ast::Declarator> declarator);
+    std::shared_ptr<const ast::Declarator> declarator = nullptr);
 
   virtual ~Variable();
 
