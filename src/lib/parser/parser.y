@@ -159,14 +159,14 @@ declarationsList:
   }
 
 functionDeclaration:
-  dataType identifier OPEN_PAREN parametersList CLOSE_PAREN SEMICOLON {
+  identifierDataType identifier OPEN_PAREN parametersList CLOSE_PAREN SEMICOLON {
     std::shared_ptr<comp::ast::DataType> return_type($1);
     std::shared_ptr<comp::ast::Identifier> identifier($2);
     std::vector<std::shared_ptr<comp::ast::Parameter>> parameters(*$4);
     delete $4;
     $$ = new comp::ast::Function(identifier, parameters, return_type, nullptr);
   }
-  | dataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON {
+  | identifierDataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON {
     std::shared_ptr<comp::ast::DataType> return_type($1);
     std::shared_ptr<comp::ast::Identifier> identifier($2);
     $$ = new comp::ast::Function(identifier, {}, return_type, nullptr);
