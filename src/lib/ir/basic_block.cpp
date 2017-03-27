@@ -16,7 +16,7 @@ void BasicBlock::Push(std::shared_ptr<Op> op) {
 }
 
 std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfTrue() {
-  this->branchIfTrue_;
+  return this->branchIfTrue_;
 }
 
 void BasicBlock::SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue) {
@@ -24,7 +24,7 @@ void BasicBlock::SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue) {
 }
 
 std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() {
-  this->branchIfFalse_;
+  return this->branchIfFalse_;
 }
 
 void BasicBlock::SetBranchIfFalse(std::shared_ptr<BasicBlock> branchIfFalse) {

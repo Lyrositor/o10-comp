@@ -370,15 +370,15 @@ std::shared_ptr<const Variable> BuildIdentifierLValueIR(
   return context.ResolveVariable(node.name);
 }
 
-std::shared_ptr<Variable> BuildWhileStatementIR(
-  static_cast<const ast::WhileStatement &>(node),
+void BuildWhileStatementIR(
+  const ast::WhileStatement &node,
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // Init
-    auto condition = BasicBlock::create();
-    auto body = BasicBlock::create();
-    auto next = BasicBlock::create();
+    std::shared_ptr<BasicBlock> condition = BasicBlock::create();
+    std::shared_ptr<BasicBlock> body = BasicBlock::create();
+    std::shared_ptr<BasicBlock> next = BasicBlock::create();
     // Building
     BuildExpressionRValueIR(*node.condition, context, condition);
     BuildStatementIR(*node.body, context, body);
@@ -391,17 +391,17 @@ std::shared_ptr<Variable> BuildWhileStatementIR(
     current_block = next;
 }
 
-std::shared_ptr<Variable> BuildForStatementIR(
-  static_cast<const ast::ForStatement &>(node),
+void BuildForStatementIR(
+  const ast::ForStatement &node,
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // Init
-    auto initialization = BasicBlock::create();
-    auto condition = BasicBlock::create();
-    auto iteration = BasicBlock::create();
-    auto body = BasicBlock::create();
-    auto next = BasicBlock::create();
+    std::shared_ptr<BasicBlock> initialization = BasicBlock::create();
+    std::shared_ptr<BasicBlock> condition = BasicBlock::create();
+    std::shared_ptr<BasicBlock> iteration = BasicBlock::create();
+    std::shared_ptr<BasicBlock> body = BasicBlock::create();
+    std::shared_ptr<BasicBlock> next = BasicBlock::create();
     // Building
     BuildExpressionRValueIR(*node.initialization, context, initialization);
     BuildExpressionRValueIR(*node.condition, context, condition);
@@ -418,15 +418,15 @@ std::shared_ptr<Variable> BuildForStatementIR(
     current_block = next;
 }
 
-std::shared_ptr<Variable> BuildIfStatementIR(
-  static_cast<const ast::IfStatement &>(node),
+void BuildIfStatementIR(
+  const ast::IfStatement &node,
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // Init
-    auto test = BasicBlock::create();
-    auto consequence = BasicBlock::create();
-    auto next = BasicBlock::create();
+    std::shared_ptr<BasicBlock> test = BasicBlock::create();
+    std::shared_ptr<BasicBlock> consequence = BasicBlock::create();
+    std::shared_ptr<BasicBlock> next = BasicBlock::create();
     // Building
     BuildExpressionRValueIR(*node.test, context, test);
     BuildStatementIR(*node.consequence, context, consequence);
@@ -434,8 +434,8 @@ std::shared_ptr<Variable> BuildIfStatementIR(
     current_block->SetBranchIfTrue(test);
     test->SetBranchIfTrue(consequence);
     consequence->SetBranchIfTrue(next);
-    if (*node.alternative !== nullptr) {
-      auto alternative = BasicBlock::create();
+    if (*node.alternative) {
+      std::shared_ptr<BasicBlock> alternative = BasicBlock::create();
       BuildStatementIR(*node.alternative, context, alternative);
       test->SetBranchIfFalse(alternative);
       alternative->SetBranchIfTrue(next);
@@ -444,8 +444,25 @@ std::shared_ptr<Variable> BuildIfStatementIR(
     current_block = next;
 }
 
-std::shared_ptr<Variable> BuildNullStatementIR(
-  static_cast<const ast::NullStatement &>(node),
+void BuildReturnStatementIR(
+  const ast::ReturnStatement &node,
+  Context &context,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+    // Init
+    std::shared_ptr<BasicBlock> expression = BasicBlock::create();
+    std::shared_ptr<BasicBlock> next = BasicBlock::create();
+    // Building
+    BuildExpressionRValueIR(*node.expression, context, expression);
+    // Branching
+    current_block->SetBranchIfTrue(expression);
+    expression->SetBranchIfTrue(next);
+    // Ending
+    current_block = next;
+}
+
+void BuildNullStatementIR(
+  const ast::NullStatement &node,
   Context &context,
   std::shared_ptr<BasicBlock> &current_block
 ) {

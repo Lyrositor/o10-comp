@@ -175,9 +175,9 @@ std::unique_ptr<rapidjson::Value> ExpressionStatementToJson(const ExpressionStat
 std::unique_ptr<rapidjson::Value> ForStatementToJson(const ForStatement &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "ForStatement", allocator);
-  result->AddMember("initialization", *StatementToJson(*node.initialization, allocator), allocator);
-  result->AddMember("condition", *StatementToJson(*node.condition, allocator), allocator);
-  result->AddMember("iteration", *StatementToJson(*node.iteration, allocator), allocator);
+  result->AddMember("initialization", *RExpressionToJson(*node.initialization, allocator), allocator);
+  result->AddMember("condition", *RExpressionToJson(*node.condition, allocator), allocator);
+  result->AddMember("iteration", *RExpressionToJson(*node.iteration, allocator), allocator);
   result->AddMember("body", *StatementToJson(*node.body, allocator), allocator);
   return result;
 }

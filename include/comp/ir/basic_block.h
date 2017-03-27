@@ -19,13 +19,13 @@ class BasicBlock {
 
   void Push(std::shared_ptr<Op> op);
 
-  std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfTrue();
+  std::shared_ptr<BasicBlock> GetBranchIfTrue();
 
-  void BasicBlock::SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue);
+  void SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue);
 
-  std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfFalse();
+  std::shared_ptr<BasicBlock> GetBranchIfFalse();
 
-  void BasicBlock::SetBranchIfFalse(std::shared_ptr<BasicBlock> branchIfFalse);
+  void SetBranchIfFalse(std::shared_ptr<BasicBlock> branchIfFalse);
 
  private:
   std::vector<std::shared_ptr<Op>> ops_;
