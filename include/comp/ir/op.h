@@ -15,6 +15,32 @@ namespace ir {
 //  Float64,
 //};
 
+struct Operand {
+  enum class Type {
+    Variable,
+    Constant
+  };
+  Operand(Type operand_type);
+
+  virtual ~Operand() = 0;
+
+  const Type operand_type;
+};
+
+struct VariableOperand final: Operand {
+  static std::unique_ptr<VariableOperand> Create(std::shared_ptr<Variable> variable);
+  VariableOperand(std::shared_ptr<Variable> variable);
+  ~VariableOperand();
+  const std::shared_ptr<Variable> variable;
+};
+
+struct ConstantOperand final: Operand {
+  static std::unique_ptr<ConstantOperand> Create(int64_t value);
+  ConstantOperand(int64_t value);
+  ~ConstantOperand();
+  int64_t value;
+};
+
 struct Op {
   enum class Type {
     Add,
@@ -32,29 +58,32 @@ struct Op {
  * Add the value of the two variables `in1` and `in2` and store the result in `out`.
  */
 struct Add final : public Op {
-  Add(std::shared_ptr<Variable> out, std::shared_ptr<Variable> in1, std::shared_ptr<Variable> in2);
+  static std::unique_ptr<Add> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
+  Add(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
   virtual ~Add();
 
-  std::shared_ptr<Variable> out;
-  std::shared_ptr<Variable> in1;
-  std::shared_ptr<Variable> in2;
+  std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<Operand> in1;
+  std::shared_ptr<Operand> in2;
 };
 
 /**
  * Copy the value from `in` to `out`.
  */
 struct Copy final : public Op {
-  Copy(std::shared_ptr<Variable> out, std::shared_ptr<Variable> in);
+  static std::unique_ptr<Copy> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
+  Copy(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
   virtual ~Copy();
 
-  std::shared_ptr<Variable> out;
-  std::shared_ptr<Variable> in;
+  std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<Operand> in;
 };
 
 /*
  * Idempotent operation
  */
 struct NoOp final : public Op {
+  static std::unique_ptr<NoOp> Create();
   NoOp();
   virtual ~NoOp();
 };
