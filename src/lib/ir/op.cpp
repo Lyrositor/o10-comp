@@ -5,14 +5,20 @@ namespace ir {
 Op::Op(Type op_type) : op_type(op_type) {
 }
 
+Op::~Op() {
+}
+
 Operand::Operand(Type operand_type) : operand_type(operand_type) {
 }
 
-std::unique_ptr<VariableOperand> VariableOperand::Create(std::shared_ptr<Variable> variable) {
+Operand::~Operand() {
+}
+
+std::unique_ptr<VariableOperand> VariableOperand::Create(const std::shared_ptr<const Variable> variable) {
   return std::unique_ptr<VariableOperand>(new VariableOperand(variable));
 }
 
-VariableOperand::VariableOperand(std::shared_ptr<Variable> variable) : Operand(Type::Variable), variable(variable) {
+VariableOperand::VariableOperand(const std::shared_ptr<const Variable> variable) : Operand(Type::Variable), variable(variable) {
 }
 
 VariableOperand::~VariableOperand() {

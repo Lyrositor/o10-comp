@@ -28,10 +28,10 @@ struct Operand {
 };
 
 struct VariableOperand final: Operand {
-  static std::unique_ptr<VariableOperand> Create(std::shared_ptr<Variable> variable);
-  VariableOperand(std::shared_ptr<Variable> variable);
+  static std::unique_ptr<VariableOperand> Create(const std::shared_ptr<const Variable> variable);
+  VariableOperand(const std::shared_ptr<const Variable> variable);
   ~VariableOperand();
-  const std::shared_ptr<Variable> variable;
+  const std::shared_ptr<const Variable> variable;
 };
 
 struct ConstantOperand final: Operand {
