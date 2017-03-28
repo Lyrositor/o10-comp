@@ -235,7 +235,7 @@ declarator:
   }
   | identifier OPEN_BRACKET CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> identifier($1);
-    $$ = new comp::ast::ArrayDeclarator(identifier, nullptr);
+    $$ = new comp::ast::ArrayDeclarator(comp::ast::IdentifierDeclarator::Create(identifier), nullptr);
   }
 /*
   | identifier OPEN_BRACKET expression CLOSE_BRACKET {
@@ -253,6 +253,12 @@ functionDefinition:
         delete($4);
         std::shared_ptr<comp::ast::BlockStatement> block($6);
         $$ = new comp::ast::Function(identifier, parametersList, return_type, block);
+    }
+    | identifierDataType identifier OPEN_PAREN CLOSE_PAREN block {
+        std::shared_ptr<comp::ast::DataType> return_type($1);
+        std::shared_ptr<comp::ast::Identifier> identifier($2);
+        std::shared_ptr<comp::ast::BlockStatement> block($5);
+        $$ = new comp::ast::Function(identifier, {}, return_type, block);
     }
 
 variableDeclaration:
