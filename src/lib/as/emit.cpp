@@ -72,9 +72,25 @@ void emitAlignDirective(const ast::AlignDirective &node, std::ostream &out) {
   out << "\n";
 }
 
+void emitCfiDefCfaOffsetDirective(const ast::CfiDefCfaOffsetDirective &node, std::ostream &out) {
+  emitLabels(node.labels, out, true);
+  out << ".cfi_def_cfa_offset ";
+  emitExpression(*node.size, out);
+  out << "\n";
+}
+
 void emitCfiEndprocDirective(const ast::CfiEndprocDirective &node, std::ostream &out) {
   emitLabels(node.labels, out, true);
   out << ".cfi_endproc\n";
+}
+
+void emitCfiOffsetDirective(const ast::CfiOffsetDirective &node, std::ostream &out) {
+  emitLabels(node.labels, out, true);
+  out << ".cfi_offset ";
+  emitRegisterOperand(*node.reg, out);
+  out << ", ";
+  emitExpression(*node.size, out);
+  out << "\n";
 }
 
 void emitCfiStartprocDirective(const ast::CfiStartprocDirective &node, std::ostream &out) {

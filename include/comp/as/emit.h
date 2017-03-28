@@ -16,7 +16,11 @@ void emitStatement(const ast::Statement &node, std::ostream &out);
 
 void emitAlignDirective(const ast::AlignDirective &node, std::ostream &out);
 
+void emitCfiDefCfaOffsetDirective(const ast::CfiDefCfaOffsetDirective &node, std::ostream &out);
+
 void emitCfiEndprocDirective(const ast::CfiEndprocDirective &node, std::ostream &out);
+
+void emitCfiOffsetDirective(const ast::CfiOffsetDirective &node, std::ostream &out);
 
 void emitCfiStartprocDirective(const ast::CfiStartprocDirective &node, std::ostream &out);
 
