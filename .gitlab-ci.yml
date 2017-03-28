@@ -20,3 +20,4 @@ gl_test:
     - make prepare
     - make test.unit
     - make test.memory
+    - make test.end-to-end
