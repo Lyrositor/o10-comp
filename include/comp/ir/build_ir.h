@@ -42,6 +42,14 @@ void BuildExpressionStatementIR(
   std::shared_ptr<BasicBlock> &current_block
 );
 
+
+void BuildVariableDeclarationIR(
+  const ast::VariableDeclaration &node,
+  ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+);
+
 // R-values
 std::shared_ptr<const ir::Variable> BuildExpressionRValueIR(
   const ast::RExpression &node,

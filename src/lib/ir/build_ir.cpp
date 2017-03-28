@@ -263,6 +263,14 @@ void BuildStatementIR(
       );
       break;
     }
+    case ast::Node::Type::VariableDeclaration: {
+      BuildVariableDeclarationIR(
+        static_cast<const ast::VariableDeclaration &>(node),
+        context,
+        cfg,
+        current_block);
+      break;
+    }
     case ast::Node::Type::WhileStatement: {
       BuildWhileStatementIR(
         static_cast<const ast::WhileStatement &>(node),
@@ -275,7 +283,6 @@ void BuildStatementIR(
     default: {
       throw std::domain_error("Unexpected value for `node.node_type`");
     }
-  }
 }
 
 void BuildBlockStatementIR(
@@ -298,6 +305,28 @@ void BuildExpressionStatementIR(
   std::shared_ptr<BasicBlock> &current_block
 ) {
   BuildExpressionRValueIR(*node.expression, context, cfg, current_block);
+}
+
+void BuildVariableDeclarationIR(
+  const ast::VariableDeclaration &node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+  std::shared_ptr<const ir::DataType> basic_type = ResolveDataTypeType(*node.data_type, context);
+  for (auto variable_declarator: node.declarators) {
+    std::string variable_name = ResolveDeclaratorName(*variable_declarator->declarator);
+    std::shared_ptr<const ir::DataType>
+      variable_type = ResolveDeclaratorType(basic_type, *variable_declarator->declarator);
+    std::shared_ptr<const Variable> variable = Variable::Create(variable_type);
+    context.RegisterVariable(variable_name, variable);
+    if (variable_declarator->initial_value != nullptr) {
+      std::shared_ptr<const Variable>
+        initial_value = BuildExpressionRValueIR(*variable_declarator->initial_value, context, cfg, current_block);
+      // TODO: current_block->Push(Op::Copy::Create(variable, initial_value))
+      throw new std::runtime_error("Not implemented: initial value, depends on the abstract assembly instruction `Copy`");
+    }
+  }
 }
 
 std::shared_ptr<const Variable> BuildExpressionRValueIR(
