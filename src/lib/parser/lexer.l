@@ -4,10 +4,23 @@
 #include <comp/ast.h>
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
+
+#define YY_USER_ACTION \
+    yylloc->first_line = yylloc->last_line; \
+    yylloc->first_column = yylloc->last_column; \
+    for(int i = 0; yytext[i] != '\0'; i++) { \
+        if(yytext[i] == '\n') { \
+            yylloc->last_line++; \
+            yylloc->last_column = 1; \
+        } \
+        else { \
+            yylloc->last_column++; \
+        } \
+    }
+
 %}
 %option 8bit
 %option bison-bridge
-/* %option debug */
 %option pointer
 /* %option nodefault */
 %option noinput
@@ -15,6 +28,8 @@
 %option noyywrap
 %option reentrant
 %option warn
+%option bison-locations
+
 %x charLiteral
 %%
 [ \n\t]       {/* ignore */}
@@ -91,3 +106,5 @@
 }
 ([0-9]+)                          {yylval->int64 = atoi(yytext); return INTEGER_LITERAL;}
 ([a-zA-Z_$][a-zA-Z_$0-9]*)        {yylval->cstring = yytext; return IDENTIFIER;}
+
+.                                 {/* Do nothing if no match was found*/}

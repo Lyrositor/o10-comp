@@ -5,21 +5,23 @@
 #include <comp/ast.h>
 #include <memory>
 
+struct YYLTYPE;
 union YYSTYPE;
 
-void yyerror(void *scanner, comp::ast::Program *, const char *);
-int yylex(YYSTYPE *lvalp, void *scanner);
+void yyerror(YYLTYPE *, void *scanner, comp::ast::Program *, const char *);
+int yylex(YYSTYPE *lvalp, YYLTYPE * yylloc, void *scanner);
 void yy_scan_string(const char *str);
 
 %}
 
+%locations
 %define api.pure full
 %define parse.error verbose
+%define parse.lac full
 
 %lex-param {void *scanner}
 
-%parse-param {void *scanner}
-%parse-param {comp::ast::Program *&root}
+%parse-param {void *scanner} {comp::ast::Program *&root}
 
 %union {
   /* Tokens */
