@@ -67,7 +67,7 @@ They correspond to the following regular expressions (using PCRE notation):
 - `void`
 
 ## ArrayDataType
-[ArrayDataType]: #ArrayDataType
+[ArrayDataType]: #arraydatatype
 
 - _[IdentifierDataType]_ `[` `]`
 
@@ -102,7 +102,7 @@ used so the second one is an anonymous parameter. This can be used to implement 
 a given function signature without producing "unused variable" warnings.
 
 ## Declarator
-[Declarator]: #Declarator
+[Declarator]: #declarator
 
 - _[Identifier]_
 - _[Identifier]_ `[` `]`
@@ -112,9 +112,10 @@ For the fixed-size array declaration (third rule), the size can be any const exp
 We keep it as this in the grammar but using anything but a literal will throw a semantic error.
 
 ## FunctionDefinition
-[FunctionDefinition]: #FunctionDefinition
+[FunctionDefinition]: #functiondefinition
 
 - _[IdentifierDataType]_ _[Identifier]_ `(` _[ParametersList]_ `)` _[Block]_
+- _[IdentifierDataType]_ _[Identifier]_ `(` `)` _[Block]_
 
 In the standard C, the return type can be any _[DataType]_ (such as `int`, `int *` or `struct {}`)
 except for an array type with fixed or unknown array size (such as `int[]`, `int[5]`).
@@ -154,13 +155,13 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - _[Declarator]_ `=` _[Expression]_
 
 ## Expression
-[Expression]: #Expression
+[Expression]: #expression
 
 - _[Expression]_ `,` _[Expression]_
 - _[AssignmentExpression]_
 
 ## AssignmentExpression
-[AssignmentExpression]: #AssignmentExpression
+[AssignmentExpression]: #assignmentexpression
 
 - _[Lvalue]_ `=` _[AssignmentExpression]_
 - _[Lvalue]_ `*=` _[AssignmentExpression]_
@@ -172,7 +173,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - _[Lvalue]_ `>>=` _[AssignmentExpression]_
 - _[Lvalue]_ `&=` _[AssignmentExpression]_
 - _[Lvalue]_ `^=` _[AssignmentExpression]_
-- _[Lvalue]_ <code>&#124;=</code> _[AssignmentExpression]_
+- _[Lvalue]_ `|=` _[AssignmentExpression]_
 - _[ConditionalExpression]_
 
 ## LValue
@@ -183,50 +184,50 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - `(` _[LValue]_ `)`
 
 ## ConditionalExpression
-[ConditionalExpression]: #ConditionalExpression
+[ConditionalExpression]: #conditionalexpression
 
 - _[LogicalORExpression]_ `?` _[expression]_ `:` _[ConditionalExpression]_
 - _[LogicalORExpression]_
 
 ## LogicalORExpression
-[LogicalORExpression]: #LogicalORExpression
+[LogicalORExpression]: #logicalorexpression
 
 - _[LogicalORExpression]_ `||` _[LogicalANDExpression]_
 - _[LogicalANDExpression]_
 
 ## LogicalANDExpression
-[LogicalANDExpression]: #LogicalANDExpression
+[LogicalANDExpression]: #logicalandexpression
 
 - _[LogicalANDExpression]_ `&&` _[InclusiveORExpression]_
 - _[InclusiveORExpression]_
 
 ## InclusiveORExpression
-[InclusiveORExpression]: #InclusiveORExpression
+[InclusiveORExpression]: #inclusiveorexpression
 
 - _[InclusiveORExpression]_ `|` _[ExclusiveORExpression]_
 - _[ExclusiveORExpression]_
 
 ## ExclusiveORExpression
-[ExclusiveORExpression]: #ExclusiveORExpression
+[ExclusiveORExpression]: #exclusiveorexpression
 
 - _[ExclusiveORExpression]_ `^` _[ANDExpression]_
 - _[ANDExpression]_
 
 ## ANDExpression
-[ANDExpression]: #ANDExpression
+[ANDExpression]: #andexpression
 
 - _[ANDExpression]_ `&` _[EqualityExpression]_
 - _[EqualityExpression]_
 
 ## EqualityExpression
-[EqualityExpression]: #EqualityExpression
+[EqualityExpression]: #equalityexpression
 
 - _[EqualityExpression]_ `==` _[RelationalExpression]_
 - _[EqualityExpression]_ `!=` _[RelationalExpression]_
 - _[RelationalExpression]_
 
 ## RelationalExpression
-[RelationalExpression]: #RelationalExpression
+[RelationalExpression]: #relationalexpression
 
 - _[RelationalExpression]_ `>` _[ShiftExpression]_
 - _[RelationalExpression]_ `<` _[ShiftExpression]_
@@ -235,21 +236,21 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - _[ShiftExpression]_
 
 ## ShiftExpression
-[ShiftExpression]: #ShiftExpression
+[ShiftExpression]: #shiftexpression
 
 - _[ShiftExpression]_ `>>` _[AdditiveExpression]_
 - _[ShiftExpression]_ `<<` _[AdditiveExpression]_
 - _[AdditiveExpression]_
 
 ## AdditiveExpression
-[AdditiveExpression]: #AdditiveExpression
+[AdditiveExpression]: #additiveexpression
 
 - _[AdditiveExpression]_ `+` _[MultiplicativeExpression]_
 - _[AdditiveExpression]_ `-` _[MultiplicativeExpression]_
 - _[MultiplicativeExpression]_
 
 ## MultiplicativeExpression
-[MultiplicativeExpression]: #MultiplicativeExpression
+[MultiplicativeExpression]: #multiplicativeexpression
 
 - _[MultiplicativeExpression]_ `*` _[UnaryExpression]_
 - _[MultiplicativeExpression]_ `/` _[UnaryExpression]_
@@ -257,7 +258,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - _[UnaryExpression]_
 
 ## UnaryExpression
-[UnaryExpression]: #UnaryExpression
+[UnaryExpression]: #unaryexpression
 
 
 - `+` _[UnaryExpression]_
@@ -267,7 +268,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - _[PrimaryExpression]_
 
 ## PrimaryExpression
-[PrimaryExpression]: #PrimaryExpression
+[PrimaryExpression]: #primaryexpression
 
 - _[VarUpdate]_
 - _[FunctionCall]_
@@ -296,7 +297,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - _[Expression]_
 
 ## Statement
-[Statement]: #Statement
+[Statement]: #statement
 
 - _[ExpressionStatement]_
 - _[ReturnStatement]_
@@ -341,13 +342,13 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - ε
 
 ## LiteralExpression
-[LiteralExpression]: #LiteralExpression
+[LiteralExpression]: #literalexpression
 
 - _[IntegerLiteral]_
 - _[CharLiteral]_
 
 ## IntegerLiteral
-[IntegerLiteral]: #IntegerLiteral
+[IntegerLiteral]: #integerliteral
 
 - PCRE Regular Expression: `[0-9]+`
 - PCRE Regular Expression: `0[xX][0-9A-Fa-f]+`
@@ -364,7 +365,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - <code>&#92;</code> _[EscapeSequence]_
 
 ## SourceChar
-[SourceChar]: #SourceChar
+[SourceChar]: #sourcechar
 
 - PCRE Regular Expression: `[^\\'\n]`
 
