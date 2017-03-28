@@ -4,7 +4,7 @@
     {
       "node_type": "VariableDeclaration",
       "data_type": {
-        "node_type": "LiteralDataType",
+        "node_type": "IdentifierDataType",
         "identifier": {
           "node_type": "Identifier",
           "name": "int64_t"

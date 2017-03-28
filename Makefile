@@ -29,6 +29,11 @@ test.memory:
 	mkdir -p build/
 	cd build/ && cmake .. && make comp_test && valgrind --leak-check=full --error-exitcode=1 ./comp_test
 
+test.end-to-end:
+	mkdir -p build/
+	cd build/ && cmake .. && make comp_main
+	python3 end-to-end/test.py
+
 coverage:
 	mkdir -p build/
 	cd build/ && cmake .. && make comp_coverage

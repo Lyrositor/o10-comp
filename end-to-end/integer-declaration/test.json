@@ -1,5 +1,5 @@
 {
   "source": "main.c",
   "expected-ast": "ast.expected.json",
-  "error": true
+  "error": "syntax"
 }
