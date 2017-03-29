@@ -347,8 +347,9 @@ std::shared_ptr<const Variable> BuildBinaryExpressionRValueIR(
 
   switch (node.op) {
     case ast::BinaryOperator::Addition: {
-      current_block->Push(Add::Create(
+      current_block->Push(BinOp::Create(
         VariableOperand::Create(r_value),
+        BinOp::BinaryOperator::Addition,
         VariableOperand::Create(left),
         VariableOperand::Create(right)
       ));

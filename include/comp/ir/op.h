@@ -1,7 +1,10 @@
 #pragma once
 
 #include <cstddef>
-#include "comp/ir/variable.h"
+#include <vector>
+#include "variable.h"
+
+
 
 namespace comp{
 namespace ir {
@@ -43,7 +46,8 @@ struct ConstantOperand final: Operand {
 
 struct Op {
   enum class Type {
-    Add,
+    Call,
+    BinOp,
     Copy,
     Comp,
     NoOp
@@ -55,15 +59,49 @@ struct Op {
   const Type op_type;
 };
 
+class FunctionSymbol;
 /**
- * Add the value of the two variables `in1` and `in2` and store the result in `out`.
+ * Call a function `function` with arguments `args` and store the result in `out`
  */
-struct Add final : public Op {
-  static std::unique_ptr<Add> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
-  Add(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
-  virtual ~Add();
+struct Call final : public Op {
+  static std::unique_ptr<Call> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args);
+  Call(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args);
+  virtual ~Call();
 
   std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<ir::FunctionSymbol> function;
+  std::vector<std::shared_ptr<Operand>> args;
+};
+
+/**
+ * Compute the value of the two variables `in1` and `in2` with the operator `binaryOperator` and store the result in `out`.
+ */
+struct BinOp final : public Op {
+  enum class BinaryOperator {
+    Addition, // left + right
+    BitwiseAnd, // left & right
+    BitwiseOr, // left | right
+    BitwiseXor, // left ^ right
+    Division, // left / right
+    Equality, // left == right
+    GreaterThan, // left > right
+    GreaterThanOrEqual, // left >= right
+    Inequality, // left != right
+    LeftShift, // left << right
+    LessThan, // left < right
+    LessThanOrEqualTo, // left <= right
+    Multiplication, // left * right
+    Remainder, // left % right
+    RightShift, // left >> right
+    Subtraction // left - right
+  };
+
+  static std::unique_ptr<BinOp> Create(std::shared_ptr<VariableOperand> out, BinaryOperator binaryOperator, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
+  BinOp(std::shared_ptr<VariableOperand> out, BinaryOperator binaryOperator, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
+  virtual ~BinOp();
+
+  std::shared_ptr<VariableOperand> out;
+  BinaryOperator binaryOperator;
   std::shared_ptr<Operand> in1;
   std::shared_ptr<Operand> in2;
 };

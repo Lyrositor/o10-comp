@@ -34,24 +34,45 @@ ConstantOperand::ConstantOperand(int64_t value) : Operand(Type::Constant), value
 ConstantOperand::~ConstantOperand() {
 }
 
-std::unique_ptr<Add> Add::Create(std::shared_ptr<VariableOperand> out,
-                                 std::shared_ptr<Operand> in1,
-                                 std::shared_ptr<Operand> in2) {
-  return std::unique_ptr<Add>(new Add(out, in1, in2));
+std::unique_ptr<Call> Call::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args) {
+  return std::unique_ptr<Call>(new Call(out, function, args));
 }
 
-Add::Add(
+Call::Call (
   std::shared_ptr<VariableOperand> out,
+  std::shared_ptr<ir::FunctionSymbol> function,
+  std::vector<std::shared_ptr<Operand>> args
+) :
+  Op(Op::Type::Call),
+  out(out),
+  function(function),
+  args(args) {
+}
+Call::~Call() {
+}
+
+std::unique_ptr<BinOp> BinOp::Create(
+  std::shared_ptr<VariableOperand> out,
+  BinaryOperator binaryOperator,
+  std::shared_ptr<Operand> in1,
+  std::shared_ptr<Operand> in2) {
+  return std::unique_ptr<BinOp>(new BinOp(out, binaryOperator, in1, in2));
+}
+
+BinOp::BinOp(
+  std::shared_ptr<VariableOperand> out,
+  BinaryOperator binaryOperator,
   std::shared_ptr<Operand> in1,
   std::shared_ptr<Operand> in2
 ) :
-  Op(Op::Type::Add),
+  Op(Op::Type::BinOp),
   out(out),
+  binaryOperator(binaryOperator),
   in1(in1),
   in2(in2) {
 }
 
-Add::~Add() {
+BinOp::~BinOp() {
 }
 
 std::unique_ptr<Copy> Copy::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
