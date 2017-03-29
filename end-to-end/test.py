@@ -8,23 +8,28 @@ import os
 import subprocess
 from typing import Set, Tuple
 
-END_TO_END_ROOT: str = os.path.dirname(os.path.realpath(__file__))
-PROJECT_ROOT: str = os.path.join(END_TO_END_ROOT, "..")
+END_TO_END_ROOT = os.path.dirname(os.path.realpath(__file__))
+PROJECT_ROOT = os.path.join(END_TO_END_ROOT, "..")
 CONFIG_FILE_NAME = "test.json"
 
 
 class Compiler:
-    def __init__(self, name: str, path: str):
+    def __init__(self, name, path):
         self.name = name
         self.path = path
 
     def generate_assembly(self, directory, source_path):
         pass
 
+# Try to get the o10 compiler path from the environment
+try:
+    o10_path = os.environ["O10_COMP_PATH"]
+except KeyError:
+    o10_path = os.path.join(PROJECT_ROOT, "build", "comp_main")
 
-clang: Compiler = Compiler("clang", "clang")
-gcc: Compiler = Compiler("g++", "g++")
-o10: Compiler = Compiler("o10", os.path.join(PROJECT_ROOT, "build", "comp_main"))
+clang = Compiler("clang", "clang")
+gcc = Compiler("g++", "g++")
+o10 = Compiler("o10", o10_path)
 
 DEFAULT_ASSEMBLY_GENERATION_CONFIGURATIONS = {
     "gcc-0": (gcc, ["-S", "-O0"]),
@@ -42,21 +47,21 @@ ERRORS_ENUM = {"syntax"}
 
 class TestConfig():
     def __init__(self):
-        self.disabled: bool = False
-        self.source_path: str = None
-        self.expect_error: str = None  # One of: {"syntax"}
-        self.name: str = None
+        self.disabled = False
+        self.source_path = None
+        self.expect_error = None  # One of: {"syntax"}
+        self.name = None
         # Only displayed if an error occurs, should explain the goal of test-case
-        self.description: str = None
+        self.description = None
 
-        self.test_ast: bool = False
-        self.expected_ast_path: str = None
-        self.actual_ast_path: str = None
+        self.test_ast = False
+        self.expected_ast_path = None
+        self.actual_ast_path = None
 
-        self.generate_assembly: bool = False
+        self.generate_assembly = False
         self.assembly_generation_configs = []
 
-    def from_json(input: str, test_dir: str) -> 'TestConfig':
+    def from_json(input, test_dir) -> 'TestConfig':
         doc = json.loads(input)
         config = TestConfig()
 
@@ -89,7 +94,7 @@ class TestConfig():
 
 
 class TestCase:
-    def __init__(self, dir: str):
+    def __init__(self, dir):
         self.dir = dir
         with open(os.path.join(dir, CONFIG_FILE_NAME), "r") as config_file:
             self.config = TestConfig.from_json(config_file.read(), dir)
@@ -164,11 +169,11 @@ class TestCase:
 
 
 # Returns a set of directories and a set of other FS nodes
-def dir_content(dir_path: str) -> Tuple[Set[str], Set[str]]:
-    files: Set[str] = set()
-    dirs: Set[str] = set()
+def dir_content(dir_path) -> Tuple[Set[str], Set[str]]:
+    files = set()
+    dirs = set()
     for node_name in os.listdir(dir_path):
-        abs_path: str = os.path.join(dir_path, node_name)
+        abs_path = os.path.join(dir_path, node_name)
         if os.path.isdir(abs_path):
             dirs.add(abs_path)
         else:
@@ -177,7 +182,7 @@ def dir_content(dir_path: str) -> Tuple[Set[str], Set[str]]:
 
 
 # Yields the test cases in the provided directory
-def discover_tests(tests_dir: str, recursive: bool = True):
+def discover_tests(tests_dir, recursive = True):
     for fs_node in os.listdir(tests_dir):
         fs_node_path = os.path.join(tests_dir, fs_node)
         if not os.path.isdir(fs_node_path):
