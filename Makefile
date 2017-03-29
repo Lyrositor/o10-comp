@@ -19,7 +19,7 @@ build/Makefile: CMakeLists.txt
 run: build
 	build/comp_main
 
-test: test.unit test.memory
+test: test.unit test.memory test.end-to-end
 
 test.unit:
 	mkdir -p build/
