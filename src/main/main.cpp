@@ -5,6 +5,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <comp/ir/program.h>
+#include <comp/ir/build_ir.h>
+#include <comp/as/ast.h>
+#include <comp/backend/x86/build_asm.h>
+#include <comp/as/emit.h>
 
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
@@ -16,8 +21,8 @@
 #include "error_handling.h"
 
 int main(int argc, char **argv) {
-  if (argc != 2) {
-    std::cout << "Incorrect arguments." << std::endl;
+  if (argc < 2) {
+    std::cout << "Expected at least one argument" << std::endl;
     return EXIT_FAILURE;
   }
 
@@ -32,14 +37,20 @@ int main(int argc, char **argv) {
 
   try {
     std::shared_ptr<comp::ast::Program>
-      program = comp::parser::parse(content);
+      programAst = comp::parser::parse(content);
 
-    std::unique_ptr<rapidjson::Document>
-      document = comp::ast::ProgramToJson(*program);
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-    document->Accept(writer);
-    std::cout << buffer.GetString() << std::endl;
+    if (argc == 2) {
+      std::unique_ptr<rapidjson::Document>
+        document = comp::ast::ProgramToJson(*programAst);
+      rapidjson::StringBuffer buffer;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+      document->Accept(writer);
+      std::cout << buffer.GetString() << std::endl;
+    } else { // Example: comp_main main.c asm
+      std::shared_ptr<comp::ir::Program> programIr = comp::ir::BuildProgramIR(*programAst);
+      std::shared_ptr<comp::as::ast::Program> programAsm = comp::backend::x86::BuildProgram(*programIr);
+      comp::as::emitProgram(*programAsm, std::cout);
+    }
   } catch (comp::SyntaxException &e) {
     PrintSyntaxException(e, content, argv[1]);
     return EXIT_FAILURE;
