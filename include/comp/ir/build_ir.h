@@ -71,30 +71,35 @@ std::shared_ptr<const ir::Variable> BuildIdentifierLValueIR(
 void BuildWhileStatementIR(
   const ast::WhileStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 void BuildForStatementIR(
   const ast::ForStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 void BuildIfStatementIR(
   const ast::IfStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 void BuildNullStatementIR(
   const ast::NullStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 void BuildReturnStatementIR(
   const ast::ReturnStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 

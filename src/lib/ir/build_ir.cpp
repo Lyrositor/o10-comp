@@ -230,6 +230,7 @@ void BuildStatementIR(
       BuildForStatementIR(
         static_cast<const ast::ForStatement &>(node),
         context,
+        cfg,
         current_block
       );
       break;
@@ -238,6 +239,7 @@ void BuildStatementIR(
       BuildIfStatementIR(
         static_cast<const ast::IfStatement &>(node),
         context,
+        cfg,
         current_block
       );
       break;
@@ -246,6 +248,7 @@ void BuildStatementIR(
       BuildNullStatementIR(
         static_cast<const ast::NullStatement &>(node),
         context,
+        cfg,
         current_block
       );
       break;
@@ -254,6 +257,7 @@ void BuildStatementIR(
       BuildReturnStatementIR(
         static_cast<const ast::ReturnStatement &>(node),
         context,
+        cfg,
         current_block
       );
       break;
@@ -262,6 +266,7 @@ void BuildStatementIR(
       BuildWhileStatementIR(
         static_cast<const ast::WhileStatement &>(node),
         context,
+        cfg,
         current_block
       );
       break;
@@ -373,15 +378,16 @@ std::shared_ptr<const Variable> BuildIdentifierLValueIR(
 void BuildWhileStatementIR(
   const ast::WhileStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // Init
-    std::shared_ptr<BasicBlock> condition = BasicBlock::create();
-    std::shared_ptr<BasicBlock> body = BasicBlock::create();
-    std::shared_ptr<BasicBlock> next = BasicBlock::create();
+    std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
     // Building
-    BuildExpressionRValueIR(*node.condition, context, condition);
-    BuildStatementIR(*node.body, context, body);
+    BuildExpressionRValueIR(*node.condition, context, cfg, condition);
+    BuildStatementIR(*node.body, context, cfg, body);
     // Branching
     current_block->SetBranchIfTrue(condition);
     condition->SetBranchIfTrue(body);
@@ -394,19 +400,20 @@ void BuildWhileStatementIR(
 void BuildForStatementIR(
   const ast::ForStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // Init
-    std::shared_ptr<BasicBlock> initialization = BasicBlock::create();
-    std::shared_ptr<BasicBlock> condition = BasicBlock::create();
-    std::shared_ptr<BasicBlock> iteration = BasicBlock::create();
-    std::shared_ptr<BasicBlock> body = BasicBlock::create();
-    std::shared_ptr<BasicBlock> next = BasicBlock::create();
+    std::shared_ptr<BasicBlock> initialization = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> iteration = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
     // Building
-    BuildExpressionRValueIR(*node.initialization, context, initialization);
-    BuildExpressionRValueIR(*node.condition, context, condition);
-    BuildExpressionRValueIR(*node.iteration, context, iteration);
-    BuildStatementIR(*node.body, context, body);
+    BuildExpressionRValueIR(*node.initialization, context, cfg, initialization);
+    BuildExpressionRValueIR(*node.condition, context, cfg, condition);
+    BuildExpressionRValueIR(*node.iteration, context, cfg, iteration);
+    BuildStatementIR(*node.body, context, cfg, body);
     // Branching
     current_block->SetBranchIfTrue(initialization);
     initialization->SetBranchIfTrue(condition);
@@ -421,24 +428,27 @@ void BuildForStatementIR(
 void BuildIfStatementIR(
   const ast::IfStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // Init
-    std::shared_ptr<BasicBlock> test = BasicBlock::create();
-    std::shared_ptr<BasicBlock> consequence = BasicBlock::create();
-    std::shared_ptr<BasicBlock> next = BasicBlock::create();
+    std::shared_ptr<BasicBlock> test = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
     // Building
-    BuildExpressionRValueIR(*node.test, context, test);
-    BuildStatementIR(*node.consequence, context, consequence);
+    BuildExpressionRValueIR(*node.test, context, cfg, test);
+    BuildStatementIR(*node.consequence, context, cfg, consequence);
     // Branching
     current_block->SetBranchIfTrue(test);
     test->SetBranchIfTrue(consequence);
     consequence->SetBranchIfTrue(next);
     if (node.alternative != nullptr) {
-      std::shared_ptr<BasicBlock> alternative = BasicBlock::create();
-      BuildStatementIR(*node.alternative, context, alternative);
+      std::shared_ptr<BasicBlock> alternative = cfg->CreateBasicBlock();
+      BuildStatementIR(*node.alternative, context, cfg, alternative);
       test->SetBranchIfFalse(alternative);
       alternative->SetBranchIfTrue(next);
+    } else {
+      test->SetBranchIfFalse(next);
     }
     // Ending
     current_block = next;
@@ -447,13 +457,14 @@ void BuildIfStatementIR(
 void BuildReturnStatementIR(
   const ast::ReturnStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // Init
-    std::shared_ptr<BasicBlock> expression = BasicBlock::create();
-    std::shared_ptr<BasicBlock> next = BasicBlock::create();
+    std::shared_ptr<BasicBlock> expression = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
     // Building
-    BuildExpressionRValueIR(*node.expression, context, expression);
+    BuildExpressionRValueIR(*node.expression, context, cfg, expression);
     // Branching
     current_block->SetBranchIfTrue(expression);
     expression->SetBranchIfTrue(next);
@@ -464,6 +475,7 @@ void BuildReturnStatementIR(
 void BuildNullStatementIR(
   const ast::NullStatement &node,
   Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
     // No-op
@@ -472,4 +484,3 @@ void BuildNullStatementIR(
 // End
 }  // namespace ir
 }  // namespace comp
-

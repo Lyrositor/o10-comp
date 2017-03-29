@@ -15,20 +15,20 @@ void BasicBlock::Push(std::shared_ptr<Op> op) {
   this->ops_.push_back(op);
 }
 
-std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfTrue() {
-  return this->branchIfTrue_;
+std::weak_ptr<BasicBlock> BasicBlock::GetBranchIfTrue() {
+  return this->branch_if_true_;
 }
 
 void BasicBlock::SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue) {
-  this->branchIfTrue_ = branchIfTrue;
+  this->branch_if_true_ = branchIfTrue;
 }
 
-std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() {
-  return this->branchIfFalse_;
+std::weak_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() {
+  return this->branch_if_false_;
 }
 
 void BasicBlock::SetBranchIfFalse(std::shared_ptr<BasicBlock> branchIfFalse) {
-  this->branchIfFalse_ = branchIfFalse;
+  this->branch_if_true_ = branchIfFalse;
 }
 
 BasicBlock::~BasicBlock() {
