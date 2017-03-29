@@ -15,6 +15,13 @@ struct Position final {
 };
 
 struct SourceLocation final {
+  static std::shared_ptr<SourceLocation> Create(
+    size_t start_index,
+    size_t start_line,
+    size_t start_column,
+    size_t end_index,
+    size_t end_line,
+    size_t end_column);
   SourceLocation(const Position &start, const Position &end);
 
   ~SourceLocation();
