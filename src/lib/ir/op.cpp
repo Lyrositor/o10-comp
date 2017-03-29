@@ -78,7 +78,7 @@ BinOp::~BinOp() {
 std::unique_ptr<UnaryOp> UnaryOp::Create(std::shared_ptr<VariableOperand> out,
                                          UnaryOp::UnaryOperator unaryOperator,
                                          std::shared_ptr<Operand> in1) {
-  return std::unique_ptr<UnaryOp>(new UnaryOperator(out, unaryOperator, in1));
+  return std::unique_ptr<UnaryOp>(new UnaryOp(out, unaryOperator, in1));
 }
 
 UnaryOp::UnaryOp(std::shared_ptr<VariableOperand> out,
