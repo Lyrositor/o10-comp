@@ -3,8 +3,11 @@
 #include <cstddef>
 #include <memory>
 
+struct YYLTYPE;
+
 namespace comp {
 namespace ast {
+
 struct Position final {
   Position(size_t index, size_t line, size_t column);
 
@@ -16,13 +19,7 @@ struct Position final {
 };
 
 struct SourceLocation final {
-  static std::shared_ptr<SourceLocation> Create(
-    size_t start_index,
-    size_t start_line,
-    size_t start_column,
-    size_t end_index,
-    size_t end_line,
-    size_t end_column);
+  static std::shared_ptr<SourceLocation> Create(const YYLTYPE *yylloc);
   SourceLocation(const Position &start, const Position &end);
 
   ~SourceLocation();

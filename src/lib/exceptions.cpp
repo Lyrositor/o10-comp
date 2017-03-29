@@ -1,32 +1,38 @@
 #include <comp/exceptions.h>
 
+#include <sstream>
+#include <unordered_map>
+
 namespace comp {
 
 Exception::Exception(const std::string &message) : runtime_error(message) {
 }
 
-Exception::~Exception() {
+CompilationException::CompilationException(
+  const std::string &message
+) : Exception(message) {
 }
 
-CompileException::CompileException(
+SyntaxException::SyntaxException(
   const std::string &message,
   const std::shared_ptr<ast::SourceLocation> location
-) : Exception(message), location_(location) {
+) : CompilationException(message), location_(location) {
 }
 
-CompileException::~CompileException() {
-}
-
-std::shared_ptr<ast::SourceLocation> CompileException::GetLocation() const {
+std::shared_ptr<ast::SourceLocation> SyntaxException::GetLocation() const {
   return location_;
 }
 
-ParserException::ParserException(
-  const std::string &message,
+UnexpectedTokenError::UnexpectedTokenError(
+  const std::string &token,
   const std::shared_ptr<ast::SourceLocation> location
-) : CompileException(message, location) {
+) :
+  SyntaxException(
+    std::string("Unexpected token") + ": '" + token + "'", location),
+    token_(token) {
 }
 
-ParserException::~ParserException() {
+std::string UnexpectedTokenError::GetToken() const {
+  return token_;
 }
 }  // namespace comp

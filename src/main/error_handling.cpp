@@ -7,8 +7,12 @@
 
 static const unsigned int TAB_WIDTH = 8;
 
-void PrintCompileException(
-  const comp::CompileException &exception,
+void PrintException(const comp::Exception &exception) {
+  std::cerr << "error: " << exception.what() << std::endl;
+}
+
+void PrintSyntaxException(
+  const comp::SyntaxException &exception,
   const std::string &content,
   const char *filename) {
   std::shared_ptr<comp::ast::SourceLocation> l = exception.GetLocation();
@@ -25,12 +29,12 @@ void PrintCompileException(
   // Display the line
   std::vector<char> underline;
   size_t idx;
-  unsigned int pos = 1;
+  unsigned int display_col = 1;  // The current column, as displayed on-screen
   for (idx = start_idx; idx < end_idx; idx++) {
     unsigned int width = 1;
     char c = content[idx];
     if (c == '\t') {
-      width = -pos % TAB_WIDTH + 1;
+      width = -display_col % TAB_WIDTH + 1;
       c = ' ';
     }
 
@@ -42,7 +46,7 @@ void PrintCompileException(
         underline.push_back('^');
       }
     }
-    pos += width;
+    display_col += width;
   }
   std::cerr << std::endl;
 

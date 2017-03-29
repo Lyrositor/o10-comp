@@ -6,8 +6,10 @@
 
 #include <comp/exceptions.h>
 
-void PrintCompileException(
-  const comp::CompileException &exception,
+void PrintException(const comp::Exception &exception);
+
+void PrintSyntaxException(
+  const comp::SyntaxException &exception,
   const std::string &content,
   const char *filename);
 

@@ -10,17 +10,18 @@ namespace comp {
 class Exception : public std::runtime_error {
  public:
   Exception(const std::string &message);
-
-  virtual ~Exception();
 };
 
-class CompileException : public Exception {
+class CompilationException : public Exception {
  public:
-  CompileException(
+  CompilationException(const std::string &message);
+};
+
+class SyntaxException : public CompilationException {
+ public:
+  SyntaxException(
     const std::string &message,
     const std::shared_ptr<ast::SourceLocation>);
-
-  virtual ~CompileException();
 
   std::shared_ptr<ast::SourceLocation> GetLocation() const;
 
@@ -28,12 +29,15 @@ class CompileException : public Exception {
   const std::shared_ptr<ast::SourceLocation> location_;
 };
 
-class ParserException : public CompileException {
+class UnexpectedTokenError : public SyntaxException {
  public:
-  ParserException(
-    const std::string &message,
-    const std::shared_ptr<ast::SourceLocation>);
+  UnexpectedTokenError(
+    const std::string &token,
+    const std::shared_ptr<ast::SourceLocation> location);
 
-  virtual ~ParserException();
+  std::string GetToken() const;
+
+ private:
+  const std::string token_;
 };
 }  // namespace comp

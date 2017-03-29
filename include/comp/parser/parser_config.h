@@ -3,8 +3,11 @@
 #include <cstddef>
 
 #include <comp/ast/program.h>
+#include <comp/ast/position.h>
 
 #define YYLTYPE_IS_DECLARED 1
+
+#define LOCATION(L) comp::ast::SourceLocation::Create(L)
 
 struct YYLTYPE;
 union YYSTYPE;

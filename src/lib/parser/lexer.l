@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <stdlib.h>
 #include <comp/ast.h>
+#include <comp/exceptions.h>
 #include <comp/parser/parser_config.h>
 
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)
@@ -112,4 +113,4 @@
 ([0-9]+)                          {yylval->int64 = atoi(yytext); return INTEGER_LITERAL;}
 ([a-zA-Z_$][a-zA-Z_$0-9]*)        {yylval->cstring = yytext; return IDENTIFIER;}
 
-.                                 {/* Do nothing if no match was found*/}
+.                                 {throw comp::UnexpectedTokenError(yytext, LOCATION(yylloc));}

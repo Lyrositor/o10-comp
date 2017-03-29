@@ -1,3 +1,4 @@
+#include <cerrno>
 #include <iostream>
 #include <string>
 
@@ -19,7 +20,7 @@ void yyerror(
 ) {
   UNUSED(scanner);
   UNUSED(res);
-  throw comp::ParserException(
+  throw comp::SyntaxException(
     msg,
     std::make_shared<comp::ast::SourceLocation>(
       comp::ast::Position(
@@ -36,7 +37,18 @@ namespace comp {
 namespace parser {
 std::shared_ptr<comp::ast::Program> parse(const std::string &input) {
   yyscan_t scanner;
-  yylex_init(&scanner);
+  if (yylex_init(&scanner)) {
+    switch (errno) {
+      case ENOMEM:
+        throw Exception(
+          "Failed to initialize parser: Could not allocate memory");
+      case EINVAL:
+        throw Exception("Failed to initialize parser: Invalid scanner");
+      default:
+        throw Exception("Failed to initialize parser: Unknown error");
+    }
+  }
+
   comp::ast::Program *root = nullptr;
   yy_scan_string(input.c_str(), scanner);
   yyparse(scanner, root);

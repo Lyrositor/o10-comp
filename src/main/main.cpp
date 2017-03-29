@@ -40,8 +40,11 @@ int main(int argc, char **argv) {
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
     document->Accept(writer);
     std::cout << buffer.GetString() << std::endl;
-  } catch (comp::CompileException &e) {
-    PrintCompileException(e, content, argv[1]);
+  } catch (comp::SyntaxException &e) {
+    PrintSyntaxException(e, content, argv[1]);
+    return EXIT_FAILURE;
+  } catch  (comp::Exception &e) {
+    PrintException(e);
     return EXIT_FAILURE;
   }
 

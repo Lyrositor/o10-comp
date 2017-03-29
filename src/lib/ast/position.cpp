@@ -1,6 +1,8 @@
 #include <comp/ast/position.h>
 #include <memory>
 
+#include <comp/parser/parser_config.h>
+
 namespace comp {
 namespace ast {
 Position::Position(size_t index, size_t line, size_t column) :
@@ -11,15 +13,11 @@ Position::~Position() {
 }
 
 std::shared_ptr<SourceLocation> SourceLocation::Create(
-  size_t start_index,
-  size_t start_line,
-  size_t start_column,
-  size_t end_index,
-  size_t end_line,
-  size_t end_column) {
+  const YYLTYPE *yylloc
+) {
   return std::unique_ptr<SourceLocation>(new SourceLocation(
-    Position(start_index, start_line, start_column),
-    Position(end_index, end_line, end_column)
+    Position(yylloc->first_index, yylloc->first_line, yylloc->first_column),
+    Position(yylloc->last_index, yylloc->last_line, yylloc->last_column)
   ));
 }
 
