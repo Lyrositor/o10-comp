@@ -1,4 +1,5 @@
 #include <comp/ast/to_json.h>
+#include <comp/utils.h>
 
 namespace comp {
 namespace ast {
@@ -349,6 +350,7 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
 }
 
 std::unique_ptr<rapidjson::Value> NullStatementToJson(const NullStatement &node, rapidjson::Document::AllocatorType &allocator) {
+  UNUSED(node);
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "NullStatement", allocator);
   return result;

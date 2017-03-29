@@ -4,5 +4,5 @@
 
 TEST(comp__ir__DataType, ArraySize) {
   const comp::ir::ArrayDataType integersArrayType(comp::ir::GetInt32Type(), 10);
-  EXPECT_EQ(10, integersArrayType.GetSize());
+  EXPECT_EQ(10U, integersArrayType.GetSize());
 }

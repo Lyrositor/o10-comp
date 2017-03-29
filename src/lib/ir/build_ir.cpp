@@ -3,6 +3,7 @@
 #include <comp/ir/builtins.h>
 #include <comp/ir/control_flow_graph.h>
 #include <comp/ir/op.h>
+#include <comp/utils.h>
 
 namespace comp {
 namespace ir {
@@ -479,7 +480,11 @@ void BuildNullStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-    // No-op
+  // No-op
+  UNUSED(node);
+  UNUSED(context);
+  UNUSED(cfg);
+  UNUSED(current_block);
 }
 
 // End

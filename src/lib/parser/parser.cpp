@@ -1,9 +1,10 @@
 #include <iostream>
 #include <string>
+
 #include <comp/ast.h>
 #include <comp/exceptions.h>
-
 #include <comp/parser/parser_config.h>
+#include <comp/utils.h>
 
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
@@ -16,6 +17,8 @@ void yyerror(
   comp::ast::Program *res,
   const char *msg
 ) {
+  UNUSED(scanner);
+  UNUSED(res);
   throw comp::ParserException(
     msg,
     std::make_shared<comp::ast::SourceLocation>(
@@ -33,7 +36,7 @@ namespace comp {
 namespace parser {
 std::shared_ptr<comp::ast::Program> parse(const std::string &input) {
   yyscan_t scanner;
-  int initResult = yylex_init(&scanner);
+  yylex_init(&scanner);
   comp::ast::Program *root = nullptr;
   yy_scan_string(input.c_str(), scanner);
   yyparse(scanner, root);
