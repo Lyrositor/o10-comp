@@ -50,7 +50,7 @@ struct Op {
     BinOp,
     UnaryOp,
     Copy,
-    Comp,
+    Return,
     NoOp
   };
 
@@ -138,15 +138,18 @@ struct Copy final : public Op {
   std::shared_ptr<Operand> in;
 };
 
-/**
- * Compare value `val` to non-zero
- */
-struct Comp final : public Op {
-  Comp(std::shared_ptr<Variable> val);
-  virtual ~Comp();
 
-  std::shared_ptr<Variable> val;
+/**
+ * Leave the function and return the `in` value or nothing if `in` is a nullptr
+ */
+struct Return final : public Op {
+  static std::unique_ptr<Return> Create(std::shared_ptr<Operand> in);
+  Return(std::shared_ptr<Operand> in);
+  virtual ~Return();
+
+  std::shared_ptr<Operand> in;
 };
+
 
 /*
  * Idempotent operation

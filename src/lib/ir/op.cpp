@@ -110,6 +110,17 @@ Copy::Copy(
 Copy::~Copy() {
 }
 
+std::unique_ptr<Return> Return::Create(std::shared_ptr<Operand> in) {
+  return std::unique_ptr<Return>(new Return(in));
+}
+
+Return::Return(std::shared_ptr<Operand> in) :
+  Op(Op::Type::Return),
+  in(in) {
+}
+
+Return::~Return() {
+}
 
 NoOp::NoOp() : Op(Op::Type::NoOp) {
 }
@@ -119,6 +130,7 @@ NoOp::~NoOp() {
 std::unique_ptr<NoOp> NoOp::Create() {
   return std::unique_ptr<NoOp>(new NoOp());
 }
+
 
 }
 }
