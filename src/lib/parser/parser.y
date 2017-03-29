@@ -7,6 +7,8 @@
 
 #include <comp/parser/parser_config.h>
 
+typedef comp::ast::SourceLocation SL;
+
 %}
 
 %locations
@@ -118,7 +120,7 @@ program:
   declarationsList {
     std::vector<std::shared_ptr<comp::ast::Declaration>> body(*$1);
     delete $1;
-    $$ = new comp::ast::Program(body);
+    $$ = new comp::ast::Program(body,SL::Create(@$.first_index,@$.first_line,@$.first_column,@$.last_index,@$.last_line,@$.last_column));
   }
 
 declarationsList:
@@ -147,12 +149,12 @@ functionDeclaration:
     std::shared_ptr<comp::ast::Identifier> identifier($2);
     std::vector<std::shared_ptr<comp::ast::Parameter>> parameters(*$4);
     delete $4;
-    $$ = new comp::ast::Function(identifier, parameters, return_type, nullptr);
+    $$ = new comp::ast::Function(identifier, parameters, return_type, nullptr,SL::Create(0,0,0,0,0,0));
   }
   | identifierDataType identifier OPEN_PAREN CLOSE_PAREN SEMICOLON {
     std::shared_ptr<comp::ast::DataType> return_type($1);
     std::shared_ptr<comp::ast::Identifier> identifier($2);
-    $$ = new comp::ast::Function(identifier, {}, return_type, nullptr);
+    $$ = new comp::ast::Function(identifier, {}, return_type, nullptr,SL::Create(0,0,0,0,0,0));
   }
 
 dataType:
@@ -165,27 +167,31 @@ dataType:
 
 identifierDataType:
   CHAR_TYPE {
-    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("char"));
+    std::shared_ptr<SL> sl= SL::Create(0,0,0,0,0,0);
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("char",sl),sl);
   }
   | INT32_TYPE {
-    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("int32_t"));
+    std::shared_ptr<SL> sl= SL::Create(0,0,0,0,0,0);
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("int32_t",sl),sl);
   }
   | INT64_TYPE {
-    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("int64_t"));
+    std::shared_ptr<SL> sl= SL::Create(0,0,0,0,0,0);
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("int64_t",sl),sl);
   }
   | VOID_TYPE {
-    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("void"));
+    std::shared_ptr<SL> sl= SL::Create(0,0,0,0,0,0);
+    $$ = new comp::ast::IdentifierDataType(comp::ast::Identifier::Create("void",sl),sl);
   }
 
 arrayDataType:
   identifierDataType OPEN_BRACKET CLOSE_BRACKET{
     std::shared_ptr<comp::ast::DataType> item_type($1);
-    $$ = new comp::ast::ArrayDataType(item_type, nullptr);
+    $$ = new comp::ast::ArrayDataType(item_type, nullptr,SL::Create(0,0,0,0,0,0));
   }
 
 identifier:
   IDENTIFIER {
-    $$ = new comp::ast::Identifier($1);
+    $$ = new comp::ast::Identifier($1,SL::Create(0,0,0,0,0,0));
   }
 
 parametersList:
@@ -204,27 +210,27 @@ parameter:
   identifierDataType declarator {
     std::shared_ptr<comp::ast::IdentifierDataType> literal_data_type($1);
     std::shared_ptr<comp::ast::Declarator> declarator($2);
-    $$ = new comp::ast::NamedParameter(literal_data_type, declarator);
+    $$ = new comp::ast::NamedParameter(literal_data_type, declarator,SL::Create(0,0,0,0,0,0));
   }
   | dataType {
     std::shared_ptr<comp::ast::DataType> dataType($1);
-    $$ = new comp::ast::AnonymousParameter(dataType);
+    $$ = new comp::ast::AnonymousParameter(dataType,SL::Create(0,0,0,0,0,0));
   }
 
 declarator:
   identifier {
     std::shared_ptr<comp::ast::Identifier> identifier($1);
-    $$ = new comp::ast::IdentifierDeclarator(identifier);
+    $$ = new comp::ast::IdentifierDeclarator(identifier,SL::Create(0,0,0,0,0,0));
   }
   | identifier OPEN_BRACKET CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> identifier($1);
-    $$ = new comp::ast::ArrayDeclarator(comp::ast::IdentifierDeclarator::Create(identifier), nullptr);
+    $$ = new comp::ast::ArrayDeclarator(comp::ast::IdentifierDeclarator::Create(identifier), nullptr,SL::Create(0,0,0,0,0,0));
   }
 /*
   | identifier OPEN_BRACKET expression CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> identifier($1);
     std::shared_ptr<comp::ast::Expression> size($3);
-    $$ = new comp::ast::ArrayDeclarator(identifier, size);
+    $$ = new comp::ast::ArrayDeclarator(identifier, size,SL::Create(0,0,0,0,0,0));
   }
 */
 
@@ -235,7 +241,7 @@ functionDefinition:
         std::vector<std::shared_ptr<comp::ast::Parameter>> parametersList(*$4);
         delete($4);
         std::shared_ptr<comp::ast::BlockStatement> block($6);
-        $$ = new comp::ast::Function(identifier, parametersList, return_type, block);
+        $$ = new comp::ast::Function(identifier, parametersList, return_type, block,SL::Create(0,0,0,0,0,0));
     }
     | identifierDataType identifier OPEN_PAREN CLOSE_PAREN block {
         std::shared_ptr<comp::ast::DataType> return_type($1);
@@ -249,7 +255,7 @@ variableDeclaration:
     std::shared_ptr<comp::ast::IdentifierDataType> base_type($1);
     std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> declarators(*$2);
     delete $2;
-    $$ = new comp::ast::VariableDeclaration(base_type, declarators);
+    $$ = new comp::ast::VariableDeclaration(base_type, declarators,SL::Create(0,0,0,0,0,0));
   }
 
 variableDeclaratorsList:
@@ -267,12 +273,12 @@ variableDeclaratorsList:
 variableDeclarator:
   declarator {
       std::shared_ptr<comp::ast::Declarator> declarator($1);
-      $$ = new comp::ast::VariableDeclarator(declarator, nullptr);
+      $$ = new comp::ast::VariableDeclarator(declarator, nullptr,SL::Create(0,0,0,0,0,0));
   }
   | declarator SIMPLE_ASSIGNMENT_OPERATOR expression {
       std::shared_ptr<comp::ast::Declarator> decl($1);
       std::shared_ptr<comp::ast::RExpression> expression($3);
-      $$ = new comp::ast::VariableDeclarator(decl, expression);
+      $$ = new comp::ast::VariableDeclarator(decl, expression),SL::Create(0,0,0,0,0,0);
   }
 
 
@@ -283,7 +289,7 @@ LValue:
     | identifier OPEN_BRACE expression CLOSE_BRACKET {
         std::shared_ptr<comp::ast::RExpression> array($1);
         std::shared_ptr<comp::ast::RExpression> index($3);
-        $$ = new comp::ast::SubscriptExpression(array, index);
+        $$ = new comp::ast::SubscriptExpression(array, index),SL::Create(0,0,0,0,0,0);
     }
     |  OPEN_PAREN LValue CLOSE_PAREN {
         $$ = $2;
@@ -293,29 +299,29 @@ varUpdate:
     LValue INCREMENT_OPERATOR {
         std::shared_ptr<comp::ast::LExpression> LValue($1);
         comp::ast::UnaryOperator op = comp::ast::UnaryOperator::PostfixIncrement;
-        $$ = new comp::ast::UnaryExpression(op, LValue);
+        $$ = new comp::ast::UnaryExpression(op, LValue,SL::Create(0,0,0,0,0,0));
     }
     | LValue DECREMENT_OPERATOR {
         std::shared_ptr<comp::ast::LExpression> LValue($1);
         comp::ast::UnaryOperator op = comp::ast::UnaryOperator::PostfixDecrement;
-        $$ = new comp::ast::UnaryExpression(op, LValue);
+        $$ = new comp::ast::UnaryExpression(op, LValue,SL::Create(0,0,0,0,0,0));
     }
     | INCREMENT_OPERATOR LValue {
         comp::ast::UnaryOperator op = comp::ast::UnaryOperator::PrefixIncrement;
         std::shared_ptr<comp::ast::LExpression> LValue($2);
-        $$ = new comp::ast::UnaryExpression(op, LValue);
+        $$ = new comp::ast::UnaryExpression(op, LValue,SL::Create(0,0,0,0,0,0));
     }
     | DECREMENT_OPERATOR LValue{
         comp::ast::UnaryOperator op = comp::ast::UnaryOperator::PrefixDecrement;
         std::shared_ptr<comp::ast::LExpression> LValue($2);
-        $$ = new comp::ast::UnaryExpression(op, LValue);
+        $$ = new comp::ast::UnaryExpression(op, LValue,SL::Create(0,0,0,0,0,0));
     }
 
 functionCall:
     /*identifier OPEN_PAREN functionCallParams CLOSE_PAREN {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
         std::vector<std::shared_ptr<comp::ast::Parameter>> functionCallParams($3);
-        $$ = new comp::ast::CallExpression(identifier, functionCallParams);
+        $$ = new comp::ast::CallExpression(identifier, functionCallParams,SL::Create(0,0,0,0,0,0));
     }
     | */ identifier OPEN_PAREN CLOSE_PAREN {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
@@ -379,12 +385,12 @@ ifStatement:
         std::shared_ptr<comp::ast::RExpression> test($3);
         std::shared_ptr<comp::ast::Statement> consequence($5);
         std::shared_ptr<comp::ast::Statement> alternative($7);
-        $$ = new comp::ast::IfStatement(comp::ast::IfStatement::test, consequence, alternative);
+        $$ = new comp::ast::IfStatement(comp::ast::IfStatement::test, consequence, alternative,SL::Create(0,0,0,0,0,0));
     }
     | IF OPEN_PAREN expression CLOSE_PAREN statement {
         std::shared_ptr<comp::ast::RExpression> expression($3);
         std::shared_ptr<comp::ast::Statement> consequence($5);
-        $$ = new comp::ast::IfStatement(comp::ast::IfStatement::test, consequence);
+        $$ = new comp::ast::IfStatement(comp::ast::IfStatement::test, consequence,SL::Create(0,0,0,0,0,0));
     }
 
 whileStatement:
@@ -400,14 +406,14 @@ forStatement:
         std::shared_ptr<comp::ast::RExpression> condition($5);
         std::shared_ptr<comp::ast::RExpression> iteration($7);
         std::shared_ptr<comp::ast::Statement> body($9);
-        $$ = new comp::ast::ForStatement(initialization, condition, iteration, body);
+        $$ = new comp::ast::ForStatement(initialization, condition, iteration, body,SL::Create(0,0,0,0,0,0));
     }
     | FOR OPEN_PAREN variableDeclaration expressionOrVoid SEMICOLON expressionOrVoid CLOSE_PAREN statement {
         std::shared_ptr<comp::ast::VariableDeclaration> initialization($3);
         std::shared_ptr<comp::ast::RExpression> condition($4);
         std::shared_ptr<comp::ast::RExpression> iteration($6);
         std::shared_ptr<comp::ast::Statement> body($8);
-        $$ = new comp::ast::ForStatement(initialization, condition, iteration, body);
+        $$ = new comp::ast::ForStatement(initialization, condition, iteration, body,SL::Create(0,0,0,0,0,0));
     }
 
 */
