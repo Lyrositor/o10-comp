@@ -296,7 +296,7 @@ LValue:
     identifier {
         $$ = $1;
     }
-    | identifier OPEN_BRACE expression CLOSE_BRACKET {
+    | identifier OPEN_BRACKET expression CLOSE_BRACKET {
         std::shared_ptr<comp::ast::RExpression> array($1);
         std::shared_ptr<comp::ast::RExpression> index($3);
         $$ = new comp::ast::SubscriptExpression(array, index, LOCATION(&@1));
@@ -328,27 +328,28 @@ varUpdate:
     }
 
 functionCall:
-    /*identifier OPEN_PAREN functionCallParams CLOSE_PAREN {
+    identifier OPEN_PAREN functionCallParams CLOSE_PAREN {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
-        std::vector<std::shared_ptr<comp::ast::Parameter>> functionCallParams($3);
-        $$ = new comp::ast::CallExpression(identifier, functionCallParams, LOCATION(&@1));
+        std::vector<std::shared_ptr<comp::ast::Parameter>> arguments(*$3);
+        delete $3;
+        $$ = new comp::ast::CallExpression(identifier, arguments, LOCATION(&@1));
     }
-    | */ identifier OPEN_PAREN CLOSE_PAREN {
+    | identifier OPEN_PAREN CLOSE_PAREN {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
         $$ = new comp::ast::CallExpression(identifier, {}, LOCATION(&@1));
     }
 
-/*functionCallParams:
+functionCallParams:
     functionCallParams COMMA_OPERATOR expression {
-        std::vector<std::shared_ptr<comp::ast::Parameter>> functionCallParams($1);
         std::shared_ptr<comp::ast::RExpression> expression($3);
-        $$ = new comp::ast::Parameter(functionCallParams, expression, LOCATION(&@1));
+        $1->push_back(expression, LOCATION(&@1));
+        $$ = $1;
     }
     | expression {
         std::shared_ptr<comp::ast::RExpression> expression($1);
-        $$ = new comp::ast::Parameter(expression, LOCATION(&@1));
+        $$ = new std::vector<std::shared_ptr<comp::ast::Parameter>>;
+        $$->push_back(expression, LOCATION(&@1));
     }
-*/
 
 statement:
     expressionStatement {
@@ -374,7 +375,7 @@ statement:
     }
 
 expressionStatement:
-    expression SEMICOLON{
+    expression SEMICOLON {
         std::shared_ptr<comp::ast::RExpression> expression($1);
         $$ = new comp::ast::ExpressionStatement(expression, LOCATION(&@1));
     }
