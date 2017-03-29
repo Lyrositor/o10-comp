@@ -283,7 +283,7 @@ void BuildStatementIR(
     default: {
       throw std::domain_error("Unexpected value for `node.node_type`");
     }
-}
+  }
 }
 
 void BuildBlockStatementIR(
@@ -324,8 +324,10 @@ void BuildVariableDeclarationIR(
     if (variable_declarator->initial_value != nullptr) {
       std::shared_ptr<const Variable>
         initial_value = BuildExpressionRValueIR(*variable_declarator->initial_value, context, cfg, current_block);
-      // TODO: current_block->Push(Op::Copy::Create(variable, initial_value))
-      throw new std::runtime_error("Not implemented: initial value, depends on the abstract assembly instruction `Copy`");
+        current_block->Push(Copy::Create(
+          VariableOperand::Create(variable),
+          VariableOperand::Create(initial_value)
+        ));
     }
   }
 }
