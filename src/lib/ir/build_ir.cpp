@@ -284,6 +284,7 @@ void BuildStatementIR(
       throw std::domain_error("Unexpected value for `node.node_type`");
     }
 }
+}
 
 void BuildBlockStatementIR(
   const ast::BlockStatement &node,
