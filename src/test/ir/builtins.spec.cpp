@@ -3,12 +3,6 @@
 
 namespace comp {
 namespace ir {
-TEST(comp__ir__builtins, checkSizeOfPrimitiveTypes) {
-  EXPECT_EQ(0, GetVoidType()->GetSize());
-  EXPECT_EQ(4, GetInt32Type()->GetSize());
-  EXPECT_EQ(8, GetInt64Type()->GetSize());
-  EXPECT_EQ(1, GetCharType()->GetSize());
-}
 
 TEST(comp__ir__builtins, resolveBuiltinTypes) {
   RootContext context = CreateRootContextWithBuiltIns();

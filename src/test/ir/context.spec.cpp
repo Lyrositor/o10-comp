@@ -19,8 +19,8 @@ TEST(comp__ir__context, registerAndResolveVariable) {
 TEST(comp__ir__context, registerAndResolveDataType) {
   std::unique_ptr<comp::ir::Context> context = comp::ir::RootContext::Create();
   std::shared_ptr<comp::ir::DataType> dataType =
-    comp::ir::PrimitiveDataType::Create(2);
-  std::string typeName = "int16_t";
+    comp::ir::Int32DataType::Create();
+  std::string typeName = "int32_t";
   context->RegisterDataType(typeName, dataType);
   EXPECT_EQ(dataType, context->ResolveDataType(typeName));
 }
