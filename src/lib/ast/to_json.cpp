@@ -42,6 +42,7 @@ std::unique_ptr<rapidjson::Value> ArrayDataTypeToJson(const ArrayDataType &node,
 std::unique_ptr<rapidjson::Value> ArrayDeclaratorToJson(const ArrayDeclarator &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "ArrayDeclarator", allocator);
+  result->AddMember("declarator", *DeclaratorToJson(*node.declarator, allocator), allocator);
   rapidjson::Value size;
   if (node.size == nullptr) {
     size.SetNull();
