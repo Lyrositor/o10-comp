@@ -2,19 +2,24 @@
 #include <cstdio>
 #include <stdlib.h>
 #include <comp/ast.h>
+#include <comp/parser/parser_config.h>
+
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
 
 #define YY_USER_ACTION \
     yylloc->first_line = yylloc->last_line; \
     yylloc->first_column = yylloc->last_column; \
+    yylloc->first_index = yylloc->last_index; \
     for(int i = 0; yytext[i] != '\0'; i++) { \
         if(yytext[i] == '\n') { \
             yylloc->last_line++; \
-            yylloc->last_column = 1; \
+            yylloc->last_column = 0; \
+            yylloc->last_index++; \
         } \
         else { \
             yylloc->last_column++; \
+            yylloc->last_index++; \
         } \
     }
 

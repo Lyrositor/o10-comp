@@ -19,17 +19,12 @@ void PrintCompileException(
   std::cerr << " error: " << exception.what() << std::endl;
 
   // Get the line which led to the error
-  unsigned int line = 0;
-  size_t idx = 0;
-  size_t start_idx = 0;
-  do {
-    for (start_idx = idx; content[idx++] != '\n';) {
-    }
-  } while (line++ < l->start.line);
-  size_t end_idx = idx - 1;
+  size_t start_idx = GetLineStartFromIndex(l->start.index, content);
+  size_t end_idx = GetLineEndFromIndex(l->end.index, content);
 
   // Display the line
   std::vector<char> underline;
+  size_t idx;
   unsigned int pos = 1;
   for (idx = start_idx; idx < end_idx; idx++) {
     unsigned int width = 1;
@@ -41,9 +36,9 @@ void PrintCompileException(
 
     for (unsigned int i = 0; i < width; i++) {
       std::cerr << c;
-      if (idx - start_idx < l->start.column) {
+      if (idx < l->start.index) {
         underline.push_back(' ');
-      } else if (idx - start_idx < l->end.column) {
+      } else if (idx < l->end.index) {
         underline.push_back('^');
       }
     }
@@ -56,4 +51,18 @@ void PrintCompileException(
     std::cerr << c;
   }
   std::cerr << std::endl;
+}
+
+size_t GetLineStartFromIndex(size_t start_idx, const std::string &content) {
+  size_t idx = start_idx;
+  while (idx-- > 0 && content[idx] != '\n') {
+  }
+  return idx + 1;  // Shift back to the line's first character
+}
+
+size_t GetLineEndFromIndex(size_t start_idx, const std::string &content) {
+  size_t idx = start_idx;
+  while (content[idx++] != '\n' && idx < content.size()) {
+  }
+  return idx - 1;  // Remove the newline
 }

@@ -2,6 +2,9 @@
 #include <string>
 #include <comp/ast.h>
 #include <comp/exceptions.h>
+
+#include <comp/parser/parser_config.h>
+
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)
 #include "parser.tab.hpp"
 // Generated with flex by CMake (lexer.yy.h is in the build directory)
@@ -17,13 +20,13 @@ void yyerror(
     msg,
     std::make_shared<comp::ast::SourceLocation>(
       comp::ast::Position(
-        0,
-        static_cast<size_t>(locp->first_line - 1),
-        static_cast<size_t>(locp->first_column - 1)),
+        locp->first_index,
+        locp->first_line,
+        locp->first_column),
       comp::ast::Position(
-        0,
-        static_cast<size_t>(locp->last_line - 1),
-        static_cast<size_t>(locp->last_column - 1))));
+        locp->last_index,
+        locp->last_line,
+        locp->last_column)));
 }
 
 namespace comp {

@@ -5,12 +5,7 @@
 #include <comp/ast.h>
 #include <memory>
 
-struct YYLTYPE;
-union YYSTYPE;
-
-void yyerror(YYLTYPE *, void *scanner, comp::ast::Program *, const char *);
-int yylex(YYSTYPE *lvalp, YYLTYPE * yylloc, void *scanner);
-void yy_scan_string(const char *str);
+#include <comp/parser/parser_config.h>
 
 %}
 
