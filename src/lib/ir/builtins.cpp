@@ -6,17 +6,17 @@
 
 namespace comp {
 namespace ir {
-static const std::shared_ptr<const PrimitiveDataType>
-  kVoidType(new PrimitiveDataType(0));
+static const std::shared_ptr<const VoidDataType>
+  kVoidType(new VoidDataType());
 
-static const std::shared_ptr<const PrimitiveDataType>
-  kCharType(new PrimitiveDataType(1));
+static const std::shared_ptr<const Uint8DataType>
+  kCharType(new Uint8DataType());
 
-static const std::shared_ptr<const PrimitiveDataType>
-  kInt32Type(new PrimitiveDataType(4));
+static const std::shared_ptr<const Int32DataType>
+  kInt32Type(new Int32DataType());
 
-static const std::shared_ptr<const PrimitiveDataType>
-  kInt64Type(new PrimitiveDataType(8));
+static const std::shared_ptr<const Int64DataType>
+  kInt64Type(new Int64DataType());
 
 static const std::shared_ptr<FunctionSymbol>
   kGetcharFunction = FunctionSymbol::Create(
@@ -45,19 +45,19 @@ static const DataTypesTable kBuiltInDataTypes = {
 
 const SymbolTable kBuiltInSymbols(kBuiltInDataTypes, {}, kBuiltInFunctions);
 
-const std::shared_ptr<const PrimitiveDataType> GetVoidType() {
+const std::shared_ptr<const VoidDataType> GetVoidType() {
   return kVoidType;
 }
 
-const std::shared_ptr<const PrimitiveDataType> GetCharType() {
+const std::shared_ptr<const Uint8DataType> GetCharType() {
   return kCharType;
 }
 
-const std::shared_ptr<const PrimitiveDataType> GetInt32Type() {
+const std::shared_ptr<const Int32DataType> GetInt32Type() {
   return kInt32Type;
 }
 
-const std::shared_ptr<const PrimitiveDataType> GetInt64Type() {
+const std::shared_ptr<const Int64DataType> GetInt64Type() {
   return kInt64Type;
 }
 

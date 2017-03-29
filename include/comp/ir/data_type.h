@@ -7,21 +7,61 @@ namespace comp {
 namespace ir {
 class DataType {
  public:
-  DataType();
-  virtual ~DataType() = 0;
-  virtual size_t GetSize() const = 0;
-};
+  enum class Type {
+    Void,
+    Uint8,
+    Int32,
+    Int64,
+    Pointer,
+    Array
+  };
 
-class PrimitiveDataType final : public DataType {
  public:
-  static std::unique_ptr<PrimitiveDataType> Create(size_t size);
+  DataType(const Type type);
+  virtual ~DataType() = 0;
 
-  PrimitiveDataType(size_t size);
-  virtual ~PrimitiveDataType();
-  size_t GetSize() const;
  private:
-  const size_t size_;
+  const Type type;
 };
+
+class VoidDataType final : public DataType {
+ public:
+  static std::unique_ptr<VoidDataType> Create();
+
+  VoidDataType();
+  virtual ~VoidDataType();
+};
+
+class IntegerDataType : public DataType {
+ public:
+  IntegerDataType(const Type type);
+  virtual ~IntegerDataType() = 0;
+};
+
+class Uint8DataType final : public IntegerDataType {
+ public:
+  static std::unique_ptr<Uint8DataType> Create();
+
+  Uint8DataType();
+  virtual ~Uint8DataType();
+};
+
+class Int32DataType final : public IntegerDataType {
+ public:
+  static std::unique_ptr<Int32DataType> Create();
+
+  Int32DataType();
+  virtual ~Int32DataType();
+};
+
+class Int64DataType final : public IntegerDataType {
+ public:
+  static std::unique_ptr<Int64DataType> Create();
+
+  Int64DataType();
+  virtual ~Int64DataType();
+};
+
 
 class ArrayDataType final : public DataType {
  public:
@@ -31,10 +71,10 @@ class ArrayDataType final : public DataType {
 
   ArrayDataType(std::shared_ptr<const DataType> item_type, size_t array_length);
   virtual ~ArrayDataType();
-  size_t GetSize() const;
+  size_t GetSize() const; // Returns the number of cells in the array
  private:
   const std::shared_ptr<const DataType> item_type_;
-  const size_t length_;
+  const size_t size_; // Number of cells in the array
 };
 
 class PointerDataType final : public DataType {
@@ -46,7 +86,6 @@ class PointerDataType final : public DataType {
 
   ~PointerDataType();
 
-  size_t GetSize() const;
  private:
   const std::shared_ptr<const DataType> pointed_type_;
 };
