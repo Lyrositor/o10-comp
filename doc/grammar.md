@@ -271,7 +271,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 [PrimaryExpression]: #primaryexpression
 
 - _[VarUpdate]_
-- _[FunctionCall]_
+- _[CallExpression]_
 - _[LValue]_
 - `(` _[Expression]_ `)`
 - _[LiteralExpression]_
@@ -284,16 +284,16 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 - `++` _[LValue]_
 - `--` _[LValue]_
 
-## FunctionCall
-[FunctionCall]: #functioncall
+## CallExpression
+[CallExpression]: #callexpression
 
-- _[Identifier]_ `(` _[FunctionCallParams]_ `)`
+- _[Identifier]_ `(` _[CallExpressionArguments]_ `)`
 - _[Identifier]_ `(` `)`
 
-## FunctionCallParams
-[FunctionCallParams]: #functioncallparams
+## CallExpressionArguments
+[CallExpressionArguments]: #callexpressionarguments
 
-- _[FunctionCallParams]_ `,` _[Expression]_
+- _[CallExpressionArguments]_ `,` _[Expression]_
 - _[Expression]_
 
 ## Statement

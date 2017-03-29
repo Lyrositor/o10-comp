@@ -65,8 +65,9 @@
   /* Temporary vectors */
   std::vector<std::shared_ptr<comp::ast::Declaration>> *declarationsList;
   std::vector<std::shared_ptr<comp::ast::Parameter>> *parametersList;
-  std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> *variableDeclaratorsList;
+  std::vector<std::shared_ptr<comp::ast::RExpression>> *rexpressionsList;
   std::vector<std::shared_ptr<comp::ast::Statement>> *statementsList;
+  std::vector<std::shared_ptr<comp::ast::VariableDeclarator>> *variableDeclaratorsList;
 }
 
 /* Untyped tokens */
@@ -98,7 +99,7 @@
 /* AST nodes */ /*
 %type <arrayDeclarator> */
 %type <blockStatement> block
-%type <callExpression> functionCall
+%type <callExpression> callExpression
 %type <dataType> arrayDataType dataType
 %type <declarator> declarator
 %type <function> functionDeclaration functionDefinition
@@ -115,14 +116,10 @@
 
 /* Temporary vectors */
 %type <declarationsList> declarationsList
-%type <parametersList> parametersList functionCallParams
-%type <variableDeclaratorsList> variableDeclaratorsList
+%type <parametersList> parametersList
+%type <rexpressionsList> callExpressionArguments
 %type <statementsList> blockContent
-
-%left SUBTRACTION_OPERATOR ADDITION_OPERATOR
-%left MULTIPLICATION_OPERATOR DIVISION_OPERATOR
-%left REMAINDER_OPERATOR
-
+%type <variableDeclaratorsList> variableDeclaratorsList
 
 %%
 root:
@@ -236,13 +233,11 @@ declarator:
     std::shared_ptr<comp::ast::Identifier> identifier($1);
     $$ = new comp::ast::ArrayDeclarator(comp::ast::IdentifierDeclarator::Create(identifier, identifier->location), nullptr, LOCATION(&@1));
   }
-/*
   | identifier OPEN_BRACKET expression CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> identifier($1);
-    std::shared_ptr<comp::ast::Expression> size($3);
-    $$ = new comp::ast::ArrayDeclarator(identifier, size, LOCATION(&@1));
+    std::shared_ptr<comp::ast::RExpression> size($3);
+    $$ = new comp::ast::ArrayDeclarator(comp::ast::IdentifierDeclarator::Create(identifier), size, LOCATION(&@1));
   }
-*/
 
 functionDefinition:
     identifierDataType identifier OPEN_PAREN parametersList CLOSE_PAREN block {
@@ -291,7 +286,6 @@ variableDeclarator:
       $$ = new comp::ast::VariableDeclarator(decl, expression, LOCATION(&@1));
   }
 
-
 LValue:
     identifier {
         $$ = $1;
@@ -327,10 +321,10 @@ varUpdate:
         $$ = new comp::ast::UnaryExpression(op, LValue, LOCATION(&@1));
     }
 
-functionCall:
-    identifier OPEN_PAREN functionCallParams CLOSE_PAREN {
+callExpression:
+    identifier OPEN_PAREN callExpressionArguments CLOSE_PAREN {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
-        std::vector<std::shared_ptr<comp::ast::Parameter>> arguments(*$3);
+        std::vector<std::shared_ptr<comp::ast::RExpression>> arguments(*$3);
         delete $3;
         $$ = new comp::ast::CallExpression(identifier, arguments, LOCATION(&@1));
     }
@@ -339,16 +333,16 @@ functionCall:
         $$ = new comp::ast::CallExpression(identifier, {}, LOCATION(&@1));
     }
 
-functionCallParams:
-    functionCallParams COMMA_OPERATOR expression {
+callExpressionArguments:
+    callExpressionArguments COMMA_OPERATOR expression {
         std::shared_ptr<comp::ast::RExpression> expression($3);
-        $1->push_back(expression, LOCATION(&@1));
+        $1->push_back(expression);
         $$ = $1;
     }
     | expression {
         std::shared_ptr<comp::ast::RExpression> expression($1);
-        $$ = new std::vector<std::shared_ptr<comp::ast::Parameter>>;
-        $$->push_back(expression, LOCATION(&@1));
+        $$ = new std::vector<std::shared_ptr<comp::ast::RExpression>>;
+        $$->push_back(expression);
     }
 
 statement:
@@ -361,7 +355,7 @@ statement:
     | block {
         $$ = $1;
     }
-    | /* ifStatement {
+    | ifStatement {
         $$ = $1;
     }
     | whileStatement {
@@ -370,7 +364,7 @@ statement:
     | forStatement {
         $$ = $1;
     }
-    |*/ SEMICOLON{
+    | SEMICOLON{
         $$ = new comp::ast::NullStatement(LOCATION(&@1));
     }
 
@@ -389,19 +383,17 @@ returnStatement:
         $$ = new comp::ast::ReturnStatement(nullptr, LOCATION(&@1));
     }
 
-/*
-
 ifStatement:
     IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement {
         std::shared_ptr<comp::ast::RExpression> test($3);
         std::shared_ptr<comp::ast::Statement> consequence($5);
         std::shared_ptr<comp::ast::Statement> alternative($7);
-        $$ = new comp::ast::IfStatement(comp::ast::IfStatement::test, consequence, alternative, LOCATION(&@1));
+        $$ = new comp::ast::IfStatement(test, consequence, alternative, LOCATION(&@1));
     }
     | IF OPEN_PAREN expression CLOSE_PAREN statement {
-        std::shared_ptr<comp::ast::RExpression> expression($3);
+        std::shared_ptr<comp::ast::RExpression> test($3);
         std::shared_ptr<comp::ast::Statement> consequence($5);
-        $$ = new comp::ast::IfStatement(comp::ast::IfStatement::test, consequence, LOCATION(&@1));
+        $$ = new comp::ast::IfStatement(test, consequence, nullptr, LOCATION(&@1));
     }
 
 whileStatement:
@@ -412,22 +404,21 @@ whileStatement:
     }
 
 forStatement:
-    FOR OPEN_PAREN expressionOrVoid SEMICOLON expressionOrVoid SEMICOLON expressionOrVoid CLOSE_PAREN statement {
+    FOR OPEN_PAREN expression SEMICOLON expression SEMICOLON expression CLOSE_PAREN statement {
         std::shared_ptr<comp::ast::RExpression> initialization($3);
         std::shared_ptr<comp::ast::RExpression> condition($5);
         std::shared_ptr<comp::ast::RExpression> iteration($7);
         std::shared_ptr<comp::ast::Statement> body($9);
         $$ = new comp::ast::ForStatement(initialization, condition, iteration, body, LOCATION(&@1));
     }
-    | FOR OPEN_PAREN variableDeclaration expressionOrVoid SEMICOLON expressionOrVoid CLOSE_PAREN statement {
-        std::shared_ptr<comp::ast::VariableDeclaration> initialization($3);
+    /*| FOR OPEN_PAREN variableDeclaration expression SEMICOLON expression CLOSE_PAREN statement {
+        std::shared_ptr<comp::ast::VariableDeclaration> variableDeclaration($2);
+        std::shared_ptr<comp::ast::RExpression> initialization($3);
         std::shared_ptr<comp::ast::RExpression> condition($4);
         std::shared_ptr<comp::ast::RExpression> iteration($6);
         std::shared_ptr<comp::ast::Statement> body($8);
         $$ = new comp::ast::ForStatement(initialization, condition, iteration, body, LOCATION(&@1));
-    }
-
-*/
+    }*/
 
 block:
      OPEN_BRACE blockContent CLOSE_BRACE {
@@ -731,7 +722,7 @@ primaryExpression:
     varUpdate{
         $$ = $1;
     }
-    | functionCall {
+    | callExpression {
         $$ = $1;
     }
     | LValue {
