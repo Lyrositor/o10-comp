@@ -17,6 +17,7 @@ add_subdirectory(src/lib)
 
 set(
   MAIN_SOURCES
+  src/main/error_handling.cpp
   src/main/main.cpp
 )
 add_executable(comp_main ${MAIN_SOURCES})
