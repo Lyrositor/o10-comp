@@ -6,7 +6,8 @@ std::unique_ptr<ControlFlowGraph> ControlFlowGraph::Create() {
   return std::unique_ptr<ControlFlowGraph>(new ControlFlowGraph());
 }
 
-ControlFlowGraph::ControlFlowGraph() {
+ControlFlowGraph::ControlFlowGraph() :
+  source_(std::unique_ptr<BasicBlock>(new BasicBlock())) {
 }
 
 ControlFlowGraph::~ControlFlowGraph() {
@@ -20,8 +21,12 @@ std::shared_ptr<BasicBlock> ControlFlowGraph::CreateBasicBlock(
   return block;
 }
 
-std::set<std::shared_ptr<BasicBlock>> ControlFlowGraph::GetBasicBlocks() {
+std::set<std::shared_ptr<BasicBlock>> ControlFlowGraph::GetBasicBlocks() const {
   return blocks_;
 }
+
+std::shared_ptr<BasicBlock> ControlFlowGraph::GetSource() const {
+  return source_;
 }
-}
+}  // namespace ir
+}  // namespace comp

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <set>
+#include <vector>
 
 #include "comp/ir/basic_block.h"
 
@@ -10,7 +11,6 @@ namespace ir {
 class ControlFlowGraph {
  public:
   static std::unique_ptr<ControlFlowGraph> Create();
-
   ControlFlowGraph();
 
   virtual ~ControlFlowGraph();
@@ -18,10 +18,13 @@ class ControlFlowGraph {
   std::shared_ptr<BasicBlock> CreateBasicBlock(
     std::vector<std::shared_ptr<Op>> ops = std::vector<std::shared_ptr<Op>>());
 
-  std::set<std::shared_ptr<BasicBlock>> GetBasicBlocks();
+  std::set<std::shared_ptr<BasicBlock>> GetBasicBlocks() const;
+
+  std::shared_ptr<BasicBlock> GetSource() const;
 
  private:
   std::set<std::shared_ptr<BasicBlock>> blocks_;
+  const std::shared_ptr<BasicBlock> source_;
 };
 }
 }

@@ -95,8 +95,8 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
 
   // Generate the function's control flow graph
   std::shared_ptr<ControlFlowGraph> cfg = ControlFlowGraph::Create();
-  std::shared_ptr<BasicBlock> first_block = cfg->CreateBasicBlock();
-  BuildBlockStatementIR(*node.body, function_context, cfg, first_block);
+  std::shared_ptr<BasicBlock> source = cfg->GetSource();
+  BuildBlockStatementIR(*node.body, function_context, cfg, source);
   function->SetBody(cfg);
   function->SetLocalVariables(function_context.GetVariables());
 
