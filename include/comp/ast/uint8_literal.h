@@ -11,7 +11,7 @@ struct Uint8Literal final : public Literal {
     uint8_t value,
     std::shared_ptr<SourceLocation> location = nullptr);
 
-  Uint8Literal(uint8_t value, std::shared_ptr<SourceLocation> location);
+  Uint8Literal(uint8_t value, std::shared_ptr<SourceLocation> location = nullptr);
 
   virtual ~Uint8Literal();
 

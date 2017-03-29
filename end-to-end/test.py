@@ -97,7 +97,10 @@ class TestCase:
     def __init__(self, dir):
         self.dir = dir
         with open(os.path.join(dir, CONFIG_FILE_NAME), "r") as config_file:
-            self.config = TestConfig.from_json(config_file.read(), dir)
+            try:
+                self.config = TestConfig.from_json(config_file.read(), dir)
+            except:
+                raise Exception("Invalid test config: " + os.path.join(dir, CONFIG_FILE_NAME))
 
     def run(self):
         if self.config.disabled:

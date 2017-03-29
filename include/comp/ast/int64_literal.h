@@ -11,7 +11,7 @@ struct Int64Literal final : public Literal {
     int64_t value,
     std::shared_ptr<SourceLocation> location = nullptr);
 
-  Int64Literal(int64_t value, std::shared_ptr<SourceLocation> location);
+  Int64Literal(int64_t value, std::shared_ptr<SourceLocation> location = nullptr);
 
   virtual ~Int64Literal();
 
