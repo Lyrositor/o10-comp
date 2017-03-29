@@ -1,0 +1,6 @@
+comp:
+    image: demurgos/cpp:insa-gcc-5
+    container_name: comp
+    volumes:
+      - .:/comp
+    working_dir: /comp
