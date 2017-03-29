@@ -93,12 +93,8 @@ void yy_scan_string(const char *str);
 %type <lExpression> lExpression LValue
 %type <identifierDataType> identifierDataType
 %type <program> program root
-%type <rExpression> assignmentExpression charLiteral expression expressionOrVoid hexIntegerLiteral unaryExpression multiplicativeExpression conditionalExpression additiveExpression primaryExpression shiftExpression relationalExpression equalityExpression ANDExpression exclusiveORExpression inclusiveORExpression logicalANDExpression logicalORExpression  varUpdate literalExpr
-%type <statement> statement
-%type <ifStatement> ifStatement
-%type <forStatement> forStatement
-%type <whileStatement> whileStatement
-%type <returnStatement> returnStatement
+%type <rExpression> assignmentExpression charLiteral expression hexIntegerLiteral unaryExpression multiplicativeExpression conditionalExpression additiveExpression primaryExpression shiftExpression relationalExpression equalityExpression ANDExpression exclusiveORExpression inclusiveORExpression logicalANDExpression logicalORExpression  varUpdate literalExpr
+%type <statement> forStatement ifStatement returnStatement statement whileStatement
 %type <expressionStatement> expressionStatement
 %type <parameter> parameter
 %type <variableDeclaration> variableDeclaration
@@ -342,7 +338,7 @@ functionCall:
 */
 
 statement:
-    /* expressionStatement {
+    expressionStatement {
         $$ = $1;
     }
     | returnStatement {
@@ -351,7 +347,7 @@ statement:
     | block {
         $$ = $1;
     }
-    | ifStatement {
+    | /* ifStatement {
         $$ = $1;
     }
     | whileStatement {
@@ -371,13 +367,15 @@ expressionStatement:
     }
 
 returnStatement:
-    RETURN expressionOrVoid SEMICOLON {
-        std::shared_ptr<comp::ast::Identifier> expression($2);
+    RETURN expression SEMICOLON {
+        std::shared_ptr<comp::ast::RExpression> expression($2);
         $$ = new comp::ast::ReturnStatement(expression);
     }
     | RETURN SEMICOLON {
-        $$ = new comp::ast::ReturnStatement();
+        $$ = new comp::ast::ReturnStatement(nullptr);
     }
+
+/*
 
 ifStatement:
     IF OPEN_PAREN expression CLOSE_PAREN statement ELSE statement {
@@ -415,6 +413,8 @@ forStatement:
         $$ = new comp::ast::ForStatement(initialization, condition, iteration, body);
     }
 
+*/
+
 block:
      OPEN_BRACE blockContent CLOSE_BRACE {
         std::vector<std::shared_ptr<comp::ast::Statement>> body(*$2);
@@ -445,15 +445,6 @@ blockContent:
         std::shared_ptr<comp::ast::Statement> statement($1);
         $$ = new std::vector<std::shared_ptr<comp::ast::Statement>>();
         $$->push_back(statement);
-    }
-
-expressionOrVoid:
-    expression{
-        std::shared_ptr<comp::ast::RExpression> expression($1);
-        $$ = new comp::ast::RExpression(expression);
-    }
-    | {
-        $$ = new comp::ast::RExpression();
     }
 
 literalExpr:
