@@ -698,7 +698,6 @@ multiplicativeExpression:
         $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Remainder, multiplicativeExpression, unaryExpression);
     }
     | unaryExpression {
-        std::shared_ptr<comp::ast::RExpression> unaryExpression($1);
         $$ = $1;
     }
 
