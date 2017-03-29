@@ -33,7 +33,6 @@ int main(int argc, char **argv) {
   try {
     std::shared_ptr<comp::ast::Program>
       program = comp::parser::parse(content);
-    std::cout << program->location->start.index << ' ' << program->location->end.index << std::endl;
 
     std::unique_ptr<rapidjson::Document>
       document = comp::ast::ProgramToJson(*program);
