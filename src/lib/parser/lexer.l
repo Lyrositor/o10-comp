@@ -65,7 +65,7 @@
 ","           {return COMMA_OPERATOR;}
 "~"           {return BINARY_ONES_COMPLEMENT_OPERATOR;}
 "?"                               {return QUESTION_MARK;}
-"?"                               {return COLON;}
+":"                               {return COLON;}
 "char"                            {return CHAR_TYPE;}
 "int32_t"                         {return INT32_TYPE;}
 "int64_t"                         {return INT64_TYPE;}

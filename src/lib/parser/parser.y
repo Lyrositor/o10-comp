@@ -41,6 +41,11 @@ void yy_scan_string(const char *str);
   comp::ast::ConditionalExpression *conditionalExpression;
   comp::ast::UnaryExpression *unaryExpression;
   comp::ast::Statement *statement;
+  comp::ast::ForStatement *forStatement;
+  comp::ast::IfStatement *ifStatement;
+  comp::ast::WhileStatement *whileStatement;
+  comp::ast::ForStatement *returnStatement;
+  comp::ast::ExpressionStatement *expressionStatement;
   comp::ast::Parameter *parameter;
   comp::ast::VariableDeclaration *variableDeclaration;
   comp::ast::VariableDeclarator *variableDeclarator;
@@ -79,7 +84,7 @@ void yy_scan_string(const char *str);
 
 /* AST nodes */ /*
 %type <arrayDeclarator> */
-%type <blockStatement> block
+%type <blockStatement> block blockContent
 %type <callExpression> functionCall
 %type <conditionalExpression> conditionalExpression
 %type <dataType> arrayDataType dataType
@@ -89,39 +94,23 @@ void yy_scan_string(const char *str);
 %type <lExpression> LValue
 %type <identifierDataType> identifierDataType
 %type <program> program root
-%type <rExpression> expression charLiteral multiplicativeExpression additiveExpression primaryExpression shiftExpression relationalExpression equalityExpression ANDExpression exclusiveORExpression inclusiveORExpression logicalANDExpression logicalORExpression assignementExpression varUpdate literalExpr
+%type <rExpression> expression expressionOrVoid charLiteral hexIntegerLiteral multiplicativeExpression additiveExpression primaryExpression shiftExpression relationalExpression equalityExpression ANDExpression exclusiveORExpression inclusiveORExpression logicalANDExpression logicalORExpression assignementExpression varUpdate literalExpr
 %type <unaryExpression> unaryExpression
+%type <statement> statement
+%type <ifStatement> ifStatement
+%type <forStatement> forStatement
+%type <whileStatement> whileStatement
+%type <returnStatement> returnStatement
+%type <expressionStatement> expressionStatement
 %type <parameter> parameter
 %type <variableDeclaration> variableDeclaration
 %type <variableDeclarator> variableDeclarator
 
-
 /* Temporary vectors */
 %type <declarationsList> declarationsList
-%type <parametersList> parametersList
+%type <parametersList> parametersList functionCallParams
 %type <variableDeclaratorsList> variableDeclaratorsList
 
-/*
-
-%type <declarationsList>
-%type <parametersList>  functionCallParams
-%type <variableDeclaratorsList> variableDeclaratorsList
-%type <unaryExpression> unaryExpression varUpdate
-%type <dataType> dataType
-%type <declarator>
-%type <identifierDataType> identifierDataType  literalExpr
-%type <arrayDataType> arrayDataType
-%type <parameter> parameter
-%type <statement> statement
-%type <expressionStatement> expressionStatement
-%type <ifStatement> ifStatement
-%type <whileStatement> whileStatement
-%type <forStatement> forStatement
-%type <block_statement> blockContent block
-%type <returnStatement> returnStatement
-%type <lvalue> LValue
-%type <callExpression> functionCall
-*/
 %left SUBTRACTION_OPERATOR ADDITION_OPERATOR
 %left MULTIPLICATION_OPERATOR DIVISION_OPERATOR
 %left REMAINDER_OPERATOR
@@ -241,9 +230,9 @@ declarator:
   }
 /*
   | identifier OPEN_BRACKET expression CLOSE_BRACKET {
-    std::shared_ptr<comp::ast::Identifier> declarator($1);
+    std::shared_ptr<comp::ast::Identifier> identifier($1);
     std::shared_ptr<comp::ast::Expression> size($3);
-    $$ = new comp::ast::ArrayDeclarator(declarator, size);
+    $$ = new comp::ast::ArrayDeclarator(identifier, size);
   }
 */
 
@@ -289,9 +278,9 @@ variableDeclarator:
       $$ = new comp::ast::VariableDeclarator(declarator, nullptr);
   }
   /*| declarator EQUAL_OPERATOR expression {
-      std::shared_ptr<comp::ast::Declarator> decl1($1);
-      std::shared_ptr<comp::ast::Declarator> expression($3);
-      $$ = new comp::ast::VariableDeclarator(decl1, expression);
+      std::shared_ptr<comp::ast::Declarator> decl($1);
+      std::shared_ptr<comp::ast::RExpression> expression($3);
+      $$ = new comp::ast::VariableDeclarator(decl, expression);
   }*/
 
 
@@ -333,16 +322,16 @@ varUpdate:
     }
 
 functionCall:
-    /*identifier OPEN_PAREN functionCallParams CLOSE_PAREN {
+    identifier OPEN_PAREN functionCallParams CLOSE_PAREN {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
         std::vector<std::shared_ptr<comp::ast::Parameter>> functionCallParams($3);
         $$ = new comp::ast::CallExpression(identifier, functionCallParams);
     }
-    | */ identifier OPEN_PAREN CLOSE_PAREN {
+    | identifier OPEN_PAREN CLOSE_PAREN {
         std::shared_ptr<comp::ast::Identifier> identifier($1);
         $$ = new comp::ast::CallExpression(identifier);
     }
-/*
+
 functionCallParams:
     functionCallParams COMMA_OPERATOR expression {
         std::vector<std::shared_ptr<comp::ast::Parameter>> functionCallParams($1);
@@ -433,16 +422,16 @@ forStatement:
         std::shared_ptr<comp::ast::Statement> body($8);
         $$ = new comp::ast::ForStatement(initialization, condition, iteration, body);
     }
-*/
+
 block:
-    /* OPEN_BRACE blockContent CLOSE_BRACE {
+     OPEN_BRACE blockContent CLOSE_BRACE {
         std::shared_ptr<comp::ast::BlockStatement> blockContent($2);
         $$ = new comp::ast::BlockStatement(blockContent);
     }
-    | */ OPEN_BRACE CLOSE_BRACE {
+    | OPEN_BRACE CLOSE_BRACE {
         $$ = new comp::ast::BlockStatement({});
     }
-/*
+
 blockContent:
     blockContent statement {
         std::shared_ptr<comp::ast::BlockStatement> blockContent($1);
@@ -463,7 +452,7 @@ expressionOrVoid:
     | {
         $$ = new comp::ast::RExpression();
     }
-*/
+
 literalExpr:
     INTEGER_LITERAL {
         std::shared_ptr<comp::ast::Int64Literal> int($1);
@@ -473,15 +462,20 @@ literalExpr:
         std::shared_ptr<comp::ast::Literal> char($1);
         $$ = new comp::ast::Uint8Literal(char, nullptr);
     }
-    /* | hexIntegerLiteral {
+    | hexIntegerLiteral {
         std::shared_ptr<comp::ast::Literal> hex($1);
         $$ = new comp::ast::RExpression(hex);
     }
-*/
+
 charLiteral:
     SIMPLE_QUOTE CHAR_ATOM SIMPLE_QUOTE {
         $$ = new comp::ast::Uint8Literal($2, nullptr);
     }
+
+/* TO DO */
+hexIntegerLiteral:
+    SIMPLE_QUOTE { $$ = 2; }
+
 
 expression:
     expression COMMA_OPERATOR expression {
