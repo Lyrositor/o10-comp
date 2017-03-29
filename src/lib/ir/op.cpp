@@ -75,6 +75,25 @@ BinOp::BinOp(
 BinOp::~BinOp() {
 }
 
+std::unique_ptr<UnaryOp> UnaryOp::Create(std::shared_ptr<VariableOperand> out,
+                                         UnaryOp::UnaryOperator unaryOperator,
+                                         std::shared_ptr<Operand> in1) {
+  return std::unique_ptr<UnaryOp>(new UnaryOperator(out, unaryOperator, in1));
+}
+
+UnaryOp::UnaryOp(std::shared_ptr<VariableOperand> out,
+                 UnaryOp::UnaryOperator unaryOperator,
+                 std::shared_ptr<Operand> in1
+) :
+  Op(Op::Type::UnaryOp),
+  out(out),
+  unaryOperator(unaryOperator),
+  in1(in1) {
+}
+
+UnaryOp::~UnaryOp() {
+}
+
 std::unique_ptr<Copy> Copy::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
   return std::unique_ptr<Copy>(new Copy(out, in));
 }
@@ -100,5 +119,6 @@ NoOp::~NoOp() {
 std::unique_ptr<NoOp> NoOp::Create() {
   return std::unique_ptr<NoOp>(new NoOp());
 }
+
 }
 }

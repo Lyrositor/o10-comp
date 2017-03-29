@@ -48,6 +48,7 @@ struct Op {
   enum class Type {
     Call,
     BinOp,
+    UnaryOp,
     Copy,
     Comp,
     NoOp
@@ -74,7 +75,7 @@ struct Call final : public Op {
 };
 
 /**
- * Compute the value of the two variables `in1` and `in2` with the operator `binaryOperator` and store the result in `out`.
+ * Compute the value of the two variables `in1` and `in2` transformed with the operator `binaryOperator` and store the result in `out`.
  */
 struct BinOp final : public Op {
   enum class BinaryOperator {
@@ -104,6 +105,25 @@ struct BinOp final : public Op {
   BinaryOperator binaryOperator;
   std::shared_ptr<Operand> in1;
   std::shared_ptr<Operand> in2;
+};
+
+/**
+ * Compute the value of the variable `in1` transformed with the operator `unaryOperator` and store the result in `out`.
+ */
+struct UnaryOp final : public Op {
+  enum class UnaryOperator {
+    BitwiseComplement, // ~expression
+    LogicalNegation, // !expression
+    UnaryMinus, // -expression
+  };
+
+  static std::unique_ptr<UnaryOp> Create(std::shared_ptr<VariableOperand> out, UnaryOperator unaryOperator, std::shared_ptr<Operand> in1);
+  UnaryOp(std::shared_ptr<VariableOperand> out, UnaryOperator unaryOperator, std::shared_ptr<Operand> in1);
+  virtual ~UnaryOp();
+
+  std::shared_ptr<VariableOperand> out;
+  UnaryOperator unaryOperator;
+  std::shared_ptr<Operand> in1;
 };
 
 /**
