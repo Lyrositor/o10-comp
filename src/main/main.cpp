@@ -5,59 +5,217 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <comp/ir/program.h>
-#include <comp/ir/build_ir.h>
-#include <comp/as/ast.h>
-#include <comp/backend/x86/build_asm.h>
-#include <comp/as/emit.h>
 
+#include <optionparser.h>
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
 
+#include <comp/as/ast.h>
+#include <comp/as/emit.h>
 #include <comp/ast/to_json.h>
+#include <comp/backend/x86/build_asm.h>
+#include <comp/ir/build_ir.h>
+#include <comp/ir/program.h>
 #include <comp/exceptions.h>
 #include <comp/parser.h>
 
 #include "error_handling.h"
 
+enum Options {Unknown, File, Help, Compile, Analyse, Optimise, Json, Output};
+
+static const option::Descriptor kUsage[] = {
+  {
+    Unknown,
+    0,
+    "",
+    "",
+    option::Arg::None,
+    "Usage: o10c [options] file\nOptions:"
+  },
+  {
+    File,
+    0,
+    "",
+    "",
+    option::Arg::Optional,
+    "  file \tThe C file to analyse or compile."
+  },
+  {
+    Help,
+    0,
+    "h",
+    "help",
+    option::Arg::None,
+    "  --help, -h \tDisplay this information."
+  },
+  {
+    Compile,
+    0,
+    "c",
+    "compile",
+    option::Arg::None,
+    "  --compile, -c \tCompile the provided file to the GNU Assembler format."
+  },
+  {
+    Analyse,
+    0,
+    "a",
+    "analyse",
+    option::Arg::None,
+    "  --analyse, -a \tStatically analyse the provided file."
+  },
+  {
+    Optimise,
+    0,
+    "o",
+    "optimise",
+    option::Arg::None,
+    "  --optimise, -o \tAttempt to optimise the generated code."
+  },
+  {
+    Json,
+    0,
+    "j",
+    "json",
+    option::Arg::None,
+    "  --json, -j \tDisplay a JSON representation of the generated syntax tree."
+  },
+  {
+    Output,
+    0,
+    "",
+    "output",
+    option::Arg::Optional,
+    "  --output \tOutput path for the ASM file."
+  },
+  {0, 0, 0, 0, 0, 0}
+};
+
+int main_exit(int retcode, option::Option buffer[], option::Option options[]) {
+  delete[] buffer;
+  delete[] options;
+  return retcode;
+}
+
 int main(int argc, char **argv) {
-  if (argc < 2) {
-    std::cout << "Expected at least one argument" << std::endl;
-    return EXIT_FAILURE;
+  // Skip program name argv[0] if present
+  argc -= argc > 0;
+  argv += argc > 0;
+
+  // Parse the command-line arguments
+  option::Stats stats(kUsage, argc, argv);
+  option::Option *options = new option::Option[stats.options_max];
+  option::Option *buffer = new option::Option[stats.buffer_max];
+  option::Parser parse(kUsage, argc, argv, options, buffer);
+
+  if (parse.error()) {
+    std::cerr << "o10c: fatal error: could not parse arguments" << std::endl;
+    std::cerr << "compilation terminated." << std::endl;
+    return main_exit(EXIT_FAILURE, buffer, options);
   }
 
-  std::ifstream ifs(argv[1]);
+  // Display an error message if requested or if no arguments were provided
+  if (options[Help] || argc == 0) {
+    option::printUsage(std::cout, kUsage);
+    return main_exit(EXIT_SUCCESS, buffer, options);
+  }
+
+  // Notify the user of any unknown options
+  for (option::Option *opt = options[Unknown]; opt; opt = opt->next()) {
+    std::cerr << "o10c: warning: unknown option: " << opt->name << std::endl;
+  }
+
+  // Ensure the user has provided a valid filename
+  if (parse.nonOptionsCount() == 0) {
+    std::cerr << "o10c: fatal error: no input files" << std::endl;
+    std::cerr << "compilation terminated." << std::endl;
+    return main_exit(EXIT_FAILURE, buffer, options);
+  }
+  std::string filename(parse.nonOptions()[0]);
+  if (parse.nonOptionsCount() > 1) {
+    std::cerr << "o10c: warning: only '" << filename << "' will be processed";
+    std::cerr << std::endl;
+  }
+  if (filename.substr(filename.length() - 2) != ".c") {
+    std::cerr << "o10c: fatal error: invalid file extension" << std::endl;
+    std::cerr << "compilation terminated." << std::endl;
+    return main_exit(EXIT_FAILURE, buffer, options);
+  }
+
+  // Read the provided file
+  std::ifstream ifs(filename);
   if (ifs.fail()) {
-    std::cerr << strerror(errno) << std::endl;
-    return EXIT_FAILURE;
+    std::cerr << "o10c: error: " << filename << ": " << strerror(errno);
+    std::cerr << std::endl;
+    std::cerr << "o10c: fatal error: no input files" << std::endl;
+    std::cerr << "compilation terminated." << std::endl;
+    return main_exit(EXIT_FAILURE, buffer, options);
   }
   std::string content(
     (std::istreambuf_iterator<char>(ifs)),
     (std::istreambuf_iterator<char>()));
 
+  // Try to parse the provided file, then perform additional operations if
+  // the user has requested them
   try {
-    std::shared_ptr<comp::ast::Program>
-      programAst = comp::parser::parse(content);
+    std::shared_ptr<comp::ast::Program> program_ast = comp::parser::parse(
+      content);
 
-    if (argc == 2) {
-      std::unique_ptr<rapidjson::Document>
-        document = comp::ast::ProgramToJson(*programAst);
-      rapidjson::StringBuffer buffer;
-      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    // Perform static analysis of the provided source file
+    if (options[Analyse]) {
+      // TODO(Lyrositor) Perform static analysis on program
+    }
+
+    // Display a JSON representation of the AST
+    if (options[Json]) {
+      std::unique_ptr<rapidjson::Document> document = comp::ast::ProgramToJson(
+        *program_ast);
+      rapidjson::StringBuffer json_buffer;
+      rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(json_buffer);
       document->Accept(writer);
-      std::cout << buffer.GetString() << std::endl;
-    } else { // Example: comp_main main.c asm
-      std::shared_ptr<comp::ir::Program> programIr = comp::ir::BuildProgramIR(*programAst);
-      std::shared_ptr<comp::as::ast::Program> programAsm = comp::backend::x86::BuildProgram(*programIr);
-      comp::as::emitProgram(*programAsm, std::cout);
+      std::cout << json_buffer.GetString() << std::endl;
+    }
+
+    // Compile the provided source file to an assembly file
+    if (options[Compile]) {
+      std::string asm_filename = filename.substr(0, filename.size()-1) + "asm";
+      if (options[Output]) {
+        if (options[Output].arg == NULL) {
+          std::cerr << "o10c: fatal error: output file path not specified";
+          std::cerr << std::endl;
+          std::cerr << "compilation terminated." << std::endl;
+          return main_exit(EXIT_FAILURE, buffer, options);
+        }
+        asm_filename = options[Output].arg;
+      }
+      std::ofstream ofs(asm_filename);
+      if (ofs.fail()) {
+        std::cerr << "o10c: error: " << asm_filename << ": " << strerror(errno);
+        std::cerr << std::endl;
+        std::cerr << "o10c: fatal error: failed to open output file";
+        std::cerr << std::endl;
+        std::cerr << "compilation terminated." << std::endl;
+        return main_exit(EXIT_FAILURE, buffer, options);
+      }
+      std::shared_ptr<comp::ir::Program> program_ir = comp::ir::BuildProgramIR(
+        *program_ast);
+
+      // Optimise the generated code
+      if (options[Optimise]) {
+        // TODO(Lyrositor) Optimise the generated code
+      }
+
+      std::shared_ptr<comp::as::ast::Program>
+        program_asm = comp::backend::x86::BuildProgram(*program_ir);
+      comp::as::emitProgram(*program_asm, ofs);
     }
   } catch (comp::SyntaxException &e) {
-    PrintSyntaxException(e, content, argv[1]);
-    return EXIT_FAILURE;
-  } catch  (comp::Exception &e) {
+    PrintSyntaxException(e, content, filename);
+    return main_exit(EXIT_FAILURE, buffer, options);
+  } catch (std::exception &e) {
     PrintException(e);
-    return EXIT_FAILURE;
+    return main_exit(EXIT_FAILURE, buffer, options);
   }
 
-  return EXIT_SUCCESS;
+  return main_exit(EXIT_SUCCESS, buffer, options);
 }

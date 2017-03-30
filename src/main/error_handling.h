@@ -6,12 +6,12 @@
 
 #include <comp/exceptions.h>
 
-void PrintException(const comp::Exception &exception);
+void PrintException(const std::exception &exception);
 
 void PrintSyntaxException(
   const comp::SyntaxException &exception,
   const std::string &content,
-  const char *filename);
+  const std::string &filename);
 
 size_t GetLineStartFromIndex(size_t start_idx, const std::string &content);
 

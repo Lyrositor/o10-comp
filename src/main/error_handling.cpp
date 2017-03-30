@@ -7,14 +7,15 @@
 
 static const unsigned int TAB_WIDTH = 8;
 
-void PrintException(const comp::Exception &exception) {
-  std::cerr << "error: " << exception.what() << std::endl;
+void PrintException(const std::exception &exception) {
+  std::cerr << "o10c: fatal error: " << exception.what();
+  std::cerr << std::endl;
 }
 
 void PrintSyntaxException(
   const comp::SyntaxException &exception,
   const std::string &content,
-  const char *filename) {
+  const std::string &filename) {
   std::shared_ptr<comp::ast::SourceLocation> l = exception.GetLocation();
 
   // Display the error and its message

@@ -24,11 +24,11 @@ class Compiler:
 DEFAULT_O10_COMP_PATH = os.path.join(PROJECT_ROOT, "build", "comp_main")
 
 # Try to get the o10 compiler path from the environment, else use the default value
-o10_path = os.environ["O10_COMP_PATH"] if "O10_COMP_PATH" in os.environ else DEFAULT_O10_COMP_PATH
+o10c_path = os.environ["O10_COMP_PATH"] if "O10_COMP_PATH" in os.environ else DEFAULT_O10_COMP_PATH
 
 clang = Compiler("clang", "clang")
 gcc = Compiler("gcc", "gcc")
-o10 = Compiler("o10", o10_path)
+o10c = Compiler("o10c", o10c_path)
 
 DEFAULT_ASSEMBLY_GENERATION_CONFIGURATIONS = {
     "gcc-0": (gcc, ["-S", "-O0", "-fno-asynchronous-unwind-tables"]),
@@ -39,6 +39,7 @@ DEFAULT_ASSEMBLY_GENERATION_CONFIGURATIONS = {
     "clang-1": (clang, ["-S", "-O1", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
     "clang-2": (clang, ["-S", "-O2", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
     "clang-3": (clang, ["-S", "-O3", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
+    #"o10c": (o10c, ["-c"])
 }
 
 ERRORS_ENUM = {"syntax"}
@@ -122,7 +123,7 @@ class TestCase:
             return "hidden", None
 
         completed_process = subprocess.run(
-            [o10.path, self.config.source_path],
+            [o10c.path, "-j", self.config.source_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -191,12 +192,9 @@ class TestCase:
         if not self.config.generate_assembly:
             return "hidden", None
 
-        # Disable assembly generation until command line arguments to control it are available
-        return "disabled", None
-
         for config_name, (compiler, options) in self.config.assembly_generation_configs.items():
             output_name = "{}.{}.asm".format(self.config.source_path, config_name)
-            arguments = [compiler.path] + options + ["-o", output_name, self.config.source_path]
+            arguments = [compiler.path] + options + ["--output", output_name, self.config.source_path]
 
             completed_process = subprocess.run(
                 arguments,

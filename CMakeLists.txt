@@ -12,7 +12,11 @@ endif ()
 set(CMAKE_SOURCE_DIR src)
 
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR} include "vendor/rapidjson/include")
+include_directories(
+  ${CMAKE_CURRENT_BINARY_DIR}
+  include
+  vendor/rapidjson/include
+  vendor/optionparser/)
 add_subdirectory(src/lib)
 
 set(
