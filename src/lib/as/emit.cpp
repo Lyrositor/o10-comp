@@ -75,7 +75,7 @@ void emitAlignDirective(const ast::AlignDirective &node, std::ostream &out) {
 void emitCfiDefCfaOffsetDirective(const ast::CfiDefCfaOffsetDirective &node, std::ostream &out) {
   emitLabels(node.labels, out, true);
   out << ".cfi_def_cfa_offset ";
-  emitExpression(*node.size, out);
+  emitExpression(*node.offset, out);
   out << "\n";
 }
 
