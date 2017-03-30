@@ -60,7 +60,7 @@ TEST(comp__as__emit, DiscriminantProgram) {
   expected << ".cfi_endproc\n";
 
   std::stringstream actual;
-  emitProgram(*program, actual);
+  EmitProgram(*program, actual);
 
   EXPECT_EQ(expected.str(), actual.str());
 }
