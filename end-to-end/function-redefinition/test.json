@@ -1,4 +1,5 @@
 {
   "source": "main.c",
-  "error": "syntax"
+  "error": "syntax",
+  "assembly": true
 }

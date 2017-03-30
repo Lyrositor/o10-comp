@@ -21,25 +21,24 @@ class Compiler:
     def generate_assembly(self, directory, source_path):
         pass
 
-# Try to get the o10 compiler path from the environment
-try:
-    o10_path = os.environ["O10_COMP_PATH"]
-except KeyError:
-    o10_path = os.path.join(PROJECT_ROOT, "build", "comp_main")
+DEFAULT_O10_COMP_PATH = os.path.join(PROJECT_ROOT, "build", "comp_main")
+
+# Try to get the o10 compiler path from the environment, else use the default value
+o10_path = os.environ["O10_COMP_PATH"] if "O10_COMP_PATH" in os.environ else DEFAULT_O10_COMP_PATH
 
 clang = Compiler("clang", "clang")
-gcc = Compiler("g++", "g++")
+gcc = Compiler("gcc", "gcc")
 o10 = Compiler("o10", o10_path)
 
 DEFAULT_ASSEMBLY_GENERATION_CONFIGURATIONS = {
-    "gcc-0": (gcc, ["-S", "-O0"]),
-    "gcc-1": (gcc, ["-S", "-O1"]),
-    "gcc-2": (gcc, ["-S", "-O2"]),
-    "gcc-3": (gcc, ["-S", "-O3"]),
-    "clang-0": (clang, ["-S", "-O0", "-Wno-main-return-type"]),
-    "clang-1": (clang, ["-S", "-O1", "-Wno-main-return-type"]),
-    "clang-2": (clang, ["-S", "-O2", "-Wno-main-return-type"]),
-    "clang-3": (clang, ["-S", "-O3", "-Wno-main-return-type"]),
+    "gcc-0": (gcc, ["-S", "-O0", "-fno-asynchronous-unwind-tables"]),
+    "gcc-1": (gcc, ["-S", "-O1", "-fno-asynchronous-unwind-tables"]),
+    "gcc-2": (gcc, ["-S", "-O2", "-fno-asynchronous-unwind-tables"]),
+    "gcc-3": (gcc, ["-S", "-O3", "-fno-asynchronous-unwind-tables"]),
+    "clang-0": (clang, ["-S", "-O0", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
+    "clang-1": (clang, ["-S", "-O1", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
+    "clang-2": (clang, ["-S", "-O2", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
+    "clang-3": (clang, ["-S", "-O3", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
 }
 
 ERRORS_ENUM = {"syntax"}
@@ -75,6 +74,8 @@ class TestConfig():
             if config.expect_error not in ERRORS_ENUM:
                 raise Exception("Invalid value for `error` ({}), expected one of: {}"
                                 .format(doc["error"], ", ".join(ERRORS_ENUM)))
+            if config.expect_error == "syntax":
+                config.test_ast = True
 
         if "expected-ast" in doc and doc["expected-ast"] is not None:
             config.test_ast = True
@@ -104,9 +105,15 @@ class TestCase:
 
     def run(self):
         if self.config.disabled:
-            return {"ast": ("disabled", None)}
+            return {
+                "ast": ("disabled", None),
+                "std-assembly": ("disabled", None)
+            }
         else:
-            return {"ast": self.run_ast()}
+            return {
+                "ast": self.run_ast(),
+                "std-assembly": self.run_assembly()
+            }
 
     def run_ast(self):
         if self.config.disabled:
@@ -148,6 +155,18 @@ class TestCase:
                    ).format(stdout, stderr, err)
             return "error", msg
 
+        if self.config.expect_error == "syntax":
+            if completed_process.returncode == 0:
+                msg = ("Expected syntax error, but got zero return code:\n"
+                       "Stdout:\n"
+                       "{}\n"
+                       "Stderr:\n"
+                       "{}"
+                       ).format(stdout, stderr)
+                return "error", msg
+            else:
+                return "success", None
+
         if self.config.actual_ast_path is not None:
             with open(self.config.actual_ast_path, "w") as actual_ast_file:
                 actual_ast_file.write(stdout)
@@ -167,8 +186,49 @@ class TestCase:
         return "success", None
 
     def run_assembly(self):
-        if self.config.disabled or not self.config.generate_assembly:
+        if self.config.disabled:
             return "disabled", None
+        if not self.config.generate_assembly:
+            return "hidden", None
+
+        # Disable assembly generation until command line arguments to control it are available
+        return "disabled", None
+
+        for config_name, (compiler, options) in self.config.assembly_generation_configs.items():
+            output_name = "{}.{}.asm".format(self.config.source_path, config_name)
+            arguments = [compiler.path] + options + ["-o", output_name, self.config.source_path]
+
+            completed_process = subprocess.run(
+                arguments,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+
+            stdout = completed_process.stdout.decode('utf-8')
+            stderr = completed_process.stderr.decode('utf-8')
+
+            if self.config.expect_error is not None:
+                if completed_process.returncode == 0:
+                    msg = ("Expected compilation error, but got zero return code for {}:\n"
+                           "Stdout:\n"
+                           "{}\n"
+                           "Stderr:\n"
+                           "{}"
+                           ).format(config_name, stdout, stderr)
+                    return "error", msg
+                else:
+                    return "success", None
+
+            if completed_process.returncode != 0:
+                msg = ("Expected successful compilation, but got non-zero return code for {}:\n"
+                       "Stdout:\n"
+                       "{}\n"
+                       "Stderr:\n"
+                       "{}"
+                       ).format(config_name, stdout, stderr)
+                return "error", msg
+
+        return "success", None
 
 
 # Returns a set of directories and a set of other FS nodes
@@ -194,11 +254,9 @@ def discover_tests(tests_dir, recursive = True):
         test_files, test_dirs = dir_content(test_dir_path)
         if os.path.join(test_dir_path, CONFIG_FILE_NAME) in test_files:
             yield TestCase(test_dir_path)
-        if recursive:
-            for test_dir in test_dirs:
-                for test_case in discover_tests(test_dir, recursive):
-                    yield test_case
-
+        elif recursive:
+            for test_case in discover_tests(test_dir_path, True):
+                yield test_case
 
 test_report = []
 test_messages = []
@@ -237,7 +295,7 @@ for status, name, message_id in test_report:
         raise RuntimeError("Unknown test status: {}".format(status))
 
     if message_id is None:
-        msg += "        "
+        msg += "         "
     else:
         msg += " < {0: 3d} > ".format(message_id)
 
@@ -263,46 +321,3 @@ print("  total: {}".format(count["total"]))
 
 if count["error"] > 0:
     exit(1)
-
-# for test_dir_name in os.listdir(END_TO_END_ROOT):
-#     test_dir_path = os.path.join(END_TO_END_ROOT, test_dir_name)
-#     if not os.path.isdir(test_dir_path):
-#         continue
-#     nodes = {os.path.join(test_dir_path, node_name) for node_name in os.listdir(test_dir_path)}
-#     files = set(filter(os.path.isfile, nodes))
-#
-#     abs_config_path = os.path.join(test_dir_path, "test.json")
-#     if abs_config_path not in files:
-#         # Ignore directories without `test.json`
-#         continue
-#
-#     with open(abs_config_path, "r") as config_file:
-#         config_json = config_file.read()
-#         config_data = json.loads(config_json)
-#
-#         source_path = config_data["source"]
-#         should_error = "error" in config_data and config_data["error"]
-#
-#         abs_source_path = os.path.join(test_dir_path, source_path)
-#
-#         for compiler_path in [GCC_PATH, CLANG_PATH]:
-#             for optimization_level in range(0, 3 + 1):
-#                 arguments = [
-#                     compiler_path,
-#                     "-S",
-#                     "-O{}".format(optimization_level),
-#                     "-o", "{}.gcc-{}.a".format(abs_source_path, optimization_level)
-#                 ]
-#                 if compiler_path == CLANG_PATH:
-#                     arguments += ["-Wno-main-return-type"]
-#                 arguments += [abs_source_path]
-#
-#                 completed_process = subprocess.run(arguments, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-#
-#                 if should_error:
-#                     if completed_process.returncode == 0:
-#                         sys.stderr.buffer.write(completed_process.stdout)
-#                         raise Exception("Expected non-zero return code")
-#                 elif completed_process.returncode != 0:
-#                     sys.stderr.buffer.write(completed_process.stdout)
-#                     raise Exception("Expected zero return code")

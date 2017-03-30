@@ -36,9 +36,22 @@
 %option warn
 %option bison-locations
 
-%x charLiteral
+%x charLiteral directiveComment lineComment blockComment
+
 %%
+
 [ \n\t]       {/* ignore */}
+
+<INITIAL>^[ \t]*#                 {BEGIN(directiveComment);}
+<directiveComment>\n              {BEGIN(INITIAL);}
+<directiveComment>.               {/* ignore */}
+<INITIAL>"//"                     {BEGIN(lineComment);}
+<lineComment>\n                   {BEGIN(INITIAL);}
+<lineComment>.                    {/* ignore */}
+<INITIAL>"/*"                     {BEGIN(blockComment);}
+<blockComment>"*/"                {BEGIN(INITIAL);}
+<blockComment>.|\n                {/* ignore */}
+
 ";"           {return SEMICOLON;}
 "["           {return OPEN_BRACKET;}
 "]"           {return CLOSE_BRACKET;}

@@ -1,3 +1,4 @@
 {
-  "source": "main.c"
+  "source": "main.c",
+  "assembly": true
 }
