@@ -192,6 +192,9 @@ class TestCase:
         if not self.config.generate_assembly:
             return "hidden", None
 
+        # Disable assembly generation until command line arguments to control it are available
+        return "disabled", None
+
         for config_name, (compiler, options) in self.config.assembly_generation_configs.items():
             output_name = "{}.{}.asm".format(self.config.source_path, config_name)
             arguments = [compiler.path] + options + ["--output", output_name, self.config.source_path]
