@@ -125,6 +125,21 @@ std::shared_ptr<FunctionSymbol> RootContext::ResolveFunction(
   }
 }
 
+bool RootContext::HasVariable(std::string name, bool check_parents) {
+  auto it = symbols_.variables.find(name);
+  return it != symbols_.variables.end();
+}
+
+bool RootContext::HasDataType(std::string name, bool check_parents) {
+  auto it = symbols_.data_types.find(name);
+  return it != symbols_.data_types.end();
+}
+
+bool RootContext::HasFunction(std::string name, bool check_parents) {
+  auto it = symbols_.functions.find(name);
+  return it != symbols_.functions.end();
+}
+
 // ChildContext
 std::unique_ptr<ChildContext> ChildContext::Create(Context &parentContext) {
   return std::unique_ptr<ChildContext>(new ChildContext(parentContext));
@@ -190,6 +205,45 @@ std::shared_ptr<FunctionSymbol> ChildContext::ResolveFunction(
     return it->second;
   } else {
     return parent_context_.ResolveFunction(name);
+  }
+}
+
+bool ChildContext::HasVariable(std::string name, bool check_parents) {
+  if (check_parents) {
+    auto it = symbols_.variables.find(name);
+    if (it != symbols_.variables.end()) {
+      return true;
+    } else {
+      return parent_context_.HasVariable(name, true);
+    }
+  } else {
+    return symbols_.variables.find(name) != symbols_.variables.end();
+  }
+}
+
+bool ChildContext::HasDataType(std::string name, bool check_parents) {
+  if (check_parents) {
+    auto it = symbols_.data_types.find(name);
+    if (it != symbols_.data_types.end()) {
+      return true;
+    } else {
+      return parent_context_.HasVariable(name, true);
+    }
+  } else {
+    return symbols_.data_types.find(name) != symbols_.data_types.end();
+  }
+}
+
+bool ChildContext::HasFunction(std::string name, bool check_parents) {
+  if (check_parents) {
+    auto it = symbols_.functions.find(name);
+    if (it != symbols_.functions.end()) {
+      return true;
+    } else {
+      return parent_context_.HasVariable(name, true);
+    }
+  } else {
+    return symbols_.functions.find(name) != symbols_.functions.end();
   }
 }
 }  // namespace ir

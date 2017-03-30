@@ -124,3 +124,25 @@ TEST(comp__ir__context, forkAndJoin) {
 
   EXPECT_THAT(actualVariables, testing::ContainerEq(expectedVariables));
 }
+
+
+TEST(comp__ir__context, HasVariable) {
+  std::shared_ptr<comp::ir::Context> parentContext =
+      comp::ir::RootContext::Create();
+  std::shared_ptr<comp::ir::Variable> parentVariable =
+      comp::ir::Variable::Create(comp::ir::GetInt64Type());
+  std::string parentVarName = "foo";
+  parentContext->RegisterVariable(parentVarName, parentVariable);
+
+  std::shared_ptr<comp::ir::Context> childContext =
+      parentContext->Fork();
+  std::shared_ptr<comp::ir::Variable> childVariable =
+      comp::ir::Variable::Create(comp::ir::GetInt64Type());
+  std::string childVarName = "zzz";
+  childContext->RegisterVariable(childVarName, childVariable);
+
+  EXPECT_TRUE(parentContext->HasVariable("foo"));
+  EXPECT_TRUE(childContext->HasVariable("foo", 1));
+  EXPECT_FALSE(parentContext->HasVariable("bar"));
+}
+

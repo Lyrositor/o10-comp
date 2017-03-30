@@ -82,6 +82,17 @@ class Context {
    */
   void Join(std::unique_ptr<ChildContext> child_context);
 
+  /**
+   * Searches the context for a certain variable, data type or function.
+   *
+   * @param name Name of the sought variable, data type or function
+   * @param check_parents True if one wants to search the parent contextes as well
+   * @return Returns 1 if found, otherwise 0
+   */
+  virtual bool HasVariable(std::string name, bool check_parents = true) = 0;
+  virtual bool HasDataType(std::string name, bool check_parents = true) = 0;
+  virtual bool HasFunction(std::string name, bool check_parents = true) = 0;
+
  protected:
   /**
    * Symbol table
@@ -107,6 +118,10 @@ class RootContext final : public Context {
     std::set<std::shared_ptr<const Variable>> variables);
 
   ~RootContext();
+
+  bool HasVariable(std::string name, bool check_parents = true);
+  bool HasDataType(std::string name, bool check_parents = true);
+  bool HasFunction(std::string name, bool check_parents = true);
 
   std::shared_ptr<const DataType> ResolveDataType(
     const std::string &name) const;
@@ -138,6 +153,10 @@ class ChildContext final : public Context {
     const std::string &name) const;
   std::shared_ptr<const Variable> ResolveVariable(
     const std::string &name) const;
+
+  bool HasVariable(std::string name, bool check_parents = true);
+  bool HasDataType(std::string name, bool check_parents = true);
+  bool HasFunction(std::string name, bool check_parents = true);
 
  protected:
   Context &parent_context_;
