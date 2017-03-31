@@ -24,8 +24,8 @@ set(
   src/main/error_handling.cpp
   src/main/main.cpp
 )
-add_executable(comp_main ${MAIN_SOURCES})
-target_link_libraries(comp_main comp)
+add_executable(o10c ${MAIN_SOURCES})
+target_link_libraries(o10c comp)
 
 add_subdirectory(vendor/googletest)
 include_directories("${gmock_SOURCE_DIR}/include/" "${gtest_SOURCE_DIR}/include/")

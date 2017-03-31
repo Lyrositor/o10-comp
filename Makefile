@@ -10,13 +10,13 @@ clean:
 	rm -rf ./build/
 
 build: build/Makefile
-	cd build/ && make comp_main --no-print-directory
+	cd build/ && make o10c --no-print-directory
 
 build/Makefile: CMakeLists.txt
 	mkdir -p build/ && cd build/ && cmake ..
 
 run: build
-	build/comp_main
+	build/o10c
 
 test: test.unit test.memory test.end-to-end
 
@@ -30,7 +30,7 @@ test.memory:
 
 test.end-to-end:
 	mkdir -p build/
-	cd build/ && cmake .. && make comp_main
+	cd build/ && cmake .. && make o10c
 	python3 end-to-end/test.py
 
 coverage:

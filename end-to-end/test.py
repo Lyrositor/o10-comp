@@ -21,7 +21,7 @@ class Compiler:
     def generate_assembly(self, directory, source_path):
         pass
 
-DEFAULT_O10_COMP_PATH = os.path.join(PROJECT_ROOT, "build", "comp_main")
+DEFAULT_O10_COMP_PATH = os.path.join(PROJECT_ROOT, "build", "o10c")
 
 # Try to get the o10 compiler path from the environment, else use the default value
 o10c_path = os.environ["O10_COMP_PATH"] if "O10_COMP_PATH" in os.environ else DEFAULT_O10_COMP_PATH

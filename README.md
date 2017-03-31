@@ -46,7 +46,7 @@ make
 
 You will get the following artifacts:
 
-- **build/comp_main**: The compiler executable
+- **build/o10c**: The compiler executable
 - **build/comp_test**: The executable that runs the unit-tests
 - **build/src/lib/libcomp.so**: The compiler library, the headers are in **include/**
 
