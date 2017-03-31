@@ -38,7 +38,7 @@ static const option::Descriptor kUsage[] = {
     "",
     "",
     option::Arg::Optional,
-    "  file \tThe C file to analyse or compile."
+    "  file \tThe C file to analyze or compile."
   },
   {
     Help,
@@ -99,8 +99,10 @@ int main_exit(int retcode, option::Option buffer[], option::Option options[]) {
 
 int main(int argc, char **argv) {
   // Skip program name argv[0] if present
-  argc -= argc > 0;
-  argv += argc > 0;
+  if (argc > 0) {
+    argc--;
+    argv++;
+  }
 
   // Parse the command-line arguments
   option::Stats stats(kUsage, argc, argv);
