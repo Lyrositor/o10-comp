@@ -12,7 +12,19 @@ namespace comp {
 namespace ir {
 class ProgramSymbol {
  public:
+  enum class Type {
+    DataObject,
+    Function
+  };
+
+  ProgramSymbol(Type type);
+
   virtual ~ProgramSymbol() = 0;
+
+  Type GetType() const;
+
+ protected:
+  Type type_;
 };
 
 class DataObjectSymbol final : public ProgramSymbol {
@@ -28,16 +40,20 @@ class DataObjectSymbol final : public ProgramSymbol {
 class FunctionSymbol final : public ProgramSymbol {
  public:
   static std::unique_ptr<FunctionSymbol> Create(
+    const std::string &name,
     std::vector<std::shared_ptr<const Variable>> parameters,
     std::shared_ptr<const DataType> return_type,
     std::shared_ptr<ControlFlowGraph> body = nullptr);
 
   FunctionSymbol(
+    const std::string &name,
     std::vector<std::shared_ptr<const Variable>> parameters,
     std::shared_ptr<const DataType> return_type,
     std::shared_ptr<ControlFlowGraph> body = nullptr);
 
   virtual ~FunctionSymbol();
+
+  std::string GetName() const;
 
   std::shared_ptr<ControlFlowGraph> GetBody() const;
 
@@ -53,6 +69,7 @@ class FunctionSymbol final : public ProgramSymbol {
     std::set<std::shared_ptr<const Variable>> local_variables);
 
  private:
+  const std::string name_;
   std::vector<std::shared_ptr<const Variable>> parameters_;
   const std::shared_ptr<const DataType> return_type_;
   std::shared_ptr<ControlFlowGraph> body_;

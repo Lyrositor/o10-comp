@@ -20,12 +20,14 @@ static const std::shared_ptr<const Int64DataType>
 
 static const std::shared_ptr<FunctionSymbol>
   kGetcharFunction = FunctionSymbol::Create(
+  "getchar",
   std::vector<std::shared_ptr<const Variable>>(),
   kCharType
 );
 
 static const std::shared_ptr<FunctionSymbol>
   kPutcharFunction = FunctionSymbol::Create(
+  "putchar",
   std::vector<std::shared_ptr<const Variable>>(
     {Variable::Create(kCharType, nullptr)}),
   kVoidType

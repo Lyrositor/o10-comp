@@ -15,6 +15,8 @@ class Program {
 
   void AddSymbol(std::shared_ptr<const ProgramSymbol> symbol);
 
+  std::vector<std::shared_ptr<const ProgramSymbol>> GetSymbols() const;
+
  protected:
   std::vector<std::shared_ptr<const ProgramSymbol>> symbols_;
 };

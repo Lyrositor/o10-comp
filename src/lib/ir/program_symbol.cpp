@@ -2,30 +2,48 @@
 
 namespace comp {
 namespace ir {
+ProgramSymbol::ProgramSymbol(ProgramSymbol::Type type) : type_(type) {
+}
+
 ProgramSymbol::~ProgramSymbol() {
 }
 
-DataObjectSymbol::DataObjectSymbol() {
+ProgramSymbol::Type ProgramSymbol::GetType() const {
+  return type_;
+}
+
+DataObjectSymbol::DataObjectSymbol() : ProgramSymbol(Type::DataObject) {
   throw std::string("Not implemented");
 }
 
 std::unique_ptr<FunctionSymbol> FunctionSymbol::Create(
+  const std::string &name,
   std::vector<std::shared_ptr<const Variable>> parameters,
   std::shared_ptr<const DataType> return_type,
   std::shared_ptr<ControlFlowGraph> body
 ) {
   return std::unique_ptr<FunctionSymbol>(
-    new FunctionSymbol(parameters, return_type, body));
+    new FunctionSymbol(name, parameters, return_type, body));
 }
 
 FunctionSymbol::FunctionSymbol(
+  const std::string &name,
   std::vector<std::shared_ptr<const Variable>> parameters,
   std::shared_ptr<const DataType> return_type,
   std::shared_ptr<ControlFlowGraph> body
-) : parameters_(parameters), return_type_(return_type), body_(body) {
+) :
+  ProgramSymbol(Type::Function),
+  name_(name),
+  parameters_(parameters),
+  return_type_(return_type),
+  body_(body) {
 }
 
 FunctionSymbol::~FunctionSymbol() {
+}
+
+std::string FunctionSymbol::GetName() const {
+  return name_;
 }
 
 std::shared_ptr<ControlFlowGraph> FunctionSymbol::GetBody() const {

@@ -7,7 +7,6 @@ prepare:
 	rm -rf vendor/rapidjson && git clone https://github.com/miloyip/rapidjson.git vendor/rapidjson
 
 clean:
-	cd build && make clean
 	rm -rf ./build/
 
 build: build/Makefile

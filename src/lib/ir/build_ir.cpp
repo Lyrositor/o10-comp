@@ -51,7 +51,8 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
     function = context.ResolveFunction(node.identifier->name);
   } catch (std::runtime_error &) {
     // Register the function's symbol (without a body initially)
-    function = FunctionSymbol::Create(parameters, return_type);
+    function = FunctionSymbol::Create(
+      node.identifier->name, parameters, return_type);
     context.RegisterFunction(node.identifier->name, function);
     if (node.body == nullptr) {
       return nullptr;
