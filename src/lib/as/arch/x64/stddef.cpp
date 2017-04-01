@@ -1,13 +1,16 @@
 #include <comp/as/arch/x64/stddef.h>
 
 #include <unordered_map>
+
 #include <comp/exceptions.h>
+#include <comp/utils.h>
 
 namespace comp {
 namespace as {
 namespace arch {
 namespace x64 {
-static const std::unordered_map<ir::DataType::Type, int64_t> kDataTypeSizes = {
+static const std::unordered_map<ir::DataType::Type, int64_t, EnumClassHash>
+  kDataTypeSizes = {
   {ir::DataType::Type::Void, 0},
   {ir::DataType::Type::Uint8, 1},
   {ir::DataType::Type::Int32, 4},
