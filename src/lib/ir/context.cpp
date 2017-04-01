@@ -209,41 +209,32 @@ std::shared_ptr<FunctionSymbol> ChildContext::ResolveFunction(
 }
 
 bool ChildContext::HasVariable(std::string name, bool check_parents) {
-  if (check_parents) {
-    auto it = symbols_.variables.find(name);
-    if (it != symbols_.variables.end()) {
-      return true;
-    } else {
-      return parent_context_.HasVariable(name, true);
-    }
+  if (symbols_.variables.find(name) != symbols_.variables.end()) {
+    return true;
+  } else if(check_parents) {
+    return parent_context_.HasVariable(name, true);
   } else {
-    return symbols_.variables.find(name) != symbols_.variables.end();
+    return false;
   }
 }
 
 bool ChildContext::HasDataType(std::string name, bool check_parents) {
-  if (check_parents) {
-    auto it = symbols_.data_types.find(name);
-    if (it != symbols_.data_types.end()) {
-      return true;
-    } else {
-      return parent_context_.HasVariable(name, true);
-    }
+  if (symbols_.data_types.find(name) != symbols_.data_types.end()) {
+    return true;
+  } else if(check_parents) {
+    return parent_context_.HasDataType(name, true);
   } else {
-    return symbols_.data_types.find(name) != symbols_.data_types.end();
+    return false;
   }
 }
 
 bool ChildContext::HasFunction(std::string name, bool check_parents) {
-  if (check_parents) {
-    auto it = symbols_.functions.find(name);
-    if (it != symbols_.functions.end()) {
-      return true;
-    } else {
-      return parent_context_.HasVariable(name, true);
-    }
+  if (symbols_.functions.find(name) != symbols_.functions.end()) {
+    return true;
+  } else if(check_parents) {
+    return parent_context_.HasFunction(name, true);
   } else {
-    return symbols_.functions.find(name) != symbols_.functions.end();
+    return false;
   }
 }
 }  // namespace ir
