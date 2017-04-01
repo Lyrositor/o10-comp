@@ -16,12 +16,13 @@ class DataType {
     Array
   };
 
- public:
   DataType(const Type type);
   virtual ~DataType() = 0;
 
+  Type GetType() const;
+
  private:
-  const Type type;
+  const Type type_;
 };
 
 class VoidDataType final : public DataType {
@@ -66,11 +67,12 @@ class Int64DataType final : public IntegerDataType {
 class ArrayDataType final : public DataType {
  public:
   static std::unique_ptr<ArrayDataType> Create(
-    std::shared_ptr<const DataType> itemType,
+    std::shared_ptr<const DataType> item_type,
     size_t arrayLength);
 
   ArrayDataType(std::shared_ptr<const DataType> item_type, size_t array_length);
   virtual ~ArrayDataType();
+  std::shared_ptr<const DataType> GetItemType() const;
   size_t GetSize() const; // Returns the number of cells in the array
  private:
   const std::shared_ptr<const DataType> item_type_;

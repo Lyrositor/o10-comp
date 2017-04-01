@@ -30,6 +30,7 @@ add_library(
   ast/symbol.cpp
   ast/text_directive.cpp
   ast/type_directive.cpp
-  backend/x64/build_asm.cpp
+  arch/x64/build_asm.cpp
+  arch/x64/stddef.cpp
   emit.cpp
 )

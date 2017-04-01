@@ -4,10 +4,14 @@ namespace comp {
 namespace ir {
 
 /** ----- DataType (abstract) ----- **/
-DataType::DataType(const Type type): type(type) {
+DataType::DataType(const Type type) : type_(type) {
 }
 
 DataType::~DataType() {
+}
+
+DataType::Type DataType::GetType() const {
+  return type_;
 }
 
 /** ----- VoidDataType ----- **/
@@ -71,14 +75,18 @@ Int64DataType::~Int64DataType() {
 
 /** ----- ArrayDataType ----- **/
 std::unique_ptr<ArrayDataType> ArrayDataType::Create(
-  std::shared_ptr<const DataType> itemType, size_t arrayLength) {
+  std::shared_ptr<const DataType> item_type, size_t arrayLength) {
   return std::unique_ptr<ArrayDataType>(
-    new ArrayDataType(itemType, arrayLength));
+    new ArrayDataType(item_type, arrayLength));
 }
 
 ArrayDataType::ArrayDataType(
   std::shared_ptr<const DataType> item_type, size_t array_length) :
   DataType(Type::Array), item_type_(item_type), size_(array_length) {
+}
+
+std::shared_ptr<const DataType> ArrayDataType::GetItemType() const {
+  return item_type_;
 }
 
 size_t ArrayDataType::GetSize() const {

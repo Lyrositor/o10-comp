@@ -13,7 +13,7 @@
 #include <comp/as/ast.h>
 #include <comp/as/emit.h>
 #include <comp/ast/to_json.h>
-#include <comp/as/backend/x64/build_asm.h>
+#include <comp/as/arch/x64/build_asm.h>
 #include <comp/ir/build_ir.h>
 #include <comp/ir/program.h>
 #include <comp/exceptions.h>
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
       }
 
       std::shared_ptr<comp::as::ast::Program>
-        program_asm = comp::as::backend::x64::BuildProgram(*program_ir);
+        program_asm = comp::as::arch::x64::BuildProgram(*program_ir);
       comp::as::emitProgram(*program_asm, ofs);
     }
   } catch (comp::SyntaxException &e) {
