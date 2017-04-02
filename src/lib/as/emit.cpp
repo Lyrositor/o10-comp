@@ -6,6 +6,9 @@ namespace comp {
 namespace as {
 void EmitProgram(const ast::Program &node, std::ostream &out) {
   for (auto statement : node.body) {
+    if (statement->node_type != ast::Node::Type::EmptyStatement) {
+      out << "\t";
+    }
     EmitStatement(*statement, out);
   }
 }
