@@ -48,16 +48,16 @@ TEST(comp__as__emit, DiscriminantProgram) {
   std::shared_ptr<ast::Program> program = ast::Program::Create(body);
 
   std::stringstream expected;
-  expected << ".text\n";
-  expected << ".global main\n";
-  expected << ".align 16, 144\n";
-  expected << ".type main CTT_FUNC\n";
+  expected << "\t.text\n";
+  expected << "\t.global main\n";
+  expected << "\t.align 16, 144\n";
+  expected << "\t.type main CTT_FUNC\n";
   expected << "main:\n";
-  expected << ".cfi_startproc\n";
-  expected << "movq $-23, %rax\n";
-  expected << "retq\n";
-  expected << ".size main, (. - main)\n";
-  expected << ".cfi_endproc\n";
+  expected << "\t.cfi_startproc\n";
+  expected << "\tmovq $-23, %rax\n";
+  expected << "\tretq\n";
+  expected << "\t.size main, (. - main)\n";
+  expected << "\t.cfi_endproc\n";
 
   std::stringstream actual;
   EmitProgram(*program, actual);
