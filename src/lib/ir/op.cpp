@@ -122,6 +122,18 @@ ReturnOp::ReturnOp(std::shared_ptr<Operand> in) :
 ReturnOp::~ReturnOp() {
 }
 
+std::unique_ptr<TestOp> TestOp::Create(std::shared_ptr<Operand> test) {
+  return std::unique_ptr<TestOp>(new TestOp(test));
+}
+
+TestOp::TestOp(std::shared_ptr<Operand> test) :
+  Op(Op::Type::TestOp),
+  test(test) {
+}
+
+TestOp::~TestOp() {
+}
+
 NoOp::NoOp() : Op(Op::Type::NoOp) {
 }
 

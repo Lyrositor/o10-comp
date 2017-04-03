@@ -51,6 +51,7 @@ struct Op {
     CopyOp,
     NoOp,
     ReturnOp,
+    TestOp,
     UnaryOp
   };
 
@@ -138,7 +139,6 @@ struct CopyOp final : public Op {
   std::shared_ptr<Operand> in;
 };
 
-
 /**
  * Leave the function and return the `in` value or nothing if `in` is a nullptr
  */
@@ -150,6 +150,19 @@ struct ReturnOp final : public Op {
   std::shared_ptr<Operand> in;
 };
 
+/**
+ * Final operation of a BasicBlock if its type is `ConditionalJump`.
+ */
+struct TestOp final : public Op {
+  static std::unique_ptr<TestOp> Create(std::shared_ptr<Operand> test);
+  TestOp(std::shared_ptr<Operand> test);
+  virtual ~TestOp();
+
+  /**
+   * If this operand is equal to 0, use the `branchIfFalse`; otherwise use the `branchIfTrue`.
+   */
+  std::shared_ptr<Operand> test;
+};
 
 /*
  * Idempotent operation
