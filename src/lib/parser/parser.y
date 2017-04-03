@@ -3,6 +3,8 @@
 #include <iostream>
 #include <comp/parser.h>
 #include <comp/ast.h>
+#include <set>
+#include <string>
 #include <memory>
 
 #include <comp/parser/parser_config.h>
@@ -115,6 +117,8 @@
 %type <statementsList> blockContent
 %type <variableDeclaratorsList> variableDeclaratorsList
 
+
+
 %%
 root:
   program {
@@ -189,9 +193,12 @@ arrayDataType:
     std::shared_ptr<comp::ast::DataType> item_type($1);
     $$ = new comp::ast::ArrayDataType(item_type, nullptr, LOCATION(&@1));
   }
-
 identifier:
   IDENTIFIER {
+    const std::set<std::string> invalid_keywords = {"auto","break","case","char","const","continue","default","do","double","else","enum","extern","float","for","goto","if","int","long","register","return","short","signed","sizeof","static","struct","switch","typedef", "union", "unsigned", "void", "volatile", "while"};
+    if (invalid_keywords.find($1) != invalid_keywords.end()){
+        throw  std::runtime_error("Invalid identifier name");
+    }
     $$ = new comp::ast::Identifier($1, LOCATION(&@1));
   }
 

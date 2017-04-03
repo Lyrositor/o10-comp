@@ -194,7 +194,13 @@ class TestCase:
 
         if self.config.test_ast:
             with open(self.config.expected_ast_path, "r") as expected_ast_file:
-                expected_ast_doc = json.loads(expected_ast_file.read())
+                try:
+                    expected_ast_doc = json.loads(expected_ast_file.read())
+                except:
+                    msg = ("Parse error:\n"
+                           "{}"
+                           ).format(self.config.expected_ast_path)
+                    return "error", msg
                 if expected_ast_doc != actual_ast_doc:
                     msg = ("Actual AST does not match the expected AST:\n"
                            "Expected AST:\n"

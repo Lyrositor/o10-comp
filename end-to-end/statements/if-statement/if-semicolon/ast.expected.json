@@ -1,0 +1,66 @@
+{
+    "node_type": "Program",
+    "body": [
+        {
+            "node_type": "Function",
+            "return_type": {
+                "node_type": "IdentifierDataType",
+                "identifier": {
+                    "node_type": "Identifier",
+                    "name": "void"
+                }
+            },
+            "parameters": [],
+            "body": {
+                "node_type": "BlockStatement",
+                "body": [
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "a"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "Int64Literal",
+                                    "value": 1
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "IfStatement",
+                        "test": {
+                            "node_type": "BinaryExpression",
+                            "op": "<",
+                            "left": {
+                                "node_type": "Identifier",
+                                "name": "a"
+                            },
+                            "right": {
+                                "node_type": "Int64Literal",
+                                "value": 2
+                            }
+                        },
+                        "consequence": {
+                            "node_type": "NullStatement"
+                        },
+                        "alternative": null
+                    }
+                ]
+            }
+        }
+    ]
+}

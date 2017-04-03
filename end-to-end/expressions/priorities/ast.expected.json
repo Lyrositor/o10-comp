@@ -1,0 +1,711 @@
+{
+    "node_type": "Program",
+    "body": [
+        {
+            "node_type": "Function",
+            "return_type": {
+                "node_type": "IdentifierDataType",
+                "identifier": {
+                    "node_type": "Identifier",
+                    "name": "int64_t"
+                }
+            },
+            "parameters": [],
+            "body": {
+                "node_type": "BlockStatement",
+                "body": [
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "a"
+                                    }
+                                },
+                                "initial_value": null
+                            },
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "b"
+                                    }
+                                },
+                                "initial_value": null
+                            },
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                },
+                                "initial_value": null
+                            },
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "d"
+                                    }
+                                },
+                                "initial_value": null
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "e"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "*",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "+",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "f"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "/",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "+",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "g"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "+",
+                                    "left": {
+                                        "node_type": "Identifier",
+                                        "name": "a"
+                                    },
+                                    "right": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "*",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "c"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "h"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "*",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "*",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "i"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "/",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "*",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "j"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "-",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "*",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "k"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "+",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "/",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "l"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "+",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "-",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "m"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "-",
+                                    "left": {
+                                        "node_type": "Identifier",
+                                        "name": "a"
+                                    },
+                                    "right": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "/",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "c"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "n"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "/",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "-",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "o"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "/",
+                                    "left": {
+                                        "node_type": "Identifier",
+                                        "name": "a"
+                                    },
+                                    "right": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "+",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "b"
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "c"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "p"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "-",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "/",
+                                        "left": {
+                                            "node_type": "BinaryExpression",
+                                            "op": "-",
+                                            "left": {
+                                                "node_type": "BinaryExpression",
+                                                "op": "+",
+                                                "left": {
+                                                    "node_type": "Identifier",
+                                                    "name": "a"
+                                                },
+                                                "right": {
+                                                    "node_type": "BinaryExpression",
+                                                    "op": "/",
+                                                    "left": {
+                                                        "node_type": "Identifier",
+                                                        "name": "b"
+                                                    },
+                                                    "right": {
+                                                        "node_type": "Identifier",
+                                                        "name": "c"
+                                                    }
+                                                }
+                                            },
+                                            "right": {
+                                                "node_type": "BinaryExpression",
+                                                "op": "/",
+                                                "left": {
+                                                    "node_type": "Identifier",
+                                                    "name": "b"
+                                                },
+                                                "right": {
+                                                    "node_type": "Identifier",
+                                                    "name": "d"
+                                                }
+                                            }
+                                        },
+                                        "right": {
+                                            "node_type": "BinaryExpression",
+                                            "op": "+",
+                                            "left": {
+                                                "node_type": "Identifier",
+                                                "name": "a"
+                                            },
+                                            "right": {
+                                                "node_type": "Identifier",
+                                                "name": "b"
+                                            }
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "Identifier",
+                                        "name": "c"
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "node_type": "VariableDeclaration",
+                        "data_type": {
+                            "node_type": "IdentifierDataType",
+                            "identifier": {
+                                "node_type": "Identifier",
+                                "name": "int64_t"
+                            }
+                        },
+                        "declarators": [
+                            {
+                                "node_type": "VariableDeclarator",
+                                "declarator": {
+                                    "node_type": "IdentifierDeclarator",
+                                    "identifier": {
+                                        "node_type": "Identifier",
+                                        "name": "q"
+                                    }
+                                },
+                                "initial_value": {
+                                    "node_type": "BinaryExpression",
+                                    "op": "+",
+                                    "left": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "-",
+                                        "left": {
+                                            "node_type": "BinaryExpression",
+                                            "op": "*",
+                                            "left": {
+                                                "node_type": "Identifier",
+                                                "name": "a"
+                                            },
+                                            "right": {
+                                                "node_type": "Identifier",
+                                                "name": "b"
+                                            }
+                                        },
+                                        "right": {
+                                            "node_type": "Identifier",
+                                            "name": "c"
+                                        }
+                                    },
+                                    "right": {
+                                        "node_type": "BinaryExpression",
+                                        "op": "/",
+                                        "left": {
+                                            "node_type": "Identifier",
+                                            "name": "a"
+                                        },
+                                        "right": {
+                                            "node_type": "BinaryExpression",
+                                            "op": "*",
+                                            "left": {
+                                                "node_type": "BinaryExpression",
+                                                "op": "-",
+                                                "left": {
+                                                    "node_type": "Identifier",
+                                                    "name": "a"
+                                                },
+                                                "right": {
+                                                    "node_type": "BinaryExpression",
+                                                    "op": "*",
+                                                    "left": {
+                                                        "node_type": "Identifier",
+                                                        "name": "b"
+                                                    },
+                                                    "right": {
+                                                        "node_type": "Identifier",
+                                                        "name": "c"
+                                                    }
+                                                }
+                                            },
+                                            "right": {
+                                                "node_type": "BinaryExpression",
+                                                "op": "-",
+                                                "left": {
+                                                    "node_type": "Identifier",
+                                                    "name": "a"
+                                                },
+                                                "right": {
+                                                    "node_type": "Identifier",
+                                                    "name": "b"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}
