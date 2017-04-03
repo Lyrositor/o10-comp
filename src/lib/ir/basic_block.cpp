@@ -32,7 +32,7 @@ std::weak_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() const {
 }
 
 void BasicBlock::SetBranchIfFalse(std::shared_ptr<BasicBlock> branchIfFalse) {
-  this->branch_if_true_ = branchIfFalse;
+  this->branch_if_false_ = branchIfFalse;
 }
 
 BasicBlock::~BasicBlock() {

@@ -97,7 +97,8 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   // Generate the function's control flow graph
   std::shared_ptr<ControlFlowGraph> cfg = ControlFlowGraph::Create();
   std::shared_ptr<BasicBlock> source = cfg->GetSource();
-  BuildBlockStatementIR(*node.body, function_context, cfg, source);
+  std::shared_ptr<BasicBlock> current_block = source;
+  BuildBlockStatementIR(*node.body, function_context, cfg, current_block);
   function->SetBody(cfg);
   function->SetLocalVariables(function_context.GetVariables());
 
@@ -417,7 +418,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     // Ending
     current_block = next;
 
-   return test_operand;
+    return test_operand;
   }
 
   if (node->op == ast::BinaryOperator::LogicalOr) {
@@ -640,26 +641,35 @@ void BuildIfStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  // Init
-  std::shared_ptr<BasicBlock> test = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
+  // Next block
   std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-  // Building
-  BuildExpressionIR(node.test, context, cfg, test);
+
+  // Test
+  std::shared_ptr<Operand> test_operand = BuildExpressionIR(node.test, context, cfg, current_block);
+  const std::shared_ptr<const DataType> test_type = getOperandType(*test_operand);
+  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(test_type);
+  const std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
+  current_block->Push(CopyOp::Create(tmp_operand, test_operand));
+
+  // Consequence
+  std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
   BuildStatementIR(*node.consequence, context, cfg, consequence);
-  // Branching
-  current_block->SetBranchIfTrue(test);
-  test->SetBranchIfTrue(consequence);
-  consequence->SetBranchIfTrue(next);
+
+  // Branches & alternative
   if (node.alternative != nullptr) {
     std::shared_ptr<BasicBlock> alternative = cfg->CreateBasicBlock();
     BuildStatementIR(*node.alternative, context, cfg, alternative);
-    test->SetBranchIfFalse(alternative);
+    current_block->SetBranchIfTrue(consequence);
+    current_block->SetBranchIfFalse(alternative);
+    consequence->SetBranchIfTrue(next);
     alternative->SetBranchIfTrue(next);
   } else {
-    test->SetBranchIfFalse(next);
+    current_block->SetBranchIfTrue(consequence);
+    current_block->SetBranchIfFalse(next);
+    consequence->SetBranchIfTrue(next);
   }
-  // Ending
+
+  // Advance the current block
   current_block = next;
 }
 

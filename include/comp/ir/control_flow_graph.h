@@ -10,8 +10,8 @@ namespace comp {
 namespace ir {
 class ControlFlowGraph {
  public:
-  static std::unique_ptr<ControlFlowGraph> Create();
-  ControlFlowGraph();
+  static std::unique_ptr<ControlFlowGraph> Create(std::shared_ptr<BasicBlock> source = std::make_shared<BasicBlock>());
+  ControlFlowGraph(std::shared_ptr<BasicBlock> source = std::make_shared<BasicBlock>());
 
   virtual ~ControlFlowGraph();
 
