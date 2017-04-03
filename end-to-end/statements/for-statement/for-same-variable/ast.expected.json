@@ -30,13 +30,10 @@
                                     "node_type": "IdentifierDeclarator",
                                     "identifier": {
                                         "node_type": "Identifier",
-                                        "name": "b"
+                                        "name": "a"
                                     }
                                 },
-                                "initial_value": {
-                                    "node_type": "Int64Literal",
-                                    "value": 1
-                                }
+                                "initial_value": null
                             }
                         ]
                     },
@@ -56,106 +53,107 @@
                                     "node_type": "IdentifierDeclarator",
                                     "identifier": {
                                         "node_type": "Identifier",
-                                        "name": "a"
+                                        "name": "i"
                                     }
                                 },
-                                "initial_value": {
-                                    "node_type": "Int64Literal",
-                                    "value": 1
-                                }
+                                "initial_value": null
                             }
                         ]
                     },
                     {
-                        "node_type": "IfStatement",
-                        "test": {
+                        "node_type": "ForStatement",
+                        "initialization": {
+                            "node_type": "AssignmentExpression",
+                            "op": "=",
+                            "lvalue": {
+                                "node_type": "Identifier",
+                                "name": "i"
+                            },
+                            "rvalue": {
+                                "node_type": "Int64Literal",
+                                "value": 0
+                            }
+                        },
+                        "condition": {
                             "node_type": "BinaryExpression",
                             "op": "<",
                             "left": {
                                 "node_type": "Identifier",
-                                "name": "a"
+                                "name": "i"
                             },
                             "right": {
                                 "node_type": "Int64Literal",
-                                "value": 2
+                                "value": 3
                             }
                         },
-                        "consequence": {
+                        "iteration": {
+                            "node_type": "UnaryExpression",
+                            "op": "PostfixIncrement",
+                            "expression": {
+                                "node_type": "Identifier",
+                                "name": "i"
+                            }
+                        },
+                        "body": {
                             "node_type": "BlockStatement",
                             "body": [
                                 {
-                                    "node_type": "ExpressionStatement",
-                                    "expression": {
+                                    "node_type": "ForStatement",
+                                    "initialization": {
+                                        "node_type": "AssignmentExpression",
+                                        "op": "=",
+                                        "lvalue": {
+                                            "node_type": "Identifier",
+                                            "name": "i"
+                                        },
+                                        "rvalue": {
+                                            "node_type": "Int64Literal",
+                                            "value": 0
+                                        }
+                                    },
+                                    "condition": {
                                         "node_type": "BinaryExpression",
-                                        "op": "==",
+                                        "op": "<",
                                         "left": {
                                             "node_type": "Identifier",
-                                            "name": "b"
+                                            "name": "i"
                                         },
                                         "right": {
                                             "node_type": "Int64Literal",
                                             "value": 3
                                         }
-                                    }
-                                }
-                            ]
-                        },
-                        "alternative": {
-                            "node_type": "BlockStatement",
-                            "body": [
-                                {
-                                    "node_type": "ExpressionStatement",
-                                    "expression": {
-                                        "node_type": "BinaryExpression",
-                                        "op": "==",
-                                        "left": {
+                                    },
+                                    "iteration": {
+                                        "node_type": "UnaryExpression",
+                                        "op": "PostfixIncrement",
+                                        "expression": {
                                             "node_type": "Identifier",
-                                            "name": "b"
-                                        },
-                                        "right": {
-                                            "node_type": "Int64Literal",
-                                            "value": 0
+                                            "name": "i"
                                         }
+                                    },
+                                    "body": {
+                                        "node_type": "BlockStatement",
+                                        "body": [
+                                            {
+                                                "node_type": "ExpressionStatement",
+                                                "expression": {
+                                                    "node_type": "AssignmentExpression",
+                                                    "op": "=",
+                                                    "lvalue": {
+                                                        "node_type": "Identifier",
+                                                        "name": "a"
+                                                    },
+                                                    "rvalue": {
+                                                        "node_type": "Int64Literal",
+                                                        "value": 1
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     }
                                 }
                             ]
                         }
-                    },
-                    {
-                        "node_type": "IfStatement",
-                        "test": {
-                            "node_type": "BinaryExpression",
-                            "op": "==",
-                            "left": {
-                                "node_type": "Identifier",
-                                "name": "a"
-                            },
-                            "right": {
-                                "node_type": "Int64Literal",
-                                "value": 1
-                            }
-                        },
-                        "consequence": {
-                            "node_type": "BlockStatement",
-                            "body": [
-                                {
-                                    "node_type": "ExpressionStatement",
-                                    "expression": {
-                                        "node_type": "BinaryExpression",
-                                        "op": "==",
-                                        "left": {
-                                            "node_type": "Identifier",
-                                            "name": "b"
-                                        },
-                                        "right": {
-                                            "node_type": "Int64Literal",
-                                            "value": 0
-                                        }
-                                    }
-                                }
-                            ]
-                        },
-                        "alternative": null
                     }
                 ]
             }
