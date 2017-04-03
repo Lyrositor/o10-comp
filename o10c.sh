@@ -3,4 +3,4 @@
 
 PATH=$PATH:$(pwd)
 o10c -co --output=/tmp/o10c.comp.asm $1
-gcc -x assembler -s /tmp/o10c.comp.asm -o $2
+gcc -ggdb -x assembler -s /tmp/o10c.comp.asm -o $2

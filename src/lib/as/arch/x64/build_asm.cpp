@@ -95,12 +95,12 @@ void BuildFunction(
       param_copies.push_back(ast::Instruction::Create(
         MOVQ,
         {kParameterRegisters[idx], address}));
-      param_stack_size += kRegisterSize;
     } else {
       address = ast::MemoryReference::Create(
         RBP,
-        ast::BigIntegerLiteral::Create(param_stack_size));
-      param_stack_size += GetDataTypeSize(params[idx]->GetDataType());
+        ast::BigIntegerLiteral::Create(kRegisterSize*2 + param_stack_size));
+      //param_stack_size += GetDataTypeSize(params[idx]->GetDataType()); TODO(Lyrositor) Use the right data type size
+      param_stack_size += kRegisterSize;
     }
     variables_table.Register(params[idx], address);
   }
@@ -113,7 +113,8 @@ void BuildFunction(
     if (variables_table.Contains(variable)) {  // Don't count the parameters
       continue;
     }
-    stack_size += GetDataTypeSize(variable->GetDataType());
+    //stack_size += GetDataTypeSize(variable->GetDataType());  TODO(Lyrositor) Use the right data type size
+    stack_size += kRegisterSize;
     variables_table.Register(variable, ast::MemoryReference::Create(
       RBP,
       ast::BigIntegerLiteral::Create(-stack_size)));
@@ -259,7 +260,8 @@ void BuildCallOp(
     } else {
       // Push the parameter's value to a location on the stack
       param_setup.push_back(ast::Instruction::Create(PUSHQ, {source}));
-      stack_size += data_type_size;
+//      stack_size += data_type_size; // TODO(Lyrositor) Use the appropriate size
+      stack_size += kRegisterSize;
     }
   }
 
