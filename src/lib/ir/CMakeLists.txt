@@ -15,4 +15,4 @@ add_library(
   value.cpp
   variable.cpp
 )
-target_link_libraries(ir dot)
+target_link_libraries(ir utils dot)
