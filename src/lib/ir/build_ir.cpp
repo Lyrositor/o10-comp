@@ -399,123 +399,117 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-
   if (node->op == ast::BinaryOperator::LogicalAnd || node->op == ast::BinaryOperator::LogicalOr) {
-    // Init
     std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
-    const std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
+    const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-    // Building
     const std::shared_ptr<Operand> left_operand = BuildExpressionIR(node->left, context, cfg, current_block);
-    const std::shared_ptr<const DataType> left_type = getOperandType(*left_operand);
-
-    const std::shared_ptr<const Variable> test_var = context.CreateVariable(left_type, node);
-    const std::shared_ptr<VariableOperand> test_operand = VariableOperand::Create(test_var);
-    current_block->Push(CopyOp::Create(test_operand, left_operand));
-
     const std::shared_ptr<Operand> right_operand = BuildExpressionIR(node->right, context, cfg, right_block);
-    right_block->Push(CopyOp::Create(test_operand, right_operand));
-    const std::shared_ptr<const DataType> right_type = getOperandType(*right_operand);
 
-    if (right_type->GetType() != left_type->GetType()) { // TODO equality overload
-      throw std::domain_error("Unexpected node type in root context");
+    const std::shared_ptr<const DataType> left_type = getOperandType(*left_operand);
+    const std::shared_ptr<const DataType> right_type = getOperandType(*right_operand);
+    if (right_type->GetType() != left_type->GetType()) { // TODO: Deep equality
+      throw std::domain_error("Incompatible types in logical binary expression");
     }
+
+    const std::shared_ptr<const Variable> result_var = context.CreateVariable(left_type, node);
+    const std::shared_ptr<VariableOperand> result_operand = VariableOperand::Create(result_var);
+
+    current_block->Push(CopyOp::Create(result_operand, left_operand));
+    right_block->Push(CopyOp::Create(result_operand, right_operand));
 
     // Branching
     if (node->op == ast::BinaryOperator::LogicalOr) {
-      current_block->SetBranchIfTrue(next);
-      current_block->SetBranchIfFalse(right_block);
+      current_block->SetConditionalJump(result_operand, next_block, right_block);
     } else { // LogicalAnd
-      current_block->SetBranchIfTrue(right_block);
-      current_block->SetBranchIfFalse(next);
+      current_block->SetConditionalJump(result_operand, right_block, next_block);
     }
-    right_block->SetBranchIfTrue(next);
+    right_block->SetJump(next_block);
 
-    // Ending
-    current_block = next;
+    current_block = next_block;
 
-   return test_operand;
+    return result_operand;
   }
 
   const std::shared_ptr<Operand> left = BuildExpressionIR(node->left, context, cfg, current_block);
-  const std::shared_ptr<const DataType> left_type = getOperandType(*left);
   const std::shared_ptr<Operand> right = BuildExpressionIR(node->right, context, cfg, current_block);
+  const std::shared_ptr<const DataType> left_type = getOperandType(*left);
   const std::shared_ptr<const DataType> right_type = getOperandType(*right);
 
-  if (left_type != right_type) {
+  if (left_type->GetType() != right_type->GetType()) { // TODO: Deep equality
     throw std::runtime_error("Mismatched types for left and right operands");
   }
 
   const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(left_type, node);
-  std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
+  std::shared_ptr<VariableOperand> result_operand = VariableOperand::Create(tmp_var);
 
   switch (node->op) {
     case ast::BinaryOperator::Addition: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Addition, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Addition, left, right));
       break;
     }
     case ast::BinaryOperator::Division: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Division, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Division, left, right));
       break;
     }
     case ast::BinaryOperator::Multiplication: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Multiplication, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Multiplication, left, right));
       break;
     }
     case ast::BinaryOperator::Subtraction: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Subtraction, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Subtraction, left, right));
       break;
     }
     case ast::BinaryOperator::BitwiseAnd: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::BitwiseAnd, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseAnd, left, right));
       break;
     };
     case ast::BinaryOperator::BitwiseOr: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::BitwiseOr, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseOr, left, right));
       break;
     };
     case ast::BinaryOperator::BitwiseXor: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::BitwiseXor, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseXor, left, right));
       break;
     };
     case ast::BinaryOperator::Comma: {
-      current_block->Push(CopyOp::Create(tmp_operand, right));
+      current_block->Push(CopyOp::Create(result_operand, right));
       break;
     };
     case ast::BinaryOperator::Equality: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Equality, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Equality, left, right));
       break;
     };
     case ast::BinaryOperator::GreaterThan: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::GreaterThan, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::GreaterThan, left, right));
       break;
     };
     case ast::BinaryOperator::GreaterThanOrEqual: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::GreaterThanOrEqual, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::GreaterThanOrEqual, left, right));
       break;
     };
     case ast::BinaryOperator::Inequality: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Inequality, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Inequality, left, right));
       break;
     };
     case ast::BinaryOperator::LeftShift: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::LeftShift, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LeftShift, left, right));
       break;
     };
     case ast::BinaryOperator::LessThan: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::LessThan, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LessThan, left, right));
       break;
     };
     case ast::BinaryOperator::LessThanOrEqualTo: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::LessThanOrEqualTo, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LessThanOrEqualTo, left, right));
       break;
     };
     case ast::BinaryOperator::Remainder: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Remainder, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Remainder, left, right));
       break;
     };
     case ast::BinaryOperator::RightShift: {
-      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::RightShift, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::RightShift, left, right));
       break;
     };
     default: {
@@ -523,7 +517,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     }
   }
 
-  return tmp_operand;
+  return result_operand;
 }
 
 std::shared_ptr<Operand> BuildUnaryExpressionIR(
@@ -557,42 +551,34 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  // Init
   std::shared_ptr<BasicBlock> consequence_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> alternative_block = cfg->CreateBasicBlock();
-  const std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
+  const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-
-
-  // Building
   const std::shared_ptr<Operand> test_operand = BuildExpressionIR(node->test, context, cfg, current_block);
+  const std::shared_ptr<Operand>
+    consequence_operand = BuildExpressionIR(node->consequence, context, cfg, consequence_block);
+  const std::shared_ptr<Operand>
+    alternative_operand = BuildExpressionIR(node->alternative, context, cfg, alternative_block);
 
-  const std::shared_ptr<Operand> consequence_operand = BuildExpressionIR(node->consequence, context, cfg, consequence_block);
   const std::shared_ptr<const DataType> consequence_type = getOperandType(*consequence_operand);
-
-  const std::shared_ptr<Operand> alternative_operand = BuildExpressionIR(node->alternative, context, cfg, alternative_block);
   const std::shared_ptr<const DataType> alternative_type = getOperandType(*alternative_operand);
-
-  if (alternative_type->GetType() != consequence_type->GetType()) { // TODO equality overload
-    throw std::domain_error("Unexpected node type in root context");
+  if (alternative_type->GetType() != consequence_type->GetType()) { // TODO: Deep equality
+    throw std::runtime_error("Incompatible types in `BuildConditionalExpressionIR`");
   }
 
-  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(consequence_type, node);
-  std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
+  const std::shared_ptr<const Variable> result_var = context.CreateVariable(consequence_type, node);
+  std::shared_ptr<VariableOperand> result_operand = VariableOperand::Create(result_var);
+  consequence_block->Push(CopyOp::Create(result_operand, consequence_operand));
+  alternative_block->Push(CopyOp::Create(result_operand, alternative_operand));
 
-  consequence_block->Push(CopyOp::Create(tmp_operand, consequence_operand));
-  alternative_block->Push(CopyOp::Create(tmp_operand, alternative_operand));
+  current_block->SetConditionalJump(test_operand, consequence_block, alternative_block);
+  consequence_block->SetJump(next_block);
+  alternative_block->SetJump(next_block);
 
-  // Branching
-  current_block->SetBranchIfTrue(consequence_block);
-  current_block->SetBranchIfFalse(alternative_block);
-  consequence_block->SetBranchIfTrue(next);
-  alternative_block->SetBranchIfTrue(next);
+  current_block = next_block;
 
-  // Ending
-  current_block = next;
-
-  return tmp_operand;
+  return result_operand;
 }
 
 std::shared_ptr<Operand> BuildIdentifierRValueIR(
@@ -623,20 +609,18 @@ void BuildWhileStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  // Init
-  std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-  // Building
-  BuildExpressionIR(node.condition, context, cfg, condition);
-  BuildStatementIR(*node.body, context, cfg, body);
-  // Branching
-  current_block->SetBranchIfTrue(condition);
-  condition->SetBranchIfTrue(body);
-  condition->SetBranchIfFalse(next);
-  body->SetBranchIfTrue(condition);
-  // Ending
-  current_block = next;
+  std::shared_ptr<BasicBlock> test_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
+
+  std::shared_ptr<Operand> test_operand = BuildExpressionIR(node.condition, context, cfg, test_block);
+  BuildStatementIR(*node.body, context, cfg, body_block);
+
+  current_block->SetJump(test_block);
+  test_block->SetConditionalJump(test_operand, body_block, next_block);
+  body_block->SetJump(test_block);
+
+  current_block = next_block;
 }
 
 void BuildForStatementIR(
@@ -645,26 +629,28 @@ void BuildForStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  // Init
-  std::shared_ptr<BasicBlock> initialization = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> iteration = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-  // Building
-  BuildExpressionIR(node.initialization, context, cfg, initialization);
-  BuildExpressionIR(node.condition, context, cfg, condition);
-  BuildExpressionIR(node.iteration, context, cfg, iteration);
-  BuildStatementIR(*node.body, context, cfg, body);
-  // Branching
-  current_block->SetBranchIfTrue(initialization);
-  initialization->SetBranchIfTrue(condition);
-  condition->SetBranchIfTrue(body);
-  condition->SetBranchIfFalse(next);
-  body->SetBranchIfTrue(iteration);
-  iteration->SetBranchIfTrue(condition);
-  // Ending
-  current_block = next;
+  if (node.condition == nullptr) {
+    throw std::runtime_error("Not implemented: infinite loops");
+  }
+
+  std::shared_ptr<BasicBlock> test_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> update_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
+
+  BuildExpressionIR(node.initialization, context, cfg, current_block);
+  std::shared_ptr<Operand> test_operand = BuildExpressionIR(node.condition, context, cfg, test_block);
+  if (node.iteration != nullptr) {
+    BuildExpressionIR(node.iteration, context, cfg, update_block);
+  }
+  BuildStatementIR(*node.body, context, cfg, body_block);
+
+  current_block->SetJump(test_block);
+  test_block->SetConditionalJump(test_operand, body_block, next_block);
+  body_block->SetJump(update_block);
+  update_block->SetJump(test_block);
+
+  current_block = next_block;
 }
 
 void BuildIfStatementIR(
@@ -673,36 +659,23 @@ void BuildIfStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  // Next block
-  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-
-  // Test
   std::shared_ptr<Operand> test_operand = BuildExpressionIR(node.test, context, cfg, current_block);
-  const std::shared_ptr<const DataType> test_type = getOperandType(*test_operand);
-  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(test_type);
-  const std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
-  current_block->Push(CopyOp::Create(tmp_operand, test_operand));
+  std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-  // Consequence
   std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
   BuildStatementIR(*node.consequence, context, cfg, consequence);
+  consequence->SetJump(next_block);
 
-  // Branches & alternative
-  if (node.alternative != nullptr) {
+  if (node.alternative == nullptr) {
+    current_block->SetConditionalJump(test_operand, consequence, next_block);
+  } else {
     std::shared_ptr<BasicBlock> alternative = cfg->CreateBasicBlock();
     BuildStatementIR(*node.alternative, context, cfg, alternative);
-    current_block->SetBranchIfTrue(consequence);
-    current_block->SetBranchIfFalse(alternative);
-    consequence->SetBranchIfTrue(next);
-    alternative->SetBranchIfTrue(next);
-  } else {
-    current_block->SetBranchIfTrue(consequence);
-    current_block->SetBranchIfFalse(next);
-    consequence->SetBranchIfTrue(next);
+    alternative->SetJump(next_block);
+    current_block->SetConditionalJump(test_operand, consequence, alternative);
   }
 
-  // Advance the current block
-  current_block = next;
+  current_block = next_block;
 }
 
 void BuildReturnStatementIR(

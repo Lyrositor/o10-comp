@@ -86,13 +86,13 @@
                 {
                   "node_type": "ExpressionStatement",
                   "expression": {
-                    "node_type": "AssignmentExpression",
-                    "op": "=",
-                    "lvalue": {
+                    "node_type": "BinaryExpression",
+                    "op": "==",
+                    "left": {
                       "node_type": "Identifier",
                       "name": "b"
                     },
-                    "rvalue": {
+                    "right": {
                       "node_type": "Int64Literal",
                       "value": 3
                     }
@@ -106,13 +106,13 @@
                 {
                   "node_type": "ExpressionStatement",
                   "expression": {
-                    "node_type": "AssignmentExpression",
-                    "op": "=",
-                    "lvalue": {
+                    "node_type": "BinaryExpression",
+                    "op": "==",
+                    "left": {
                       "node_type": "Identifier",
                       "name": "b"
                     },
-                    "rvalue": {
+                    "right": {
                       "node_type": "Int64Literal",
                       "value": 0
                     }
@@ -141,13 +141,13 @@
                 {
                   "node_type": "ExpressionStatement",
                   "expression": {
-                    "node_type": "AssignmentExpression",
-                    "op": "=",
-                    "lvalue": {
+                    "node_type": "BinaryExpression",
+                    "op": "==",
+                    "left": {
                       "node_type": "Identifier",
                       "name": "b"
                     },
-                    "rvalue": {
+                    "right": {
                       "node_type": "Int64Literal",
                       "value": 0
                     }

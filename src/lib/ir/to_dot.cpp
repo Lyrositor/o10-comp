@@ -91,6 +91,12 @@ void EmitReturnOp(const ReturnOp &node, std::ostream &out) {
   out << ");";
 }
 
+void EmitTestOp(const TestOp &node, std::ostream &out) {
+  out << "Test(";
+  EmitOperand(*node.test, out);
+  out << ");";
+}
+
 std::string UnaryOperatorToString(const UnaryOp::UnaryOperator &node) {
   switch (node) {
     case UnaryOp::UnaryOperator::BitwiseComplement: return "BitwiseComplement";
@@ -129,6 +135,10 @@ void EmitOp(const Op &node, std::ostream &out) {
     }
     case Op::Type::ReturnOp: {
       EmitReturnOp(static_cast<const ReturnOp &>(node), out);
+      break;
+    }
+    case Op::Type::TestOp: {
+      EmitTestOp(static_cast<const TestOp &>(node), out);
       break;
     }
     case Op::Type::UnaryOp: {
@@ -172,31 +182,35 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
   result.push_back(dot::ast::NodeStatement::Create(id, attributes));
 
-  std::shared_ptr<BasicBlock> branch_if_true = node.GetBranchIfTrue().lock();
-  std::shared_ptr<BasicBlock> branch_if_false = node.GetBranchIfFalse().lock();
-
-  if (branch_if_true != nullptr) {
-    if (branch_if_false != nullptr) {
+  switch (node.GetType()) {
+    case BasicBlock::Type::Incomplete: {
+      break; // TODO: Dotted line ?
+    }
+    case BasicBlock::Type::Final: {
+      break; // TODO: Double line width ?
+    }
+    case BasicBlock::Type::Jump: {
+      result.push_back(dot::ast::EdgeStatement::Create({id, "bb" + pointer_to_string(node.GetBranch().get())}, {}));
+      break;
+    }
+    case BasicBlock::Type::ConditionalJump: {
+      std::shared_ptr<BasicBlock> branch_if_true = node.GetBranchIfTrue();
+      std::shared_ptr<BasicBlock> branch_if_false = node.GetBranchIfFalse();
       std::vector<std::string> false_edge;
       result.push_back(
         dot::ast::EdgeStatement::Create(
-          {
-            id,
-            "bb" + pointer_to_string(branch_if_true.get())
-          },
-          {
-            dot::ast::Assignment::Create("color", "#45a03b")
-          }
-        )
+          {id, "bb" + pointer_to_string(branch_if_true.get())},
+          {dot::ast::Assignment::Create("color", "#45a03b")})
       );
       result.push_back(
         dot::ast::EdgeStatement::Create(
           {id, "bb" + pointer_to_string(branch_if_false.get())},
-          {dot::ast::Assignment::Create("color", "#a52f29")}
-        )
+          {dot::ast::Assignment::Create("color", "#a52f29")})
       );
-    } else {
-      result.push_back(dot::ast::EdgeStatement::Create({id, "bb" + pointer_to_string(branch_if_true.get())}, {}));
+      break;
+    }
+    default: {
+      throw std::domain_error("Unexpected value for `node.GetType()` in `BasicBlockToDot`");
     }
   }
 
