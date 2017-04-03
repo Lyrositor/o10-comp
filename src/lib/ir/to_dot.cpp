@@ -12,11 +12,32 @@ std::string pointer_to_string(void const *ptr) {
 
 void EmitOp(const Op &node, std::ostream &out) {
   switch (node.op_type) {
+    case Op::Type::BinOp: {
+      out << "BinOp;";
+      break;
+    }
+    case Op::Type::Copy: {
+      out << "Copy;";
+      break;
+    }
+    case Op::Type::Call: {
+      out << "Call;";
+      break;
+    }
     case Op::Type::NoOp: {
       out << "NoOp;";
+      break;
+    }
+    case Op::Type::Return: {
+      out << "Return;";
+      break;
+    }
+    case Op::Type::UnaryOp: {
+      out << "UnaryOp;";
+      break;
     }
     default: {
-      out << "Unk;";
+      throw std::domain_error("Unexpected value for `node.op_type` in `EmitOp`");
     }
   }
 }

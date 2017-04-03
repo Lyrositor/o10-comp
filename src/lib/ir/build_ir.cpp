@@ -2,7 +2,6 @@
 
 #include <comp/ir/builtins.h>
 #include <comp/ir/control_flow_graph.h>
-#include <comp/ir/op.h>
 #include <comp/utils.h>
 
 namespace comp {
@@ -323,17 +322,31 @@ void BuildVariableDeclarationIR(
     std::shared_ptr<const Variable> variable = Variable::Create(variable_type);
     context.RegisterVariable(variable_name, variable);
     if (variable_declarator->initial_value != nullptr) {
-      std::shared_ptr<const Variable>
+      std::shared_ptr<Operand>
         initial_value = BuildExpressionIR(variable_declarator->initial_value, context, cfg, current_block);
       current_block->Push(Copy::Create(
         VariableOperand::Create(variable),
-        VariableOperand::Create(initial_value)
+        initial_value
       ));
     }
   }
 }
 
-std::shared_ptr<const Variable> BuildExpressionIR(
+const std::shared_ptr<const DataType> getOperandType(const Operand &operand) {
+  switch (operand.operand_type) {
+    case Operand::Type::Variable: {
+      return static_cast<const VariableOperand &>(operand).variable->GetDataType();
+    }
+    case Operand::Type::Constant: {
+      return GetInt64Type();
+    }
+    default: {
+      throw std::domain_error("Unexpected value for `operand.operand_type` in `getOperandType`");
+    }
+  }
+}
+
+std::shared_ptr<Operand> BuildExpressionIR(
   const std::shared_ptr<ast::RExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
@@ -367,84 +380,86 @@ std::shared_ptr<const Variable> BuildExpressionIR(
 }
 
 // TODO(demurgos) handle mismatched types
-std::shared_ptr<const Variable> BuildBinaryExpressionIR(
+std::shared_ptr<Operand> BuildBinaryExpressionIR(
   const std::shared_ptr<ast::BinaryExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  const std::shared_ptr<const Variable> left =
-    BuildExpressionIR(node->left, context, cfg, current_block);
-  const std::shared_ptr<const Variable> right =
-    BuildExpressionIR(node->right, context, cfg, current_block);
-  const std::shared_ptr<const DataType> left_type = left->GetDataType();
-  const std::shared_ptr<const DataType> right_type = right->GetDataType();
+  const std::shared_ptr<Operand> left = BuildExpressionIR(node->left, context, cfg, current_block);
+  const std::shared_ptr<const DataType> left_type = getOperandType(*left);
+  const std::shared_ptr<Operand> right = BuildExpressionIR(node->right, context, cfg, current_block);
+  const std::shared_ptr<const DataType> right_type = getOperandType(*right);
+
   if (left_type != right_type) {
     throw std::runtime_error("Mismatched types for left and right operands");
   }
-  const std::shared_ptr<const Variable> r_value = context.CreateVariable(
-    left_type,
-    left->GetAstNode());
+
+  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(left_type, node);
+  std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
 
   switch (node->op) {
     case ast::BinaryOperator::Addition: {
-      current_block->Push(BinOp::Create(
-        VariableOperand::Create(r_value),
-        BinOp::BinaryOperator::Addition,
-        VariableOperand::Create(left),
-        VariableOperand::Create(right)
-      ));
+      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Addition, left, right));
+      break;
+    }
+    case ast::BinaryOperator::Division: {
+      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Division, left, right));
+      break;
+    }
+    case ast::BinaryOperator::Multiplication: {
+      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Multiplication, left, right));
+      break;
+    }
+    case ast::BinaryOperator::Subtraction: {
+      current_block->Push(BinOp::Create(tmp_operand, BinOp::BinaryOperator::Subtraction, left, right));
       break;
     }
     default: {
       throw std::domain_error("Unexpected value for node.op");
     }
   }
-  return r_value;
+
+  return tmp_operand;
 }
 
-std::shared_ptr<const Variable> BuildUnaryExpressionIR(
+std::shared_ptr<Operand> BuildUnaryExpressionIR(
   const std::shared_ptr<ast::UnaryExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  const std::shared_ptr<const Variable> expr =
-    BuildExpressionIR(node->expression, context, cfg, current_block);
-  const std::shared_ptr<const DataType> expr_type = expr->GetDataType();
-  const std::shared_ptr<const Variable> r_value = context.CreateVariable(
-    expr_type,
-    node);
+  const std::shared_ptr<Operand> expr = BuildExpressionIR(node->expression, context, cfg, current_block);
+  const std::shared_ptr<const DataType> expr_type = getOperandType(*expr);
 
-//  switch (node->op) {
-//    case ast::BinaryOperator::Addition: {
-//      current_block->Push(BinOp::Create(
-//        VariableOperand::Create(r_value),
-//        BinOp::BinaryOperator::Addition,
-//        VariableOperand::Create(left),
-//        VariableOperand::Create(right)
-//      ));
-//      break;
-//    }
-//    default: {
-//      throw std::domain_error("Unexpected value for node.op");
-//    }
-//  }
-  return r_value;
+  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(expr_type, node);
+  std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
+
+  switch (node->op) {
+    case ast::UnaryOperator::UnaryMinus: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::UnaryMinus, expr));
+      break;
+    }
+    default: {
+      throw std::domain_error("Unexpected value for node.op");
+    }
+  }
+
+  return tmp_operand;
 }
 
-std::shared_ptr<const Variable> BuildIdentifierRValueIR(
+std::shared_ptr<Operand> BuildIdentifierRValueIR(
   const std::shared_ptr<ast::Identifier> node,
   Context &context
 ) {
-  return context.ResolveVariable(node->name);
+  return VariableOperand::Create(context.ResolveVariable(node->name));
 }
 
-std::shared_ptr<const Variable> BuildIdentifierLValueIR(
+std::shared_ptr<VariableOperand> BuildIdentifierLValueIR(
   const ast::Identifier &node,
   Context &context
 ) {
-  return context.ResolveVariable(node.name);
+  return VariableOperand::Create(context.ResolveVariable(node.name));
 }
 
 void BuildWhileStatementIR(

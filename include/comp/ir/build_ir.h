@@ -3,6 +3,7 @@
 #include "comp/ast.h"
 #include "comp/ir/basic_block.h"
 #include "comp/ir/context.h"
+#include "comp/ir/op.h"
 #include "comp/ir/program.h"
 #include "comp/ir/variable.h"
 
@@ -51,34 +52,34 @@ void BuildVariableDeclarationIR(
 );
 
 // R-values
-std::shared_ptr<const ir::Variable> BuildExpressionIR(
+std::shared_ptr<Operand> BuildExpressionIR(
   const std::shared_ptr<ast::RExpression> node,
   ir::Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
-std::shared_ptr<const ir::Variable> BuildBinaryExpressionIR(
+std::shared_ptr<Operand> BuildBinaryExpressionIR(
   const std::shared_ptr<ast::BinaryExpression> node,
   ir::Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
-std::shared_ptr<const ir::Variable> BuildUnaryExpressionIR(
+std::shared_ptr<Operand> BuildUnaryExpressionIR(
   const std::shared_ptr<ast::UnaryExpression> node,
   ir::Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
-std::shared_ptr<const ir::Variable> BuildIdentifierRValueIR(
+std::shared_ptr<Operand> BuildIdentifierRValueIR(
   const std::shared_ptr<ast::Identifier> node,
   ir::Context &context
 );
 
 // L-values
-std::shared_ptr<const ir::Variable> BuildIdentifierLValueIR(
+std::shared_ptr<VariableOperand> BuildIdentifierLValueIR(
   const ast::Identifier &node,
   ir::Context &context
 );

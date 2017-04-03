@@ -46,12 +46,12 @@ struct ConstantOperand final: Operand {
 
 struct Op {
   enum class Type {
-    Call,
     BinOp,
-    UnaryOp,
+    Call,
     Copy,
+    NoOp,
     Return,
-    NoOp
+    UnaryOp
   };
 
   Op(Type op_type);

@@ -1,6 +1,7 @@
 {
   "source": "main.c",
   "assembly": true,
+  "actual-ast": "ast.actual.json",
   "ir": {
     "actual-dot": "ir.actual.dot"
   }
