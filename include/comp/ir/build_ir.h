@@ -78,6 +78,11 @@ std::shared_ptr<Operand> BuildIdentifierRValueIR(
   ir::Context &context
 );
 
+std::shared_ptr<Operand> BuildInt64LiteralIR(
+  const std::shared_ptr<ast::Int64Literal> node,
+  ir::Context &context
+);
+
 // L-values
 std::shared_ptr<VariableOperand> BuildIdentifierLValueIR(
   const ast::Identifier &node,

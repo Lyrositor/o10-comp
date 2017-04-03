@@ -34,21 +34,21 @@ ConstantOperand::ConstantOperand(int64_t value) : Operand(Type::Constant), value
 ConstantOperand::~ConstantOperand() {
 }
 
-std::unique_ptr<Call> Call::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args) {
-  return std::unique_ptr<Call>(new Call(out, function, args));
+std::unique_ptr<CallOp> CallOp::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args) {
+  return std::unique_ptr<CallOp>(new CallOp(out, function, args));
 }
 
-Call::Call (
+CallOp::CallOp (
   std::shared_ptr<VariableOperand> out,
   std::shared_ptr<ir::FunctionSymbol> function,
   std::vector<std::shared_ptr<Operand>> args
 ) :
-  Op(Op::Type::Call),
+  Op(Op::Type::CallOp),
   out(out),
   function(function),
   args(args) {
 }
-Call::~Call() {
+CallOp::~CallOp() {
 }
 
 std::unique_ptr<BinOp> BinOp::Create(
@@ -94,32 +94,32 @@ UnaryOp::UnaryOp(std::shared_ptr<VariableOperand> out,
 UnaryOp::~UnaryOp() {
 }
 
-std::unique_ptr<Copy> Copy::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
-  return std::unique_ptr<Copy>(new Copy(out, in));
+std::unique_ptr<CopyOp> CopyOp::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
+  return std::unique_ptr<CopyOp>(new CopyOp(out, in));
 }
 
-Copy::Copy(
+CopyOp::CopyOp(
   std::shared_ptr<VariableOperand> out,
   std::shared_ptr<Operand> in
 ) :
-  Op(Op::Type::Copy),
+  Op(Op::Type::CopyOp),
   out(out),
   in(in) {
 }
 
-Copy::~Copy() {
+CopyOp::~CopyOp() {
 }
 
-std::unique_ptr<Return> Return::Create(std::shared_ptr<Operand> in) {
-  return std::unique_ptr<Return>(new Return(in));
+std::unique_ptr<ReturnOp> ReturnOp::Create(std::shared_ptr<Operand> in) {
+  return std::unique_ptr<ReturnOp>(new ReturnOp(in));
 }
 
-Return::Return(std::shared_ptr<Operand> in) :
-  Op(Op::Type::Return),
+ReturnOp::ReturnOp(std::shared_ptr<Operand> in) :
+  Op(Op::Type::ReturnOp),
   in(in) {
 }
 
-Return::~Return() {
+ReturnOp::~ReturnOp() {
 }
 
 NoOp::NoOp() : Op(Op::Type::NoOp) {

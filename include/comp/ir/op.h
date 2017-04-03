@@ -47,10 +47,10 @@ struct ConstantOperand final: Operand {
 struct Op {
   enum class Type {
     BinOp,
-    Call,
-    Copy,
+    CallOp,
+    CopyOp,
     NoOp,
-    Return,
+    ReturnOp,
     UnaryOp
   };
 
@@ -64,10 +64,10 @@ class FunctionSymbol;
 /**
  * Call a function `function` with arguments `args` and store the result in `out`
  */
-struct Call final : public Op {
-  static std::unique_ptr<Call> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args);
-  Call(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args);
-  virtual ~Call();
+struct CallOp final : public Op {
+  static std::unique_ptr<CallOp> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args);
+  CallOp(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args);
+  virtual ~CallOp();
 
   std::shared_ptr<VariableOperand> out;
   std::shared_ptr<ir::FunctionSymbol> function;
@@ -129,10 +129,10 @@ struct UnaryOp final : public Op {
 /**
  * Copy the value from `in` to `out`.
  */
-struct Copy final : public Op {
-  static std::unique_ptr<Copy> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
-  Copy(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
-  virtual ~Copy();
+struct CopyOp final : public Op {
+  static std::unique_ptr<CopyOp> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
+  CopyOp(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
+  virtual ~CopyOp();
 
   std::shared_ptr<VariableOperand> out;
   std::shared_ptr<Operand> in;
@@ -142,10 +142,10 @@ struct Copy final : public Op {
 /**
  * Leave the function and return the `in` value or nothing if `in` is a nullptr
  */
-struct Return final : public Op {
-  static std::unique_ptr<Return> Create(std::shared_ptr<Operand> in);
-  Return(std::shared_ptr<Operand> in);
-  virtual ~Return();
+struct ReturnOp final : public Op {
+  static std::unique_ptr<ReturnOp> Create(std::shared_ptr<Operand> in);
+  ReturnOp(std::shared_ptr<Operand> in);
+  virtual ~ReturnOp();
 
   std::shared_ptr<Operand> in;
 };

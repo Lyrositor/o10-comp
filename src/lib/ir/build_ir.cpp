@@ -324,7 +324,7 @@ void BuildVariableDeclarationIR(
     if (variable_declarator->initial_value != nullptr) {
       std::shared_ptr<Operand>
         initial_value = BuildExpressionIR(variable_declarator->initial_value, context, cfg, current_block);
-      current_block->Push(Copy::Create(
+      current_block->Push(CopyOp::Create(
         VariableOperand::Create(variable),
         initial_value
       ));
@@ -363,6 +363,11 @@ std::shared_ptr<Operand> BuildExpressionIR(
     case ast::Node::Type::Identifier: {
       return BuildIdentifierRValueIR(
         std::dynamic_pointer_cast<ast::Identifier>(node),
+        context);
+    }
+    case ast::Node::Type::Int64Literal: {
+      return BuildInt64LiteralIR(
+        std::dynamic_pointer_cast<ast::Int64Literal>(node),
         context);
     }
     case ast::Node::Type::UnaryExpression: {
@@ -453,6 +458,14 @@ std::shared_ptr<Operand> BuildIdentifierRValueIR(
   Context &context
 ) {
   return VariableOperand::Create(context.ResolveVariable(node->name));
+}
+
+std::shared_ptr<Operand> BuildInt64LiteralIR(
+  const std::shared_ptr<ast::Int64Literal> node,
+  Context &context
+) {
+  UNUSED(context);
+  return ConstantOperand::Create(node->value);
 }
 
 std::shared_ptr<VariableOperand> BuildIdentifierLValueIR(
@@ -547,16 +560,12 @@ void BuildReturnStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  // Init
-  std::shared_ptr<BasicBlock> expression = cfg->CreateBasicBlock();
-  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-  // Building
-  BuildExpressionIR(node.expression, context, cfg, expression);
-  // Branching
-  current_block->SetBranchIfTrue(expression);
-  expression->SetBranchIfTrue(next);
-  // Ending
-  current_block = next;
+  if (node.expression == nullptr) {
+    current_block->Push(ReturnOp::Create(nullptr));
+  } else {
+    const std::shared_ptr<Operand> expr = BuildExpressionIR(node.expression, context, cfg, current_block);
+    current_block->Push(ReturnOp::Create(expr));
+  }
 }
 
 void BuildNullStatementIR(
