@@ -5,7 +5,7 @@ namespace comp {
 namespace dot {
 void emitIdentifier(const std::string &identifier, std::ostream &out) {
   out << "\"";
-  for(const char c : identifier) {
+  for (const char c : identifier) {
     switch (c) {
       case '\"': {
         out << "\\\"";
@@ -29,6 +29,15 @@ void emitIdentifier(const std::string &identifier, std::ostream &out) {
     }
   }
   out << "\"";
+}
+
+void emitAttributes(std::vector<std::shared_ptr<ast::Assignment>> attributes, std::ostream &out) {
+  out << "[";
+  for (size_t i = 0, l = attributes.size(); i < l; i++) {
+    auto attribute = attributes[i];
+    EmitAssignment(*attribute, out);
+  }
+  out << "]";
 }
 
 void EmitAssignment(const ast::Assignment &node, std::ostream &out) {
@@ -94,11 +103,28 @@ void EmitNode(const ast::Node &node, std::ostream &out) {
 }
 
 void EmitNodeStatement(const ast::NodeStatement &node, std::ostream &out) {
-  out << "N;";
+  emitIdentifier(node.id, out);
+  out << " ";
+  emitAttributes(node.attributes, out);
+  out << ";";
 }
 
 void EmitSubgraphStatement(const ast::SubgraphStatement &node, std::ostream &out) {
-  out << "N;";
+  out << "subgraph ";
+  if (node.name != nullptr) {
+    emitIdentifier(*node.name, out);
+    out << " ";
+  }
+  out << "{";
+  for (size_t i = 0, l = node.statements.size(); i < l; i++) {
+    if (i == 0) {
+      out << "\n";
+    }
+    auto statement = node.statements[i];
+    EmitStatement(*statement, out);
+    out << "\n";
+  }
+  out << "};";
 }
 
 void EmitStatement(const ast::Statement &node, std::ostream &out) {

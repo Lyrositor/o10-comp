@@ -1,4 +1,7 @@
 {
   "source": "main.c",
-  "assembly": true
+  "assembly": true,
+  "ir": {
+    "actual-dot": "ir.actual.dot"
+  }
 }

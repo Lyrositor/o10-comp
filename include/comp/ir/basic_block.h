@@ -17,13 +17,15 @@ class BasicBlock {
 
   virtual ~BasicBlock();
 
+  std::vector<std::shared_ptr<Op>> GetOps() const;
+
   void Push(std::shared_ptr<Op> op);
 
-  std::weak_ptr<BasicBlock> GetBranchIfTrue();
+  std::weak_ptr<BasicBlock> GetBranchIfTrue() const;
 
   void SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue);
 
-  std::weak_ptr<BasicBlock> GetBranchIfFalse();
+  std::weak_ptr<BasicBlock> GetBranchIfFalse() const;
 
   void SetBranchIfFalse(std::shared_ptr<BasicBlock> branchIfFalse);
 

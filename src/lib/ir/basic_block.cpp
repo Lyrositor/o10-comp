@@ -11,11 +11,15 @@ BasicBlock::BasicBlock(
   std::vector<std::shared_ptr<Op>> ops) : ops_(std::move(ops)) {
 }
 
+std::vector<std::shared_ptr<Op>> BasicBlock::GetOps() const {
+  return this->ops_;
+}
+
 void BasicBlock::Push(std::shared_ptr<Op> op) {
   this->ops_.push_back(op);
 }
 
-std::weak_ptr<BasicBlock> BasicBlock::GetBranchIfTrue() {
+std::weak_ptr<BasicBlock> BasicBlock::GetBranchIfTrue() const {
   return this->branch_if_true_;
 }
 
@@ -23,7 +27,7 @@ void BasicBlock::SetBranchIfTrue(std::shared_ptr<BasicBlock> branchIfTrue) {
   this->branch_if_true_ = branchIfTrue;
 }
 
-std::weak_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() {
+std::weak_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() const {
   return this->branch_if_false_;
 }
 
