@@ -10,5 +10,6 @@ add_library(
   program.cpp
   program_symbol.cpp
   symbol_table.cpp
+  to_dot.cpp
   variable.cpp
 )

@@ -18,10 +18,13 @@
 #include <comp/ir/program.h>
 #include <comp/exceptions.h>
 #include <comp/parser.h>
+#include <comp/dot/ast.h>
+#include <comp/ir/to_dot.h>
+#include <comp/dot/emit.h>
 
 #include "error_handling.h"
 
-enum Options {Unknown, File, Help, Compile, Analyse, Optimise, Json, Output};
+enum Options { Analyse, Compile, Dot, File, Json, Help, Optimise, Output, Unknown };
 
 static const option::Descriptor kUsage[] = {
   {
@@ -78,7 +81,15 @@ static const option::Descriptor kUsage[] = {
     "j",
     "json",
     option::Arg::None,
-    "  --json, -j \tDisplay a JSON representation of the generated syntax tree."
+    "  --json, -j \tDisplay a JSON representation of the generated abstract syntax tree."
+  },
+  {
+    Dot,
+    0,
+    "",
+    "dot",
+    option::Arg::None,
+    "  --dot \tEmit a Dot representation of the generated intermediate representation."
   },
   {
     Output,
@@ -178,9 +189,22 @@ int main(int argc, char **argv) {
       std::cout << json_buffer.GetString() << std::endl;
     }
 
+    if (!(options[Compile] || options[Dot])) {
+      return main_exit(EXIT_SUCCESS, buffer, options);
+    }
+
+    std::shared_ptr<comp::ir::Program> program_ir = comp::ir::BuildProgramIR(
+      *program_ast);
+    if (options[Dot]) {
+      std::unique_ptr<comp::dot::ast::Graph> program_graph = comp::ir::ProgramToDot(
+        *program_ir);
+      comp::dot::EmitGraph(*program_graph, std::cout);
+      std::cout << std::endl;
+    }
+
     // Compile the provided source file to an assembly file
     if (options[Compile]) {
-      std::string asm_filename = filename.substr(0, filename.size()-1) + "asm";
+      std::string asm_filename = filename.substr(0, filename.size() - 1) + "asm";
       if (options[Output]) {
         if (options[Output].arg == NULL) {
           std::cerr << "o10c: fatal error: output file path not specified";
@@ -199,8 +223,6 @@ int main(int argc, char **argv) {
         std::cerr << "compilation terminated." << std::endl;
         return main_exit(EXIT_FAILURE, buffer, options);
       }
-      std::shared_ptr<comp::ir::Program> program_ir = comp::ir::BuildProgramIR(
-        *program_ast);
 
       // Optimise the generated code
       if (options[Optimise]) {

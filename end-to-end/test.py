@@ -21,6 +21,7 @@ class Compiler:
     def generate_assembly(self, directory, source_path):
         pass
 
+
 DEFAULT_O10_COMP_PATH = os.path.join(PROJECT_ROOT, "build", "o10c")
 
 # Try to get the o10 compiler path from the environment, else use the default value
@@ -39,10 +40,16 @@ DEFAULT_ASSEMBLY_GENERATION_CONFIGURATIONS = {
     "clang-1": (clang, ["-S", "-O1", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
     "clang-2": (clang, ["-S", "-O2", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
     "clang-3": (clang, ["-S", "-O3", "-fno-asynchronous-unwind-tables", "-Wno-main-return-type"]),
-    #"o10c": (o10c, ["-c"])
+    # "o10c": (o10c, ["-c"])
 }
 
 ERRORS_ENUM = {"syntax"}
+
+
+class IrTestConfig():
+    def __init__(self):
+        self.disabled = False
+        self.actual_ir_path = None
 
 
 class TestConfig():
@@ -60,6 +67,8 @@ class TestConfig():
 
         self.generate_assembly = False
         self.assembly_generation_configs = []
+
+        self.ir = None  # type: IrTestConfig
 
     def from_json(input, test_dir) -> 'TestConfig':
         doc = json.loads(input)
@@ -92,12 +101,21 @@ class TestConfig():
                 config.generate_assembly = True
                 raise NotImplementedError("Custom assembly generation options")
 
+        if "ir" in doc:
+            ir_config = IrTestConfig()
+            if "disabled" in doc["ir"] and doc["ir"]["disabled"]:
+                ir_config.disabled = True
+            else:
+                ir_config.actual_ir_path = os.path.join(test_dir, doc["ir"]["actual-dot"])
+            config.ir = ir_config
+
         return config
 
 
 class TestCase:
     def __init__(self, dir):
         self.dir = dir
+        self.config = None  # type: TestConfig
         with open(os.path.join(dir, CONFIG_FILE_NAME), "r") as config_file:
             try:
                 self.config = TestConfig.from_json(config_file.read(), dir)
@@ -108,12 +126,14 @@ class TestCase:
         if self.config.disabled:
             return {
                 "ast": ("disabled", None),
-                "std-assembly": ("disabled", None)
+                "std-assembly": ("disabled", None),
+                "ir": ("hidden" if self.config.ir is None else "disabled", None)
             }
         else:
             return {
                 "ast": self.run_ast(),
-                "std-assembly": self.run_assembly()
+                "std-assembly": self.run_assembly(),
+                "ir": self.run_ir()
             }
 
     def run_ast(self):
@@ -186,6 +206,39 @@ class TestCase:
 
         return "success", None
 
+    def run_ir(self):
+        if self.config.ir is None:
+            return "hidden", None
+        if self.config.ir.disabled:
+            return "disabled", None
+
+        completed_process = subprocess.run(
+            [o10c.path, "--dot", self.config.source_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        stdout = completed_process.stdout.decode('utf-8')
+        stderr = completed_process.stderr.decode('utf-8')
+
+        if completed_process.returncode != 0:
+            if self.config.expect_error == "syntax":
+                return "success", None
+            else:
+                msg = ("Unable to generate IR:\n"
+                       "stdout:\n"
+                       "{}\n"
+                       "stderr:\n"
+                       "{}"
+                       ).format(stdout, stderr)
+                return "error", msg
+
+        if self.config.ir.actual_ir_path is not None:
+            with open(self.config.ir.actual_ir_path, "w") as actual_ir_file:
+                actual_ir_file.write(stdout)
+
+        return "success", None
+
     def run_assembly(self):
         if self.config.disabled:
             return "disabled", None
@@ -246,7 +299,7 @@ def dir_content(dir_path) -> Tuple[Set[str], Set[str]]:
 
 
 # Yields the test cases in the provided directory
-def discover_tests(tests_dir, recursive = True):
+def discover_tests(tests_dir, recursive=True):
     for fs_node in os.listdir(tests_dir):
         fs_node_path = os.path.join(tests_dir, fs_node)
         if not os.path.isdir(fs_node_path):
@@ -258,6 +311,7 @@ def discover_tests(tests_dir, recursive = True):
         elif recursive:
             for test_case in discover_tests(test_dir_path, True):
                 yield test_case
+
 
 test_report = []
 test_messages = []
