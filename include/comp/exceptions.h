@@ -14,7 +14,14 @@ class Exception : public std::runtime_error {
 
 class CompilationException : public Exception {
  public:
-  CompilationException(const std::string &message);
+  CompilationException(
+    const std::string &message,
+    const std::shared_ptr<ast::SourceLocation>);
+
+  std::shared_ptr<ast::SourceLocation> GetLocation() const;
+
+ private:
+    const std::shared_ptr<ast::SourceLocation> location_;
 };
 
 class SyntaxException : public CompilationException {
@@ -23,10 +30,6 @@ class SyntaxException : public CompilationException {
     const std::string &message,
     const std::shared_ptr<ast::SourceLocation>);
 
-  std::shared_ptr<ast::SourceLocation> GetLocation() const;
-
- private:
-  const std::shared_ptr<ast::SourceLocation> location_;
 };
 
 class UnexpectedTokenError : public SyntaxException {
