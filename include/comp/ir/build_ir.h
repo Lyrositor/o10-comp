@@ -51,22 +51,29 @@ void BuildVariableDeclarationIR(
 );
 
 // R-values
-std::shared_ptr<const ir::Variable> BuildExpressionRValueIR(
-  const ast::RExpression &node,
+std::shared_ptr<const ir::Variable> BuildExpressionIR(
+  const std::shared_ptr<ast::RExpression> node,
   ir::Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
-std::shared_ptr<const ir::Variable> BuildBinaryExpressionRValueIR(
-  const ast::BinaryExpression &node,
+std::shared_ptr<const ir::Variable> BuildBinaryExpressionIR(
+  const std::shared_ptr<ast::BinaryExpression> node,
+  ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+);
+
+std::shared_ptr<const ir::Variable> BuildUnaryExpressionIR(
+  const std::shared_ptr<ast::UnaryExpression> node,
   ir::Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );
 
 std::shared_ptr<const ir::Variable> BuildIdentifierRValueIR(
-  const ast::Identifier &node,
+  const std::shared_ptr<ast::Identifier> node,
   ir::Context &context
 );
 

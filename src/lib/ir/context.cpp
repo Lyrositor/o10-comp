@@ -40,10 +40,10 @@ void Context::RegisterFunction(
 
 std::shared_ptr<const Variable> Context::CreateVariable(
   std::shared_ptr<const DataType> data_type,
-  std::shared_ptr<const ast::Declarator> declarator
+  const std::shared_ptr<const ast::Node> node
 ) {
   std::shared_ptr<const Variable> result = Variable::Create(
-    data_type, declarator);
+    data_type, node);
   variables_.insert(result);
   return result;
 }

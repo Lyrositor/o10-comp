@@ -132,7 +132,7 @@ std::shared_ptr<const DataType> ResolveDataTypeType(const ast::DataType &data_ty
       return context.ResolveDataType(identifierDeclarator.identifier->name);
     }
     default: {
-      throw std::runtime_error("Unexpected node type");
+      throw std::runtime_error("Unexpected node type in `ResolveDataTypeType`");
     }
   }
 }
@@ -153,7 +153,7 @@ std::shared_ptr<const DataType> ResolveDeclaratorType(const std::shared_ptr<cons
       return base_type;
     }
     default: {
-      throw std::runtime_error("Unexpected node type");
+      throw std::runtime_error("Unexpected node type in `ResolveDeclaratorType`");
     }
   }
 }
@@ -169,7 +169,7 @@ std::shared_ptr<const DataType> ResolveParameterType(const ast::Parameter &param
       return ResolveDataTypeType(*anonymousParameter.data_type, context);
     }
     default: {
-      throw std::runtime_error("Unexpected node type");
+      throw std::runtime_error("Unexpected node type in `ResolveParameterType`");
     }
   }
 }
@@ -185,7 +185,7 @@ std::string ResolveDeclaratorName(const ast::Declarator &declarator) {
       return identifierDeclarator.identifier->name;
     }
     default: {
-      throw std::runtime_error("Unexpected node type");
+      throw std::runtime_error("Unexpected node type in `ResolveDeclaratorName`");
     }
   }
 }
@@ -200,7 +200,7 @@ std::string ResolveParameterName(const ast::Parameter &parameter) {
       return "";
     }
     default: {
-      throw std::runtime_error("Unexpected node type");
+      throw std::runtime_error("Unexpected node type in `ResolveParameterName`");
     }
   }
 }
@@ -282,7 +282,7 @@ void BuildStatementIR(
       break;
     }
     default: {
-      throw std::domain_error("Unexpected value for `node.node_type`");
+      throw std::domain_error("Unexpected value for `node.node_type` in `BuildStatementIR`");
     }
   }
 }
@@ -306,7 +306,7 @@ void BuildExpressionStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  BuildExpressionRValueIR(*node.expression, context, cfg, current_block);
+  BuildExpressionIR(node.expression, context, cfg, current_block);
 }
 
 void BuildVariableDeclarationIR(
@@ -324,52 +324,59 @@ void BuildVariableDeclarationIR(
     context.RegisterVariable(variable_name, variable);
     if (variable_declarator->initial_value != nullptr) {
       std::shared_ptr<const Variable>
-        initial_value = BuildExpressionRValueIR(*variable_declarator->initial_value, context, cfg, current_block);
-        current_block->Push(Copy::Create(
-          VariableOperand::Create(variable),
-          VariableOperand::Create(initial_value)
-        ));
+        initial_value = BuildExpressionIR(variable_declarator->initial_value, context, cfg, current_block);
+      current_block->Push(Copy::Create(
+        VariableOperand::Create(variable),
+        VariableOperand::Create(initial_value)
+      ));
     }
   }
 }
 
-std::shared_ptr<const Variable> BuildExpressionRValueIR(
-  const ast::RExpression &node,
+std::shared_ptr<const Variable> BuildExpressionIR(
+  const std::shared_ptr<ast::RExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  switch (node.node_type) {
+  switch (node->node_type) {
+    case ast::Node::Type::BinaryExpression: {
+      return BuildBinaryExpressionIR(
+        std::dynamic_pointer_cast<ast::BinaryExpression>(node),
+        context,
+        cfg,
+        current_block);
+    }
     case ast::Node::Type::Identifier: {
       return BuildIdentifierRValueIR(
-        static_cast<const ast::Identifier &>(node),
+        std::dynamic_pointer_cast<ast::Identifier>(node),
         context);
     }
-    case ast::Node::Type::BinaryExpression: {
-      return BuildBinaryExpressionRValueIR(
-        static_cast<const ast::BinaryExpression &>(node),
+    case ast::Node::Type::UnaryExpression: {
+      return BuildUnaryExpressionIR(
+        std::dynamic_pointer_cast<ast::UnaryExpression>(node),
         context,
         cfg,
         current_block);
     }
     default: {
       throw std::domain_error(
-        "Unexpected value for `node.expression->node_type`");
+        "Unexpected value for `node.expression->node_type` in `BuildExpressionIR`");
     }
   }
 }
 
 // TODO(demurgos) handle mismatched types
-std::shared_ptr<const Variable> BuildBinaryExpressionRValueIR(
-  const ast::BinaryExpression &node,
+std::shared_ptr<const Variable> BuildBinaryExpressionIR(
+  const std::shared_ptr<ast::BinaryExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
   const std::shared_ptr<const Variable> left =
-    BuildExpressionRValueIR(*node.left, context, cfg, current_block);
+    BuildExpressionIR(node->left, context, cfg, current_block);
   const std::shared_ptr<const Variable> right =
-    BuildExpressionRValueIR(*node.right, context, cfg, current_block);
+    BuildExpressionIR(node->right, context, cfg, current_block);
   const std::shared_ptr<const DataType> left_type = left->GetDataType();
   const std::shared_ptr<const DataType> right_type = right->GetDataType();
   if (left_type != right_type) {
@@ -377,9 +384,9 @@ std::shared_ptr<const Variable> BuildBinaryExpressionRValueIR(
   }
   const std::shared_ptr<const Variable> r_value = context.CreateVariable(
     left_type,
-    left->GetDeclarator());
+    left->GetAstNode());
 
-  switch (node.op) {
+  switch (node->op) {
     case ast::BinaryOperator::Addition: {
       current_block->Push(BinOp::Create(
         VariableOperand::Create(r_value),
@@ -396,11 +403,41 @@ std::shared_ptr<const Variable> BuildBinaryExpressionRValueIR(
   return r_value;
 }
 
+std::shared_ptr<const Variable> BuildUnaryExpressionIR(
+  const std::shared_ptr<ast::UnaryExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+  const std::shared_ptr<const Variable> expr =
+    BuildExpressionIR(node->expression, context, cfg, current_block);
+  const std::shared_ptr<const DataType> expr_type = expr->GetDataType();
+  const std::shared_ptr<const Variable> r_value = context.CreateVariable(
+    expr_type,
+    node);
+
+//  switch (node->op) {
+//    case ast::BinaryOperator::Addition: {
+//      current_block->Push(BinOp::Create(
+//        VariableOperand::Create(r_value),
+//        BinOp::BinaryOperator::Addition,
+//        VariableOperand::Create(left),
+//        VariableOperand::Create(right)
+//      ));
+//      break;
+//    }
+//    default: {
+//      throw std::domain_error("Unexpected value for node.op");
+//    }
+//  }
+  return r_value;
+}
+
 std::shared_ptr<const Variable> BuildIdentifierRValueIR(
-  const ast::Identifier &node,
+  const std::shared_ptr<ast::Identifier> node,
   Context &context
 ) {
-  return context.ResolveVariable(node.name);
+  return context.ResolveVariable(node->name);
 }
 
 std::shared_ptr<const Variable> BuildIdentifierLValueIR(
@@ -416,20 +453,20 @@ void BuildWhileStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-    // Init
-    std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-    // Building
-    BuildExpressionRValueIR(*node.condition, context, cfg, condition);
-    BuildStatementIR(*node.body, context, cfg, body);
-    // Branching
-    current_block->SetBranchIfTrue(condition);
-    condition->SetBranchIfTrue(body);
-    condition->SetBranchIfFalse(next);
-    body->SetBranchIfTrue(condition);
-    // Ending
-    current_block = next;
+  // Init
+  std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
+  // Building
+  BuildExpressionIR(node.condition, context, cfg, condition);
+  BuildStatementIR(*node.body, context, cfg, body);
+  // Branching
+  current_block->SetBranchIfTrue(condition);
+  condition->SetBranchIfTrue(body);
+  condition->SetBranchIfFalse(next);
+  body->SetBranchIfTrue(condition);
+  // Ending
+  current_block = next;
 }
 
 void BuildForStatementIR(
@@ -438,26 +475,26 @@ void BuildForStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-    // Init
-    std::shared_ptr<BasicBlock> initialization = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> iteration = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-    // Building
-    BuildExpressionRValueIR(*node.initialization, context, cfg, initialization);
-    BuildExpressionRValueIR(*node.condition, context, cfg, condition);
-    BuildExpressionRValueIR(*node.iteration, context, cfg, iteration);
-    BuildStatementIR(*node.body, context, cfg, body);
-    // Branching
-    current_block->SetBranchIfTrue(initialization);
-    initialization->SetBranchIfTrue(condition);
-    condition->SetBranchIfTrue(body);
-    condition->SetBranchIfFalse(next);
-    body->SetBranchIfTrue(iteration);
-    iteration->SetBranchIfTrue(condition);
-    // Ending
-    current_block = next;
+  // Init
+  std::shared_ptr<BasicBlock> initialization = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> condition = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> iteration = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> body = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
+  // Building
+  BuildExpressionIR(node.initialization, context, cfg, initialization);
+  BuildExpressionIR(node.condition, context, cfg, condition);
+  BuildExpressionIR(node.iteration, context, cfg, iteration);
+  BuildStatementIR(*node.body, context, cfg, body);
+  // Branching
+  current_block->SetBranchIfTrue(initialization);
+  initialization->SetBranchIfTrue(condition);
+  condition->SetBranchIfTrue(body);
+  condition->SetBranchIfFalse(next);
+  body->SetBranchIfTrue(iteration);
+  iteration->SetBranchIfTrue(condition);
+  // Ending
+  current_block = next;
 }
 
 void BuildIfStatementIR(
@@ -466,27 +503,27 @@ void BuildIfStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-    // Init
-    std::shared_ptr<BasicBlock> test = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-    // Building
-    BuildExpressionRValueIR(*node.test, context, cfg, test);
-    BuildStatementIR(*node.consequence, context, cfg, consequence);
-    // Branching
-    current_block->SetBranchIfTrue(test);
-    test->SetBranchIfTrue(consequence);
-    consequence->SetBranchIfTrue(next);
-    if (node.alternative != nullptr) {
-      std::shared_ptr<BasicBlock> alternative = cfg->CreateBasicBlock();
-      BuildStatementIR(*node.alternative, context, cfg, alternative);
-      test->SetBranchIfFalse(alternative);
-      alternative->SetBranchIfTrue(next);
-    } else {
-      test->SetBranchIfFalse(next);
-    }
-    // Ending
-    current_block = next;
+  // Init
+  std::shared_ptr<BasicBlock> test = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
+  // Building
+  BuildExpressionIR(node.test, context, cfg, test);
+  BuildStatementIR(*node.consequence, context, cfg, consequence);
+  // Branching
+  current_block->SetBranchIfTrue(test);
+  test->SetBranchIfTrue(consequence);
+  consequence->SetBranchIfTrue(next);
+  if (node.alternative != nullptr) {
+    std::shared_ptr<BasicBlock> alternative = cfg->CreateBasicBlock();
+    BuildStatementIR(*node.alternative, context, cfg, alternative);
+    test->SetBranchIfFalse(alternative);
+    alternative->SetBranchIfTrue(next);
+  } else {
+    test->SetBranchIfFalse(next);
+  }
+  // Ending
+  current_block = next;
 }
 
 void BuildReturnStatementIR(
@@ -495,16 +532,16 @@ void BuildReturnStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-    // Init
-    std::shared_ptr<BasicBlock> expression = cfg->CreateBasicBlock();
-    std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-    // Building
-    BuildExpressionRValueIR(*node.expression, context, cfg, expression);
-    // Branching
-    current_block->SetBranchIfTrue(expression);
-    expression->SetBranchIfTrue(next);
-    // Ending
-    current_block = next;
+  // Init
+  std::shared_ptr<BasicBlock> expression = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
+  // Building
+  BuildExpressionIR(node.expression, context, cfg, expression);
+  // Branching
+  current_block->SetBranchIfTrue(expression);
+  expression->SetBranchIfTrue(next);
+  // Ending
+  current_block = next;
 }
 
 void BuildNullStatementIR(
@@ -519,7 +556,5 @@ void BuildNullStatementIR(
   UNUSED(cfg);
   UNUSED(current_block);
 }
-
-// End
 }  // namespace ir
 }  // namespace comp
