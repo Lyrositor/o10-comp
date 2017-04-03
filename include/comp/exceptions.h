@@ -19,6 +19,7 @@ class CompilationException : public Exception {
     const std::shared_ptr<ast::SourceLocation>);
 
   std::shared_ptr<ast::SourceLocation> GetLocation() const;
+  static std::string PrintLocation(const std::shared_ptr<ast::SourceLocation>);
 
  private:
     const std::shared_ptr<ast::SourceLocation> location_;
@@ -47,13 +48,8 @@ class UnexpectedTokenError : public SyntaxException {
 class UnexpectedNodeTypeError : public SyntaxException {
  public:
   UnexpectedNodeTypeError(
-    const std::string &node,
     const std::shared_ptr<ast::SourceLocation> location);
 
-  std::string GetNode() const;
-
- private:
-  const std::string node_;
 };
 
 class UnexpectedNodeValueError : public SyntaxException {
@@ -71,16 +67,7 @@ class UnexpectedNodeValueError : public SyntaxException {
 class MismatchedTypesLeftRightError : public CompilationException {
  public:
   MismatchedTypesLeftRightError(
-      const std::string &left,
-      const std::string &right,
       const std::shared_ptr<ast::SourceLocation> location);
-
-  std::string GetLeft() const;
-  std::string GetRight() const;
-
- private:
-  const std::string left_;
-  const std::string right_;
 };
 
 class FunctionAlreadyDefinedError : public CompilationException {
@@ -136,37 +123,19 @@ class FunctionParameterTypeDoesNotMatchError : public CompilationException {
 class UnexpectedNodeTypeInRootError : public SyntaxException {
  public:
   UnexpectedNodeTypeInRootError(
-    const std::string &node,
     const std::shared_ptr<ast::SourceLocation> location);
-
-  std::string GetNode() const;
-
- private:
-  const std::string node_;
 };
 
 class ArrayLengthNotLiteralError : public SyntaxException {
  public:
   ArrayLengthNotLiteralError(
-    const std::string &array,
     const std::shared_ptr<ast::SourceLocation> location);
-
-  std::string GetArray() const;
-
- private:
-  const std::string array_;
 };
 
 class CannotSpecifySizeError : public SyntaxException {
  public:
   CannotSpecifySizeError(
-    const std::string &array,
     const std::shared_ptr<ast::SourceLocation> location);
-
-  std::string GetArray() const;
-
- private:
-  const std::string array_;
 };
 
 
