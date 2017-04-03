@@ -29,7 +29,9 @@ UnexpectedTokenError::UnexpectedTokenError(
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   SyntaxException(
-    std::string("Unexpected token") + ": '" + token + "'", location),
+    std::string("Unexpected token") + ": '" + token + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
     token_(token) {
 }
 
@@ -37,79 +39,195 @@ std::string UnexpectedTokenError::GetToken() const {
   return token_;
 }
 
-UnexpectedNodeType::UnexpectedNodeType(
+UnexpectedNodeTypeError::UnexpectedNodeTypeError(
   const std::string &node,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
-  CompilationException(
-    std::string("Unexpected node type") + ": '" + node, location),
+  SyntaxException(
+    std::string("Unexpected node type") + ": '" + node + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
     node_(node) {
 }
 
-UnexpectedNodeValue::UnexpectedNodeValue(
-  const std::string &value,
+std::string UnexpectedNodeTypeError::GetNode() const {
+  return node_;
+}
+
+UnexpectedNodeValueError::UnexpectedNodeValueError(
   const std::string &node,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
-  CompilationException(
-    std::string("Unexpected node value") + ": '" + node + " '" + value, location),
-    value_(value),
+  SyntaxException(
+    std::string("Unexpected node value") + ": '" + node + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
     node_(node) {
 }
 
-MismatchedTypesLeftRight::MismatchedTypesLeftRight(
+std::string UnexpectedNodeValueError::GetNode() const {
+  return node_;
+}
+
+MismatchedTypesLeftRightError::MismatchedTypesLeftRightError(
   const std::string &left,
   const std::string &right,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Mismatched types for left and right operands") + ": '" + left + ", " + right, location),
+    std::string("Mismatched types for left and right operands") + ": '" + left + ", " + right + "'"
+      + " at line " + std::to_string(location->start.line)
+      + ", column " + std::to_string(location->start.column) + ".",
+    location),
     left_(left),
     right_(right) {
 }
 
-FunctionAlreadyDefined::FunctionAlreadyDefined(
+std::string MismatchedTypesLeftRightError::GetLeft() const {
+  return left_;
+}
+
+std::string MismatchedTypesLeftRightError::GetRight() const {
+  return right_;
+}
+
+FunctionAlreadyDefinedError::FunctionAlreadyDefinedError(
   const std::string &function,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Function already defined") + ": '" + function, location),
+    std::string("Function already defined") + ": '" + function + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
     function_(function) {
 }
 
-FunctionAlreadyDeclared::FunctionAlreadyDeclared(
+std::string FunctionAlreadyDefinedError::GetFunction() const {
+  return function_;
+}
+
+FunctionAlreadyDeclaredError::FunctionAlreadyDeclaredError(
   const std::string &function,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Function already declared") + ": '" + function, location),
+    std::string("Function already declared") + ": '" + function + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
     function_(function) {
 }
 
-FunctionParameterListDoesNotMatch::FunctionParameterListDoesNotMatch(
+std::string FunctionAlreadyDeclaredError::GetFunction() const {
+  return function_;
+}
+
+FunctionParameterListDoesNotMatchError::FunctionParameterListDoesNotMatchError(
   const std::string &function,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Function's parameter list does not match the declared list") + ": '" + function, location),
+    std::string("Function's parameter list does not match the declared list") + ": '" + function + "'"
+      + " at line " + std::to_string(location->start.line)
+      + ", column " + std::to_string(location->start.column) + ".",
+    location),
     function_(function) {
 }
 
-FunctionReturnTypeDoesNotMatch::FunctionReturnTypeDoesNotMatch(
+std::string FunctionParameterListDoesNotMatchError::GetFunction() const {
+  return function_;
+}
+
+FunctionReturnTypeDoesNotMatchError::FunctionReturnTypeDoesNotMatchError(
   const std::string &function,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Function's return type does not match the declared type") + ": '" + function, location),
+    std::string("Function's return type does not match the declared type") + ": '" + function + "'"
+      + " at line " + std::to_string(location->start.line)
+      + ", column " + std::to_string(location->start.column) + ".",
+    location),
     function_(function) {
 }
 
-FunctionParameterTypeDoesNotMatch::FunctionParameterTypeDoesNotMatch(
+std::string FunctionReturnTypeDoesNotMatchError::GetFunction() const {
+  return function_;
+}
+
+FunctionParameterTypeDoesNotMatchError::FunctionParameterTypeDoesNotMatchError(
   const std::string &function,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Function's parameter type does not match the declared type") + ": '" + function, location),
+    std::string("Function's parameter type does not match the declared type") + ": '" + function + "'"
+      + " at line " + std::to_string(location->start.line)
+      + ", column " + std::to_string(location->start.column) + ".",
+    location),
     function_(function) {
 }
+
+std::string FunctionParameterTypeDoesNotMatchError::GetFunction() const {
+  return function_;
+}
+
+UnexpectedNodeTypeInRootError::UnexpectedNodeTypeInRootError(
+  const std::string &node,
+  const std::shared_ptr<ast::SourceLocation> location
+) :
+  SyntaxException(
+    std::string("Unexpected node type in root context") + ": '" + node + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
+  node_(node) {
+}
+
+std::string UnexpectedNodeTypeInRootError::GetNode() const {
+  return node_;
+}
+
+ArrayLengthNotLiteralError::ArrayLengthNotLiteralError(
+  const std::string &array,
+  const std::shared_ptr<ast::SourceLocation> location
+) :
+  SyntaxException(
+    std::string("Array length not a literal") + ": '" + array + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
+  array_(array) {
+}
+
+std::string ArrayLengthNotLiteralError::GetArray() const {
+  return array_;
+}
+
+CannotSpecifySizeError::CannotSpecifySizeError(
+  const std::string &array,
+  const std::shared_ptr<ast::SourceLocation> location
+) :
+  SyntaxException(
+    std::string("Cannot specify size") + ": '" + array + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
+  array_(array) {
+}
+
+std::string CannotSpecifySizeError::GetArray() const {
+  return array_;
+}
+
+InvalidIdentifierError::InvalidIdentifierError(
+  const std::string &identifier,
+  const std::shared_ptr<ast::SourceLocation> location
+) :
+  SyntaxException(
+    std::string("Cannot specify size") + ": '" + identifier + "'" + " at line " +
+      std::to_string(location->start.line) + ", column " + std::to_string(location->start.column) + ".",
+    location),
+  identifier_(identifier) {
+}
+
+std::string InvalidIdentifierError::GetIdentifier() const {
+  return identifier_;
+}
+
+
 }  // namespace comp

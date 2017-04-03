@@ -44,9 +44,9 @@ class UnexpectedTokenError : public SyntaxException {
   const std::string token_;
 };
 
-class UnexpectedNodeType : public CompilationException {
+class UnexpectedNodeTypeError : public SyntaxException {
  public:
-  UnexpectedNodeType(
+  UnexpectedNodeTypeError(
     const std::string &node,
     const std::shared_ptr<ast::SourceLocation> location);
 
@@ -56,24 +56,21 @@ class UnexpectedNodeType : public CompilationException {
   const std::string node_;
 };
 
-class UnexpectedNodeValue : public CompilationException {
+class UnexpectedNodeValueError : public SyntaxException {
  public:
-  UnexpectedNodeValue(
-    const std::string &value,
+  UnexpectedNodeValueError(
     const std::string &node,
     const std::shared_ptr<ast::SourceLocation> location);
 
   std::string GetNode() const;
-  std::string GetValue() const;
 
  private:
   const std::string node_;
-  const std::string value_;
 };
 
-class MismatchedTypesLeftRight : public CompilationException {
+class MismatchedTypesLeftRightError : public CompilationException {
  public:
-  MismatchedTypesLeftRight(
+  MismatchedTypesLeftRightError(
       const std::string &left,
       const std::string &right,
       const std::shared_ptr<ast::SourceLocation> location);
@@ -86,48 +83,104 @@ class MismatchedTypesLeftRight : public CompilationException {
   const std::string right_;
 };
 
-class FunctionAlreadyDefined : public CompilationException {
+class FunctionAlreadyDefinedError : public CompilationException {
  public:
-  FunctionAlreadyDefined(
+  FunctionAlreadyDefinedError(
     const std::string &function,
     const std::shared_ptr<ast::SourceLocation> location);
+  std::string GetFunction() const;
  private:
   const std::string function_;
 };
 
-class FunctionAlreadyDeclared : public CompilationException {
+class FunctionAlreadyDeclaredError : public CompilationException {
  public:
-  FunctionAlreadyDeclared(
+  FunctionAlreadyDeclaredError(
     const std::string &function,
     const std::shared_ptr<ast::SourceLocation> location);
+  std::string GetFunction() const;
  private:
   const std::string function_;
 };
 
-class FunctionParameterListDoesNotMatch : public CompilationException {
+class FunctionParameterListDoesNotMatchError : public CompilationException {
  public:
-  FunctionParameterListDoesNotMatch(
+  FunctionParameterListDoesNotMatchError(
     const std::string &function,
     const std::shared_ptr<ast::SourceLocation> location);
+  std::string GetFunction() const;
  private:
   const std::string function_;
 };
 
-class FunctionReturnTypeDoesNotMatch : public CompilationException {
+class FunctionReturnTypeDoesNotMatchError : public CompilationException {
  public:
-  FunctionReturnTypeDoesNotMatch(
+  FunctionReturnTypeDoesNotMatchError(
     const std::string &function,
     const std::shared_ptr<ast::SourceLocation> location);
+  std::string GetFunction() const;
  private:
   const std::string function_;
 };
 
-class FunctionParameterTypeDoesNotMatch : public CompilationException {
+class FunctionParameterTypeDoesNotMatchError : public CompilationException {
  public:
-  FunctionParameterTypeDoesNotMatch(
-      const std::string &function,
-      const std::shared_ptr<ast::SourceLocation> location);
+  FunctionParameterTypeDoesNotMatchError(
+    const std::string &function,
+    const std::shared_ptr<ast::SourceLocation> location);
+  std::string GetFunction() const;
  private:
   const std::string function_;
 };
+
+class UnexpectedNodeTypeInRootError : public SyntaxException {
+ public:
+  UnexpectedNodeTypeInRootError(
+    const std::string &node,
+    const std::shared_ptr<ast::SourceLocation> location);
+
+  std::string GetNode() const;
+
+ private:
+  const std::string node_;
+};
+
+class ArrayLengthNotLiteralError : public SyntaxException {
+ public:
+  ArrayLengthNotLiteralError(
+    const std::string &array,
+    const std::shared_ptr<ast::SourceLocation> location);
+
+  std::string GetArray() const;
+
+ private:
+  const std::string array_;
+};
+
+class CannotSpecifySizeError : public SyntaxException {
+ public:
+  CannotSpecifySizeError(
+    const std::string &array,
+    const std::shared_ptr<ast::SourceLocation> location);
+
+  std::string GetArray() const;
+
+ private:
+  const std::string array_;
+};
+
+
+class InvalidIdentifierError : public SyntaxException {
+ public:
+  InvalidIdentifierError(
+    const std::string &identifier,
+    const std::shared_ptr<ast::SourceLocation> location);
+
+  std::string GetIdentifier() const;
+
+ private:
+  const std::string identifier_;
+};
+
+
 }  // namespace comp
