@@ -377,6 +377,13 @@ std::shared_ptr<Operand> BuildExpressionIR(
         cfg,
         current_block);
     }
+    case ast::Node::Type::ConditionalExpression: {
+      return BuildConditionalExpressionIR(
+        std::dynamic_pointer_cast<ast::ConditionalExpression>(node),
+        context,
+        cfg,
+        current_block);
+    }
     default: {
       throw std::domain_error(
         "Unexpected value for `node.expression->node_type` in `BuildExpressionIR`");
@@ -392,7 +399,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   std::shared_ptr<BasicBlock> &current_block
 ) {
 
-  if (node->op == ast::BinaryOperator::LogicalAnd) {
+  if (node->op == ast::BinaryOperator::LogicalAnd || node->op == ast::BinaryOperator::LogicalOr) {
     // Init
     std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
     const std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
@@ -405,47 +412,28 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     const std::shared_ptr<VariableOperand> test_operand = VariableOperand::Create(test_var);
     current_block->Push(CopyOp::Create(test_operand, left_operand));
 
-    const std::shared_ptr<Operand> right = BuildExpressionIR(node->right, context, cfg, right_block);
-    right_block->Push(CopyOp::Create(test_operand, right));
-    const std::shared_ptr<const DataType> right_type = getOperandType(*right);
+    const std::shared_ptr<Operand> right_operand = BuildExpressionIR(node->right, context, cfg, right_block);
+    right_block->Push(CopyOp::Create(test_operand, right_operand));
+    const std::shared_ptr<const DataType> right_type = getOperandType(*right_operand);
+
+    if (right_type->GetType() != left_type->GetType()) { // TODO equality overload
+      throw std::domain_error("Unexpected node type in root context");
+    }
 
     // Branching
-    current_block->SetBranchIfTrue(right_block);
-    current_block->SetBranchIfFalse(next);
+    if (node->op == ast::BinaryOperator::LogicalOr) {
+      current_block->SetBranchIfTrue(next);
+      current_block->SetBranchIfFalse(right_block);
+    } else { // LogicalAnd
+      current_block->SetBranchIfTrue(right_block);
+      current_block->SetBranchIfFalse(next);
+    }
     right_block->SetBranchIfTrue(next);
 
     // Ending
     current_block = next;
 
    return test_operand;
-  }
-
-  if (node->op == ast::BinaryOperator::LogicalOr) {
-    // Init
-    std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
-    const std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
-
-    // Building
-    const std::shared_ptr<Operand> left_operand = BuildExpressionIR(node->left, context, cfg, current_block);
-    const std::shared_ptr<const DataType> left_type = getOperandType(*left_operand);
-
-    const std::shared_ptr<const Variable> test_var = context.CreateVariable(left_type, node);
-    const std::shared_ptr<VariableOperand> test_operand = VariableOperand::Create(test_var);
-    current_block->Push(CopyOp::Create(test_operand, left_operand));
-
-    const std::shared_ptr<Operand> right = BuildExpressionIR(node->right, context, cfg, right_block);
-    right_block->Push(CopyOp::Create(test_operand, right));
-    const std::shared_ptr<const DataType> right_type = getOperandType(*right);
-
-    // Branching
-    current_block->SetBranchIfTrue(next);
-    current_block->SetBranchIfFalse(right_block);
-    right_block->SetBranchIfTrue(next);
-
-    // Ending
-    current_block = next;
-
-    return test_operand;
   }
 
   const std::shared_ptr<Operand> left = BuildExpressionIR(node->left, context, cfg, current_block);
@@ -558,6 +546,50 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
       throw std::domain_error("Unexpected value for node.op");
     }
   }
+
+  return tmp_operand;
+}
+
+std::shared_ptr<Operand> BuildConditionalExpressionIR(
+  const std::shared_ptr<ast::ConditionalExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+  // Init
+  std::shared_ptr<BasicBlock> consequence_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> alternative_block = cfg->CreateBasicBlock();
+  const std::shared_ptr<BasicBlock> next = cfg->CreateBasicBlock();
+
+
+
+  // Building
+  const std::shared_ptr<Operand> test_operand = BuildExpressionIR(node->test, context, cfg, current_block);
+
+  const std::shared_ptr<Operand> consequence_operand = BuildExpressionIR(node->consequence, context, cfg, consequence_block);
+  const std::shared_ptr<const DataType> consequence_type = getOperandType(*consequence_operand);
+
+  const std::shared_ptr<Operand> alternative_operand = BuildExpressionIR(node->alternative, context, cfg, alternative_block);
+  const std::shared_ptr<const DataType> alternative_type = getOperandType(*alternative_operand);
+
+  if (alternative_type->GetType() != consequence_type->GetType()) { // TODO equality overload
+    throw std::domain_error("Unexpected node type in root context");
+  }
+
+  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(consequence_type, node);
+  std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
+
+  consequence_block->Push(CopyOp::Create(tmp_operand, consequence_operand));
+  alternative_block->Push(CopyOp::Create(tmp_operand, alternative_operand));
+
+  // Branching
+  current_block->SetBranchIfTrue(consequence_block);
+  current_block->SetBranchIfFalse(alternative_block);
+  consequence_block->SetBranchIfTrue(next);
+  alternative_block->SetBranchIfTrue(next);
+
+  // Ending
+  current_block = next;
 
   return tmp_operand;
 }

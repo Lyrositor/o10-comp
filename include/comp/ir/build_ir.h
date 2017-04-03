@@ -73,6 +73,13 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
   std::shared_ptr<BasicBlock> &current_block
 );
 
+std::shared_ptr<Operand> BuildConditionalExpressionIR(
+  const std::shared_ptr<ast::ConditionalExpression> node,
+  ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+);
+
 std::shared_ptr<Operand> BuildIdentifierRValueIR(
   const std::shared_ptr<ast::Identifier> node,
   ir::Context &context
