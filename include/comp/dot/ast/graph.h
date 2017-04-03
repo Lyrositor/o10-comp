@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "comp/dot/ast/node.h"
+#include "comp/dot/ast/statement.h"
 
 namespace comp {
 namespace dot {
@@ -12,19 +13,19 @@ struct Graph final : Node {
     bool strict,
     bool directed,
     std::shared_ptr<std::string> name,
-    std::vector<std::shared_ptr<std::string>> statements);
+    std::vector<std::shared_ptr<Statement>> statements);
 
   Graph(
     bool strict,
     bool directed,
     std::shared_ptr<std::string> name,
-    std::vector<std::shared_ptr<std::string>> statements);
+    std::vector<std::shared_ptr<Statement>> statements);
   ~Graph();
 
   const bool strict;
   const bool directed;
   std::shared_ptr<std::string> name;
-  std::vector<std::shared_ptr<std::string>> statements;
+  std::vector<std::shared_ptr<Statement>> statements;
 };
 }  // namespace ast
 }  // namespace dot

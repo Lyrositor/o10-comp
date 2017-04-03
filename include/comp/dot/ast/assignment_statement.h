@@ -12,6 +12,10 @@ struct AssignmentStatement final : Statement {
   static std::unique_ptr<AssignmentStatement> Create(
     std::shared_ptr<Assignment> assignment);
 
+  static std::unique_ptr<AssignmentStatement> Create(
+    std::string key,
+    std::string value);
+
   AssignmentStatement(
     std::shared_ptr<Assignment> assignment);
   ~AssignmentStatement();

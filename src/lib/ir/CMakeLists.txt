@@ -13,3 +13,4 @@ add_library(
   to_dot.cpp
   variable.cpp
 )
+target_link_libraries(ir dot)

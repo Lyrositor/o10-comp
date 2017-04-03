@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "comp/dot/ast/graph.h"
+#include "comp/dot/ast.h"
 #include "comp/ir/program.h"
 
 namespace comp {
