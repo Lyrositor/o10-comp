@@ -1,6 +1,8 @@
 add_library(
   as STATIC
   ast/align_directive.cpp
+  ast/address_expression.cpp
+  ast/address_operand.cpp
   ast/asciz_directive.cpp
   ast/big_integer_literal.cpp
   ast/binary_expression.cpp
@@ -9,7 +11,6 @@ add_library(
   ast/current_address.cpp
   ast/directive.cpp
   ast/empty_statement.cpp
-  ast/expression.cpp
   ast/global_directive.cpp
   ast/global_symbol.cpp
   ast/immediate_operand.cpp

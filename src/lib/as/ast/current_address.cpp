@@ -8,7 +8,7 @@ std::unique_ptr<CurrentAddress> CurrentAddress::Create() {
 }
 
 CurrentAddress::CurrentAddress() :
-  Expression(Type::CurrentAddress) {
+  AddressExpression(Type::CurrentAddress) {
 }
 
 CurrentAddress::~CurrentAddress() {

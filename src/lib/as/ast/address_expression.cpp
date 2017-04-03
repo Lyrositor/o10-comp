@@ -1,15 +1,15 @@
-#include <comp/as/ast/expression.h>
+#include <comp/as/ast/address_expression.h>
 
 namespace comp {
 namespace as {
 namespace ast {
-Expression::Expression(
+AddressExpression::AddressExpression(
   Type node_type
 ) :
   Node(node_type) {
 }
 
-Expression::~Expression() {
+AddressExpression::~AddressExpression() {
 }
 }  // namespace ast
 }  // namespace as

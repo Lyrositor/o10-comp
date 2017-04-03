@@ -335,12 +335,12 @@ callExpression:
     }
 
 callExpressionArguments:
-    callExpressionArguments COMMA_OPERATOR expression {
+    callExpressionArguments COMMA_OPERATOR assignmentExpression {
         std::shared_ptr<comp::ast::RExpression> expression($3);
         $1->push_back(expression);
         $$ = $1;
     }
-    | expression {
+    | assignmentExpression {
         std::shared_ptr<comp::ast::RExpression> expression($1);
         $$ = new std::vector<std::shared_ptr<comp::ast::RExpression>>;
         $$->push_back(expression);

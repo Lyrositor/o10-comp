@@ -1,3 +1,5 @@
+#include "comp/as/ast/address_expression.h"
+#include "comp/as/ast/address_operand.h"
 #include "comp/as/ast/align_directive.h"
 #include "comp/as/ast/asciz_directive.h"
 #include "comp/as/ast/big_integer_literal.h"
@@ -9,7 +11,6 @@
 #include "comp/as/ast/current_address.h"
 #include "comp/as/ast/directive.h"
 #include "comp/as/ast/empty_statement.h"
-#include "comp/as/ast/expression.h"
 #include "comp/as/ast/global_directive.h"
 #include "comp/as/ast/global_symbol.h"
 #include "comp/as/ast/immediate_operand.h"

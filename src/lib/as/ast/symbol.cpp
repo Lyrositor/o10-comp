@@ -6,7 +6,7 @@ namespace ast {
 Symbol::Symbol(
   Type node_type
 ) :
-  Expression(node_type) {
+  AddressExpression(node_type) {
 }
 
 Symbol::~Symbol() {

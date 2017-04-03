@@ -7,6 +7,7 @@ namespace as {
 namespace ast {
 struct Node {
   enum class Type {
+    AddressOperand,
     AlignDirective,
     AscizDirective,
     BigIntegerLiteral,

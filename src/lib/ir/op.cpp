@@ -38,7 +38,7 @@ std::unique_ptr<CallOp> CallOp::Create(std::shared_ptr<VariableOperand> out, std
   return std::unique_ptr<CallOp>(new CallOp(out, function, args));
 }
 
-CallOp::CallOp (
+CallOp::CallOp(
   std::shared_ptr<VariableOperand> out,
   std::shared_ptr<ir::FunctionSymbol> function,
   std::vector<std::shared_ptr<Operand>> args
@@ -48,6 +48,7 @@ CallOp::CallOp (
   function(function),
   args(args) {
 }
+
 CallOp::~CallOp() {
 }
 

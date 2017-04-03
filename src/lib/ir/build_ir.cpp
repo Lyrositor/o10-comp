@@ -2,6 +2,7 @@
 
 #include <comp/ir/builtins.h>
 #include <comp/ir/control_flow_graph.h>
+#include <comp/exceptions.h>
 #include <comp/utils.h>
 
 namespace comp {
@@ -333,7 +334,7 @@ void BuildVariableDeclarationIR(
   }
 }
 
-const std::shared_ptr<const DataType> getOperandType(const Operand &operand) {
+const std::shared_ptr<const DataType> GetOperandType(const Operand &operand) {
   switch (operand.operand_type) {
     case Operand::Type::Variable: {
       return static_cast<const VariableOperand &>(operand).variable->GetDataType();
@@ -342,7 +343,7 @@ const std::shared_ptr<const DataType> getOperandType(const Operand &operand) {
       return GetInt64Type();
     }
     default: {
-      throw std::domain_error("Unexpected value for `operand.operand_type` in `getOperandType`");
+      throw std::domain_error("Unexpected value for `operand.operand_type` in `GetOperandType`");
     }
   }
 }
@@ -361,6 +362,13 @@ std::shared_ptr<Operand> BuildExpressionIR(
         cfg,
         current_block);
     }
+    case ast::Node::Type::CallExpression: {
+      return BuildCallExpressionIR(
+        std::dynamic_pointer_cast<ast::CallExpression>(node),
+        context,
+        cfg,
+        current_block);
+    }
     case ast::Node::Type::Identifier: {
       return BuildIdentifierRValueIR(
         std::dynamic_pointer_cast<ast::Identifier>(node),
@@ -369,6 +377,11 @@ std::shared_ptr<Operand> BuildExpressionIR(
     case ast::Node::Type::Int64Literal: {
       return BuildInt64LiteralIR(
         std::dynamic_pointer_cast<ast::Int64Literal>(node),
+        context);
+    }
+    case ast::Node::Type::Uint8Literal: {
+      return BuildUint8LiteralIR(
+        std::dynamic_pointer_cast<ast::Uint8Literal>(node),
         context);
     }
     case ast::Node::Type::UnaryExpression: {
@@ -399,6 +412,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
+
   if (node->op == ast::BinaryOperator::LogicalAnd || node->op == ast::BinaryOperator::LogicalOr) {
     std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
     const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
@@ -406,8 +420,8 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     const std::shared_ptr<Operand> left_operand = BuildExpressionIR(node->left, context, cfg, current_block);
     const std::shared_ptr<Operand> right_operand = BuildExpressionIR(node->right, context, cfg, right_block);
 
-    const std::shared_ptr<const DataType> left_type = getOperandType(*left_operand);
-    const std::shared_ptr<const DataType> right_type = getOperandType(*right_operand);
+    const std::shared_ptr<const DataType> left_type = GetOperandType(*left_operand);
+    const std::shared_ptr<const DataType> right_type = GetOperandType(*right_operand);
     if (right_type->GetType() != left_type->GetType()) { // TODO: Deep equality
       throw std::domain_error("Incompatible types in logical binary expression");
     }
@@ -433,8 +447,8 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
 
   const std::shared_ptr<Operand> left = BuildExpressionIR(node->left, context, cfg, current_block);
   const std::shared_ptr<Operand> right = BuildExpressionIR(node->right, context, cfg, current_block);
-  const std::shared_ptr<const DataType> left_type = getOperandType(*left);
-  const std::shared_ptr<const DataType> right_type = getOperandType(*right);
+  const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
+  const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
 
   if (left_type->GetType() != right_type->GetType()) { // TODO: Deep equality
     throw std::runtime_error("Mismatched types for left and right operands");
@@ -520,6 +534,42 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   return result_operand;
 }
 
+std::shared_ptr<Operand> BuildCallExpressionIR(
+  const std::shared_ptr<ast::CallExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+  // Get the function
+  std::shared_ptr<FunctionSymbol> function;
+  switch (node->callee->node_type) {
+    case ast::Node::Type::Identifier:
+      function = context.ResolveFunction(
+        std::static_pointer_cast<ast::Identifier>(node->callee)->name);
+      break;
+    default:
+      //throw Exception("Invalid callee node type for function call");  // TODO(Lyrositor) Uncomment once exceptions are fixed
+      throw std::domain_error("Invalid callee node type for function call");
+  }
+
+  // Create the return variable
+  const std::shared_ptr<const Variable>
+    tmp_var = context.CreateVariable(function->GetReturnType(), node);
+  std::shared_ptr<VariableOperand>
+    tmp_operand = VariableOperand::Create(tmp_var);
+
+  // Add the parameters
+  std::vector<std::shared_ptr<Operand>> args;
+  for (auto arg_node : node->arguments) {
+    args.push_back(BuildExpressionIR(arg_node, context, cfg, current_block));
+  }
+
+  // Add the call operation to the current basic block
+  current_block->Push(CallOp::Create(tmp_operand, function, args));
+
+  return tmp_operand;
+}
+
 std::shared_ptr<Operand> BuildUnaryExpressionIR(
   const std::shared_ptr<ast::UnaryExpression> node,
   Context &context,
@@ -527,7 +577,7 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
   std::shared_ptr<BasicBlock> &current_block
 ) {
   const std::shared_ptr<Operand> expr = BuildExpressionIR(node->expression, context, cfg, current_block);
-  const std::shared_ptr<const DataType> expr_type = getOperandType(*expr);
+  const std::shared_ptr<const DataType> expr_type = GetOperandType(*expr);
 
   const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(expr_type, node);
   std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
@@ -561,8 +611,8 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
   const std::shared_ptr<Operand>
     alternative_operand = BuildExpressionIR(node->alternative, context, cfg, alternative_block);
 
-  const std::shared_ptr<const DataType> consequence_type = getOperandType(*consequence_operand);
-  const std::shared_ptr<const DataType> alternative_type = getOperandType(*alternative_operand);
+  const std::shared_ptr<const DataType> consequence_type = GetOperandType(*consequence_operand);
+  const std::shared_ptr<const DataType> alternative_type = GetOperandType(*alternative_operand);
   if (alternative_type->GetType() != consequence_type->GetType()) { // TODO: Deep equality
     throw std::runtime_error("Incompatible types in `BuildConditionalExpressionIR`");
   }
@@ -590,6 +640,14 @@ std::shared_ptr<Operand> BuildIdentifierRValueIR(
 
 std::shared_ptr<Operand> BuildInt64LiteralIR(
   const std::shared_ptr<ast::Int64Literal> node,
+  Context &context
+) {
+  UNUSED(context);
+  return ConstantOperand::Create(node->value);
+}
+
+std::shared_ptr<Operand> BuildUint8LiteralIR(
+  const std::shared_ptr<ast::Uint8Literal> node,
   Context &context
 ) {
   UNUSED(context);

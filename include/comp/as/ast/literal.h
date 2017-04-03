@@ -1,12 +1,12 @@
 #pragma once
 
 #include <memory>
-#include "comp/as/ast/expression.h"
+#include "comp/as/ast/address_expression.h"
 
 namespace comp {
 namespace as {
 namespace ast {
-struct Literal : public Expression {
+struct Literal : public AddressExpression {
   Literal(Type node_type);
 
   virtual ~Literal() = 0;

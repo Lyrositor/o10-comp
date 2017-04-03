@@ -11,14 +11,14 @@ namespace ast {
  */
 struct CfiDefCfaOffsetDirective final : public Directive {
   static std::unique_ptr<CfiDefCfaOffsetDirective> Create(
-    std::shared_ptr<Expression> offset);
+    std::shared_ptr<AddressExpression> offset);
 
   CfiDefCfaOffsetDirective(
-    std::shared_ptr<Expression> offset);
+    std::shared_ptr<AddressExpression> offset);
 
   ~CfiDefCfaOffsetDirective();
 
-  std::shared_ptr<Expression> offset;
+  std::shared_ptr<AddressExpression> offset;
 };
 }  // namespace ast
 }  // namespace as

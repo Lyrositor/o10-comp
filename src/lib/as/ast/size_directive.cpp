@@ -5,13 +5,13 @@ namespace as {
 namespace ast {
 std::unique_ptr<SizeDirective> SizeDirective::Create(
   std::shared_ptr<Symbol> symbol,
-  std::shared_ptr<Expression> size) {
+  std::shared_ptr<AddressExpression> size) {
   return std::unique_ptr<SizeDirective>(new SizeDirective(symbol, size));
 }
 
 SizeDirective::SizeDirective(
   std::shared_ptr<Symbol> symbol,
-  std::shared_ptr<Expression> size
+  std::shared_ptr<AddressExpression> size
 ) :
   Directive(Type::SizeDirective),
   symbol(symbol),

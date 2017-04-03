@@ -5,17 +5,17 @@ namespace as {
 namespace ast {
 std::unique_ptr<BinaryExpression> BinaryExpression::Create(
   BinaryOperator op,
-  std::shared_ptr<Expression> left,
-  std::shared_ptr<Expression> right) {
+  std::shared_ptr<AddressExpression> left,
+  std::shared_ptr<AddressExpression> right) {
   return std::unique_ptr<BinaryExpression>(new BinaryExpression(op, left, right));
 }
 
 BinaryExpression::BinaryExpression(
   BinaryOperator op,
-  std::shared_ptr<Expression> left,
-  std::shared_ptr<Expression> right
+  std::shared_ptr<AddressExpression> left,
+  std::shared_ptr<AddressExpression> right
 ) :
-  Expression(Type::BinaryExpression),
+  AddressExpression(Type::BinaryExpression),
   op(op),
   left(left),
   right(right) {

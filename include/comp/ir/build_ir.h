@@ -24,54 +24,53 @@ std::string ResolveParameterName (const ast::Parameter &parameter);
 // Statements
 void BuildStatementIR(
   const ast::Statement &node,
-  ir::Context &context,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 void BuildBlockStatementIR(
   const ast::BlockStatement &node,
-  ir::Context &context,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 void BuildExpressionStatementIR(
   const ast::ExpressionStatement &node,
-  ir::Context &context,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 
 void BuildVariableDeclarationIR(
   const ast::VariableDeclaration &node,
-  ir::Context &context,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 // R-values
 std::shared_ptr<Operand> BuildExpressionIR(
   const std::shared_ptr<ast::RExpression> node,
-  ir::Context &context,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 std::shared_ptr<Operand> BuildBinaryExpressionIR(
   const std::shared_ptr<ast::BinaryExpression> node,
-  ir::Context &context,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
+
+std::shared_ptr<Operand> BuildCallExpressionIR(
+  const std::shared_ptr<ast::CallExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block);
 
 std::shared_ptr<Operand> BuildUnaryExpressionIR(
   const std::shared_ptr<ast::UnaryExpression> node,
-  ir::Context &context,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 std::shared_ptr<Operand> BuildConditionalExpressionIR(
   const std::shared_ptr<ast::ConditionalExpression> node,
@@ -82,54 +81,50 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
 
 std::shared_ptr<Operand> BuildIdentifierRValueIR(
   const std::shared_ptr<ast::Identifier> node,
-  ir::Context &context
-);
+  Context &context);
 
 std::shared_ptr<Operand> BuildInt64LiteralIR(
   const std::shared_ptr<ast::Int64Literal> node,
-  ir::Context &context
-);
+  Context &context);
+
+std::shared_ptr<Operand> BuildUint8LiteralIR(
+  const std::shared_ptr<ast::Uint8Literal> node,
+  Context &context);
 
 // L-values
 std::shared_ptr<VariableOperand> BuildIdentifierLValueIR(
   const ast::Identifier &node,
-  ir::Context &context
-);
+  Context &context);
 
 void BuildWhileStatementIR(
   const ast::WhileStatement &node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 void BuildForStatementIR(
   const ast::ForStatement &node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 void BuildIfStatementIR(
   const ast::IfStatement &node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 void BuildNullStatementIR(
   const ast::NullStatement &node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 void BuildReturnStatementIR(
   const ast::ReturnStatement &node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
-  std::shared_ptr<BasicBlock> &current_block
-);
+  std::shared_ptr<BasicBlock> &current_block);
 
 }  // namespace ir
 }  // namespace comp

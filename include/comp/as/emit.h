@@ -36,7 +36,7 @@ void EmitTextDirective(const ast::TextDirective &node, std::ostream &out);
 
 void EmitTypeDirective(const ast::TypeDirective &node, std::ostream &out);
 
-void EmitExpression(const ast::Expression &node, std::ostream &out);
+void EmitExpression(const ast::AddressExpression &node, std::ostream &out);
 
 void EmitSymbol(const ast::Symbol &node, std::ostream &out);
 
@@ -59,5 +59,9 @@ void EmitOperand(const ast::Operand &node, std::ostream &out);
 void EmitImmediateOperand(const ast::ImmediateOperand &node, std::ostream &out);
 
 void EmitRegisterOperand(const ast::RegisterOperand &node, std::ostream &out);
+
+void EmitMemoryReference(const ast::MemoryReference &node, std::ostream &out);
+
+void EmitAddressOperand(const ast::AddressOperand &node, std::ostream &out);
 }
 }

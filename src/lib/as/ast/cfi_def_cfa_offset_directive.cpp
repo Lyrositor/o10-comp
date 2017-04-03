@@ -4,13 +4,13 @@ namespace comp {
 namespace as {
 namespace ast {
 std::unique_ptr<CfiDefCfaOffsetDirective> CfiDefCfaOffsetDirective::Create(
-  std::shared_ptr<Expression> offset
+  std::shared_ptr<AddressExpression> offset
 ) {
   return std::unique_ptr<CfiDefCfaOffsetDirective>(new CfiDefCfaOffsetDirective(offset));
 }
 
 CfiDefCfaOffsetDirective::CfiDefCfaOffsetDirective(
-  std::shared_ptr<Expression> offset
+  std::shared_ptr<AddressExpression> offset
 ) :
   Directive(Type::CfiDefCfaOffsetDirective),
   offset(offset) {

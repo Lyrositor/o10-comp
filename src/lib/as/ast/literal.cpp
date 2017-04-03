@@ -6,7 +6,7 @@ namespace ast {
 Literal::Literal(
   Type node_type
 ) :
-  Expression(node_type) {
+  AddressExpression(node_type) {
 }
 
 Literal::~Literal() {

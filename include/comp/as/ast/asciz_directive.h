@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include "comp/as/ast/directive.h"
-#include "comp/as/ast/expression.h"
+#include "comp/as/ast/address_expression.h"
 
 namespace comp {
 namespace as {

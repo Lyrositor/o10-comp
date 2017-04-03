@@ -9,10 +9,10 @@ namespace ast {
 /**
  * Address expression, used in directives.
  */
-struct Expression : public Node {
-  Expression(Type node_type);
+struct AddressExpression : public Node {
+  AddressExpression(Type node_type);
 
-  virtual ~Expression() = 0;
+  virtual ~AddressExpression() = 0;
 };
 }  // namespace ast
 }  // namespace as

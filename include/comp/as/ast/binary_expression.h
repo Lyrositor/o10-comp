@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "comp/as/ast/expression.h"
+#include "comp/as/ast/address_expression.h"
 
 namespace comp {
 namespace as {
@@ -28,22 +28,22 @@ enum class BinaryOperator {
   Subtraction // left - right
 };
 
-struct BinaryExpression final : public Expression {
+struct BinaryExpression final : public AddressExpression {
   static std::unique_ptr<BinaryExpression> Create(
     BinaryOperator op,
-    std::shared_ptr<Expression> left,
-    std::shared_ptr<Expression> right);
+    std::shared_ptr<AddressExpression> left,
+    std::shared_ptr<AddressExpression> right);
 
   BinaryExpression(
     BinaryOperator op,
-    std::shared_ptr<Expression> left,
-    std::shared_ptr<Expression> right);
+    std::shared_ptr<AddressExpression> left,
+    std::shared_ptr<AddressExpression> right);
 
   ~BinaryExpression();
 
   const BinaryOperator op;
-  const std::shared_ptr<Expression> left;
-  const std::shared_ptr<Expression> right;
+  const std::shared_ptr<AddressExpression> left;
+  const std::shared_ptr<AddressExpression> right;
 };
 }  // namespace ast
 }  // namespace as
