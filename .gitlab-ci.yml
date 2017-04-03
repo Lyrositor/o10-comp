@@ -2,6 +2,7 @@ image: demurgos/cpp:insa-gcc-5
 
 before_script:
  - git submodule update --init --recursive
+ - export CXX=/usr/local/bin/g++
 
 stages:
   - build

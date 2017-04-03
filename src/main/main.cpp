@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
 
       std::shared_ptr<comp::as::ast::Program>
         program_asm = comp::as::arch::x64::BuildProgram(*program_ir);
-      comp::as::emitProgram(*program_asm, ofs);
+      comp::as::EmitProgram(*program_asm, ofs);
     }
   } catch (comp::SyntaxException &e) {
     PrintSyntaxException(e, content, filename);
