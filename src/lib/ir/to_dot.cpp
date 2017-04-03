@@ -171,13 +171,45 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
   std::string id = "bb" + pointer_to_string(&node);
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
   result.push_back(dot::ast::NodeStatement::Create(id, attributes));
+
+  std::shared_ptr<BasicBlock> branch_if_true = node.GetBranchIfTrue().lock();
+  std::shared_ptr<BasicBlock> branch_if_false = node.GetBranchIfFalse().lock();
+
+  if (branch_if_true != nullptr) {
+    if (branch_if_false != nullptr) {
+      std::vector<std::string> false_edge;
+      result.push_back(
+        dot::ast::EdgeStatement::Create(
+          {
+            id,
+            "bb" + pointer_to_string(branch_if_true.get())
+          },
+          {
+            dot::ast::Assignment::Create("color", "#45a03b")
+          }
+        )
+      );
+      result.push_back(
+        dot::ast::EdgeStatement::Create(
+          {id, "bb" + pointer_to_string(branch_if_false.get())},
+          {dot::ast::Assignment::Create("color", "#a52f29")}
+        )
+      );
+    } else {
+      result.push_back(dot::ast::EdgeStatement::Create({id, "bb" + pointer_to_string(branch_if_true.get())}, {}));
+    }
+  }
+
   return result;
 }
 
 std::vector<std::shared_ptr<dot::ast::Statement>> ControlFlowGraphToDot(const ControlFlowGraph &node) {
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
-  for (auto statement : BasicBlockToDot(*node.GetSource())) {
-    result.push_back(statement);
+  std::set<std::shared_ptr<BasicBlock>> basic_blocks = node.GetBasicBlocks();
+  for (auto basic_block : basic_blocks) {
+    for (auto statement : BasicBlockToDot(*basic_block)) {
+      result.push_back(statement);
+    }
   }
   return result;
 }

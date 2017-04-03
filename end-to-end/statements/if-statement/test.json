@@ -1,5 +1,8 @@
 {
   "source": "main.c",
   "expected-ast": "ast.expected.json",
-  "actual-ast": "ast.actual.json"
+  "actual-ast": "ast.actual.json",
+  "ir": {
+    "actual-dot": "ir.actual.dot"
+  }
 }

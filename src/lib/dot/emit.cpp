@@ -34,6 +34,9 @@ void emitIdentifier(const std::string &identifier, std::ostream &out) {
 void emitAttributes(std::vector<std::shared_ptr<ast::Assignment>> attributes, std::ostream &out) {
   out << "[";
   for (size_t i = 0, l = attributes.size(); i < l; i++) {
+    if (i > 0) {
+      out << ", ";
+    }
     auto attribute = attributes[i];
     EmitAssignment(*attribute, out);
   }
@@ -47,7 +50,14 @@ void EmitAssignment(const ast::Assignment &node, std::ostream &out) {
 }
 
 void EmitEdgeStatement(const ast::EdgeStatement &node, std::ostream &out) {
-  out << "E;";
+  for (size_t i = 0, l = node.nodes.size(); i < l; i++) {
+    if (i > 0) {
+      out << " -> ";
+    }
+    emitIdentifier(node.nodes[i], out);
+  }
+  out << " ";
+  emitAttributes(node.attributes, out);
 }
 
 void EmitAssignmentStatement(const ast::AssignmentStatement &node, std::ostream &out) {

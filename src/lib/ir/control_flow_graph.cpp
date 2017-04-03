@@ -2,12 +2,12 @@
 
 namespace comp {
 namespace ir {
-std::unique_ptr<ControlFlowGraph> ControlFlowGraph::Create() {
-  return std::unique_ptr<ControlFlowGraph>(new ControlFlowGraph());
+std::unique_ptr<ControlFlowGraph> ControlFlowGraph::Create(std::shared_ptr<BasicBlock> source) {
+  return std::unique_ptr<ControlFlowGraph>(new ControlFlowGraph(source));
 }
 
-ControlFlowGraph::ControlFlowGraph() :
-  source_(std::unique_ptr<BasicBlock>(new BasicBlock())) {
+ControlFlowGraph::ControlFlowGraph(std::shared_ptr<BasicBlock> source) :
+  source_(source), blocks_({source}) {
 }
 
 ControlFlowGraph::~ControlFlowGraph() {
