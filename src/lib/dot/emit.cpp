@@ -58,6 +58,7 @@ void EmitEdgeStatement(const ast::EdgeStatement &node, std::ostream &out) {
   }
   out << " ";
   emitAttributes(node.attributes, out);
+  out << ";";
 }
 
 void EmitAssignmentStatement(const ast::AssignmentStatement &node, std::ostream &out) {

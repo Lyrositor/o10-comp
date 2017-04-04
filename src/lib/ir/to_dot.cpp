@@ -183,20 +183,25 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
 
   std::string id = "bb" + pointer_to_string(&node);
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
-  result.push_back(dot::ast::NodeStatement::Create(id, attributes));
 
   switch (node.GetType()) {
     case BasicBlock::Type::Incomplete: {
-      break; // TODO: Dotted line ?
+      attributes.push_back(dot::ast::Assignment::Create("style", "dotted"));
+      result.push_back(dot::ast::NodeStatement::Create(id, attributes));
+      break;
     }
     case BasicBlock::Type::Final: {
-      break; // TODO: Double line width ?
+      attributes.push_back(dot::ast::Assignment::Create("style", "bold"));
+      result.push_back(dot::ast::NodeStatement::Create(id, attributes));
+      break;
     }
     case BasicBlock::Type::Jump: {
+      result.push_back(dot::ast::NodeStatement::Create(id, attributes));
       result.push_back(dot::ast::EdgeStatement::Create({id, "bb" + pointer_to_string(node.GetBranch().get())}, {}));
       break;
     }
     case BasicBlock::Type::ConditionalJump: {
+      result.push_back(dot::ast::NodeStatement::Create(id, attributes));
       std::shared_ptr<BasicBlock> branch_if_true = node.GetBranchIfTrue();
       std::shared_ptr<BasicBlock> branch_if_false = node.GetBranchIfFalse();
       std::vector<std::string> false_edge;
