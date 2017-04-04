@@ -2,6 +2,7 @@
 
 #include <comp/as/arch/x64/stddef.h>
 #include <comp/ir/builtins.h>
+#include <comp/utils.h>
 #include <comp/exceptions.h>
 #include <queue>
 
@@ -304,6 +305,9 @@ void BuildNoOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   VariablesTable &variables_table
 ) {
+  UNUSED(op);
+  UNUSED(body);
+  UNUSED(variables_table);
   body.push_back(ast::Instruction::Create(NOP));
 }
 

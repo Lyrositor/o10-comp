@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+#include <comp/utils.h>
+
 namespace comp {
 namespace ir {
 // Context
@@ -126,16 +128,19 @@ std::shared_ptr<FunctionSymbol> RootContext::ResolveFunction(
 }
 
 bool RootContext::HasVariable(std::string name, bool check_parents) {
+  UNUSED(check_parents);
   auto it = symbols_.variables.find(name);
   return it != symbols_.variables.end();
 }
 
 bool RootContext::HasDataType(std::string name, bool check_parents) {
+  UNUSED(check_parents);
   auto it = symbols_.data_types.find(name);
   return it != symbols_.data_types.end();
 }
 
 bool RootContext::HasFunction(std::string name, bool check_parents) {
+  UNUSED(check_parents);
   auto it = symbols_.functions.find(name);
   return it != symbols_.functions.end();
 }

@@ -23,8 +23,8 @@ class ControlFlowGraph {
   std::shared_ptr<BasicBlock> GetSource() const;
 
  private:
-  std::set<std::shared_ptr<BasicBlock>> blocks_;
   const std::shared_ptr<BasicBlock> source_;
+  std::set<std::shared_ptr<BasicBlock>> blocks_;
 };
 }
 }

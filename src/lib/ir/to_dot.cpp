@@ -1,6 +1,8 @@
 #include <iomanip>
 #include <sstream>
+
 #include <comp/ir/to_dot.h>
+#include <comp/utils.h>
 
 namespace comp {
 namespace ir {
@@ -80,6 +82,7 @@ void EmitCallOp(const CallOp &node, std::ostream &out) {
 }
 
 void EmitNoOp(const NoOp &node, std::ostream &out) {
+  UNUSED(node);
   out << "NoOp;";
 }
 
