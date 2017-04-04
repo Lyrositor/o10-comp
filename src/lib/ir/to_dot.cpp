@@ -217,6 +217,11 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
       );
       break;
     }
+    case BasicBlock::Type::Return: {
+      attributes.push_back(dot::ast::Assignment::Create("style", "bold"));
+      result.push_back(dot::ast::NodeStatement::Create(id, attributes));
+      break;
+    }
     default: {
       throw std::domain_error("Unexpected value for `node.GetType()` in `BasicBlockToDot`");
     }

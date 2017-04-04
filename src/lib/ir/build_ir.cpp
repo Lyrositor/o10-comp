@@ -829,10 +829,10 @@ void BuildReturnStatementIR(
   std::shared_ptr<BasicBlock> &current_block
 ) {
   if (node.expression == nullptr) {
-    current_block->Push(ReturnOp::Create(nullptr));
+    current_block->SetReturn(nullptr);
   } else {
     const std::shared_ptr<Operand> expr = BuildRExpressionIR(node.expression, context, cfg, current_block);
-    current_block->Push(ReturnOp::Create(expr));
+    current_block->SetReturn(expr);
   }
 }
 

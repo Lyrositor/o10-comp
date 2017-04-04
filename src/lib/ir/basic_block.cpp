@@ -61,6 +61,15 @@ void BasicBlock::SetConditionalJump(
   this->branch_if_false_ = branch_if_false;
 }
 
+void BasicBlock::SetReturn(std::shared_ptr<Operand> return_value) {
+  if (this->type_ != Type::Incomplete) {
+    throw std::runtime_error(
+      "Invalid `type` for the current `BasicBlock`, required `Incomplete` for `SetReturn`");
+  }
+  this->type_ = Type::Return;
+  this->ops_.push_back(ReturnOp::Create(return_value));
+}
+
 std::shared_ptr<BasicBlock> BasicBlock::GetBranch() const {
   if (this->type_ != Type::Jump) {
     throw std::runtime_error("Invalid `type` for the current `BasicBlock`, required `Jump` for `GetBranch`");
@@ -111,6 +120,19 @@ std::shared_ptr<BasicBlock> BasicBlock::GetBranchIfFalse() const {
     throw std::runtime_error("Basic Block with `ConditionalJump` type has `nullptr` branch_if_false");
   }
   return result;
+}
+
+std::shared_ptr<Operand> BasicBlock::GetReturnValue() const {
+  if (this->type_ != Type::Return) {
+    throw std::runtime_error("Invalid `type` for the current `BasicBlock`, required `Return` for `GetReturnValue`");
+  } else if (this->ops_.size() == 0) {
+    throw std::runtime_error("Basic Block with `Return` type has an empty operations list");
+  }
+  std::shared_ptr<Op> last_op = this->ops_[this->ops_.size() - 1];
+  if (last_op->op_type != Op::Type::ReturnOp) {
+    throw std::runtime_error("Basic Block with `Return` type does not end with a `ReturnOp` operation");
+  }
+  return static_cast<ReturnOp &>(*last_op).in;
 }
 
 BasicBlock::~BasicBlock() {

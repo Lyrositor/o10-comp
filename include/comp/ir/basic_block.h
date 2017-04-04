@@ -29,7 +29,12 @@ class BasicBlock {
      * There are two possible next basick blocks. The destination is chosen
      * depending on a test operand.
      */
-      ConditionalJump
+      ConditionalJump,
+
+    /**
+     * This basic returns a value from the current function.
+     */
+      Return
   };
 
   /**
@@ -99,6 +104,19 @@ class BasicBlock {
   );
 
   /**
+   * Changes the type to `Return`
+   *
+   * This adds a `Return` operation at the end of the block, using the provided operand.
+   *
+   * Requires the `Incomplete` type, otherwise throws a runtine error.
+   *
+   * @param return_value Return value operand
+   */
+  void SetReturn(
+    std::shared_ptr<Operand> return_value
+  );
+
+  /**
    * Requires the `Jump` type, otherwise throws a runtine error.
    *
    * Guarantees a non-null pointer.
@@ -134,6 +152,15 @@ class BasicBlock {
    */
   std::shared_ptr<BasicBlock> GetBranchIfFalse() const;
 
+  /**
+   * Requires the `Return` type, otherwise throws a runtine error.
+   *
+   * Guarantees a non-null pointer.
+   *
+   * @return The return value operand for the `Return` operation of the current basic block. Nullable.
+   */
+  std::shared_ptr<Operand> GetReturnValue() const;
+
  private:
   /**
    * The current type (state) of this basic block
@@ -150,6 +177,7 @@ class BasicBlock {
    * `Final` -> `nullptr`
    * `Jump` -> return value for `GetBranch`
    * `ConditionalJump` -> return value for `GetBranchIfTrue`
+   * `Return` -> `nullptr`
    */
   std::weak_ptr<BasicBlock> branch_if_true_;
   /**
@@ -157,6 +185,7 @@ class BasicBlock {
    * `Final` -> `nullptr`
    * `Jump` -> `nullptr`
    * `ConditionalJump` -> return value for `GetBranchIfFalse`
+   * `Return` -> `nullptr`
    */
   std::weak_ptr<BasicBlock> branch_if_false_;
 };
