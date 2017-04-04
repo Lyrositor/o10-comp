@@ -47,9 +47,20 @@ void BuildVariableDeclarationIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block);
 
-// R-values
-std::shared_ptr<Operand> BuildExpressionIR(
+std::shared_ptr<Operand> BuildRExpressionIR(
   const std::shared_ptr<ast::RExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block);
+
+std::shared_ptr<VariableOperand> BuildLExpressionIR(
+  const std::shared_ptr<ast::LExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block);
+
+std::shared_ptr<Operand> BuildAssignmentExpressionIR(
+  const std::shared_ptr<ast::AssignmentExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block);
@@ -79,7 +90,7 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
   std::shared_ptr<BasicBlock> &current_block
 );
 
-std::shared_ptr<Operand> BuildIdentifierRValueIR(
+std::shared_ptr<VariableOperand> BuildIdentifierIR(
   const std::shared_ptr<ast::Identifier> node,
   Context &context);
 

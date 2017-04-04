@@ -307,7 +307,7 @@ void BuildExpressionStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  BuildExpressionIR(node.expression, context, cfg, current_block);
+  BuildRExpressionIR(node.expression, context, cfg, current_block);
 }
 
 void BuildVariableDeclarationIR(
@@ -325,7 +325,7 @@ void BuildVariableDeclarationIR(
     context.RegisterVariable(variable_name, variable);
     if (variable_declarator->initial_value != nullptr) {
       std::shared_ptr<Operand>
-        initial_value = BuildExpressionIR(variable_declarator->initial_value, context, cfg, current_block);
+        initial_value = BuildRExpressionIR(variable_declarator->initial_value, context, cfg, current_block);
       current_block->Push(CopyOp::Create(
         VariableOperand::Create(variable),
         initial_value
@@ -348,13 +348,20 @@ const std::shared_ptr<const DataType> GetOperandType(const Operand &operand) {
   }
 }
 
-std::shared_ptr<Operand> BuildExpressionIR(
+std::shared_ptr<Operand> BuildRExpressionIR(
   const std::shared_ptr<ast::RExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
   switch (node->node_type) {
+    case ast::Node::Type::AssignmentExpression: {
+      return BuildAssignmentExpressionIR(
+        std::dynamic_pointer_cast<ast::AssignmentExpression>(node),
+        context,
+        cfg,
+        current_block);
+    }
     case ast::Node::Type::BinaryExpression: {
       return BuildBinaryExpressionIR(
         std::dynamic_pointer_cast<ast::BinaryExpression>(node),
@@ -369,8 +376,15 @@ std::shared_ptr<Operand> BuildExpressionIR(
         cfg,
         current_block);
     }
+    case ast::Node::Type::ConditionalExpression: {
+      return BuildConditionalExpressionIR(
+        std::dynamic_pointer_cast<ast::ConditionalExpression>(node),
+        context,
+        cfg,
+        current_block);
+    }
     case ast::Node::Type::Identifier: {
-      return BuildIdentifierRValueIR(
+      return BuildIdentifierIR(
         std::dynamic_pointer_cast<ast::Identifier>(node),
         context);
     }
@@ -391,21 +405,100 @@ std::shared_ptr<Operand> BuildExpressionIR(
         cfg,
         current_block);
     }
-    case ast::Node::Type::ConditionalExpression: {
-      return BuildConditionalExpressionIR(
-        std::dynamic_pointer_cast<ast::ConditionalExpression>(node),
-        context,
-        cfg,
-        current_block);
-    }
     default: {
       throw std::domain_error(
-        "Unexpected value for `node.expression->node_type` in `BuildExpressionIR`");
+        "Unexpected value for `node->node_type` in `BuildRExpressionIR`");
     }
   }
 }
 
-// TODO(demurgos) handle mismatched types
+std::shared_ptr<VariableOperand> BuildLExpressionIR(
+  const std::shared_ptr<ast::LExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+  switch (node->node_type) {
+    case ast::Node::Type::Identifier: {
+      return BuildIdentifierIR(
+        std::dynamic_pointer_cast<ast::Identifier>(node),
+        context);
+    }
+    default: {
+      throw std::domain_error(
+        "Unexpected value for `node->node_type` in `BuildLExpressionIR`");
+    }
+  }
+}
+
+std::shared_ptr<Operand> BuildAssignmentExpressionIR(
+  const std::shared_ptr<ast::AssignmentExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+  const std::shared_ptr<VariableOperand> left = BuildLExpressionIR(node->left, context, cfg, current_block);
+  const std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
+  const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
+  const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
+
+  if (left_type->GetType() != right_type->GetType()) { // TODO: Deep equality
+    throw std::runtime_error("Mismatched types for left and right operands in `BuildAssignmentExpressionIR`");
+  }
+
+  switch (node->op) {
+    case ast::AssignmentOperator::Addition: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::Addition, left, right));
+      break;
+    }
+    case ast::AssignmentOperator::BitwiseAnd: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::BitwiseAnd, left, right));
+      break;
+    }
+    case ast::AssignmentOperator::BitwiseOr: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::BitwiseOr, left, right));
+      break;
+    }
+    case ast::AssignmentOperator::BitwiseXor: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::BitwiseXor, left, right));
+      break;
+    }
+    case ast::AssignmentOperator::Division: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::Division, left, right));
+      break;
+    };
+    case ast::AssignmentOperator::LeftShift: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::LeftShift, left, right));
+      break;
+    };
+    case ast::AssignmentOperator::Multiplication: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::Multiplication, left, right));
+      break;
+    };
+    case ast::AssignmentOperator::Remainder: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::Remainder, left, right));
+      break;
+    };
+    case ast::AssignmentOperator::RightShift: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::RightShift, left, right));
+      break;
+    };
+    case ast::AssignmentOperator::Simple: {
+      current_block->Push(CopyOp::Create(left, right));
+      break;
+    };
+    case ast::AssignmentOperator::Subtraction: {
+      current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::Subtraction, left, right));
+      break;
+    };
+    default: {
+      throw std::domain_error("Unexpected value for node.op in `BuildAssignmentExpressionIR`");
+    }
+  }
+
+  return left;
+}
+
 std::shared_ptr<Operand> BuildBinaryExpressionIR(
   const std::shared_ptr<ast::BinaryExpression> node,
   Context &context,
@@ -417,8 +510,8 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
     const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-    const std::shared_ptr<Operand> left_operand = BuildExpressionIR(node->left, context, cfg, current_block);
-    const std::shared_ptr<Operand> right_operand = BuildExpressionIR(node->right, context, cfg, right_block);
+    const std::shared_ptr<Operand> left_operand = BuildRExpressionIR(node->left, context, cfg, current_block);
+    const std::shared_ptr<Operand> right_operand = BuildRExpressionIR(node->right, context, cfg, right_block);
 
     const std::shared_ptr<const DataType> left_type = GetOperandType(*left_operand);
     const std::shared_ptr<const DataType> right_type = GetOperandType(*right_operand);
@@ -445,8 +538,8 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     return result_operand;
   }
 
-  const std::shared_ptr<Operand> left = BuildExpressionIR(node->left, context, cfg, current_block);
-  const std::shared_ptr<Operand> right = BuildExpressionIR(node->right, context, cfg, current_block);
+  const std::shared_ptr<Operand> left = BuildRExpressionIR(node->left, context, cfg, current_block);
+  const std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
   const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
   const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
 
@@ -460,18 +553,6 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   switch (node->op) {
     case ast::BinaryOperator::Addition: {
       current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Addition, left, right));
-      break;
-    }
-    case ast::BinaryOperator::Division: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Division, left, right));
-      break;
-    }
-    case ast::BinaryOperator::Multiplication: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Multiplication, left, right));
-      break;
-    }
-    case ast::BinaryOperator::Subtraction: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Subtraction, left, right));
       break;
     }
     case ast::BinaryOperator::BitwiseAnd: {
@@ -490,6 +571,10 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
       current_block->Push(CopyOp::Create(result_operand, right));
       break;
     };
+    case ast::BinaryOperator::Division: {
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Division, left, right));
+      break;
+    }
     case ast::BinaryOperator::Equality: {
       current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Equality, left, right));
       break;
@@ -518,6 +603,10 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
       current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LessThanOrEqualTo, left, right));
       break;
     };
+    case ast::BinaryOperator::Multiplication: {
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Multiplication, left, right));
+      break;
+    }
     case ast::BinaryOperator::Remainder: {
       current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Remainder, left, right));
       break;
@@ -526,6 +615,10 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
       current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::RightShift, left, right));
       break;
     };
+    case ast::BinaryOperator::Subtraction: {
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Subtraction, left, right));
+      break;
+    }
     default: {
       throw std::domain_error("Unexpected value for node.op");
     }
@@ -561,7 +654,7 @@ std::shared_ptr<Operand> BuildCallExpressionIR(
   // Add the parameters
   std::vector<std::shared_ptr<Operand>> args;
   for (auto arg_node : node->arguments) {
-    args.push_back(BuildExpressionIR(arg_node, context, cfg, current_block));
+    args.push_back(BuildRExpressionIR(arg_node, context, cfg, current_block));
   }
 
   // Add the call operation to the current basic block
@@ -576,7 +669,7 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  const std::shared_ptr<Operand> expr = BuildExpressionIR(node->expression, context, cfg, current_block);
+  const std::shared_ptr<Operand> expr = BuildRExpressionIR(node->expression, context, cfg, current_block);
   const std::shared_ptr<const DataType> expr_type = GetOperandType(*expr);
 
   const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(expr_type, node);
@@ -605,11 +698,11 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
   std::shared_ptr<BasicBlock> alternative_block = cfg->CreateBasicBlock();
   const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-  const std::shared_ptr<Operand> test_operand = BuildExpressionIR(node->test, context, cfg, current_block);
+  const std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node->test, context, cfg, current_block);
   const std::shared_ptr<Operand>
-    consequence_operand = BuildExpressionIR(node->consequence, context, cfg, consequence_block);
+    consequence_operand = BuildRExpressionIR(node->consequence, context, cfg, consequence_block);
   const std::shared_ptr<Operand>
-    alternative_operand = BuildExpressionIR(node->alternative, context, cfg, alternative_block);
+    alternative_operand = BuildRExpressionIR(node->alternative, context, cfg, alternative_block);
 
   const std::shared_ptr<const DataType> consequence_type = GetOperandType(*consequence_operand);
   const std::shared_ptr<const DataType> alternative_type = GetOperandType(*alternative_operand);
@@ -631,7 +724,7 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
   return result_operand;
 }
 
-std::shared_ptr<Operand> BuildIdentifierRValueIR(
+std::shared_ptr<VariableOperand> BuildIdentifierIR(
   const std::shared_ptr<ast::Identifier> node,
   Context &context
 ) {
@@ -654,13 +747,6 @@ std::shared_ptr<Operand> BuildUint8LiteralIR(
   return ConstantOperand::Create(node->value);
 }
 
-std::shared_ptr<VariableOperand> BuildIdentifierLValueIR(
-  const ast::Identifier &node,
-  Context &context
-) {
-  return VariableOperand::Create(context.ResolveVariable(node.name));
-}
-
 void BuildWhileStatementIR(
   const ast::WhileStatement &node,
   Context &context,
@@ -671,7 +757,7 @@ void BuildWhileStatementIR(
   std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-  std::shared_ptr<Operand> test_operand = BuildExpressionIR(node.condition, context, cfg, test_block);
+  std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.condition, context, cfg, test_block);
   BuildStatementIR(*node.body, context, cfg, body_block);
 
   current_block->SetJump(test_block);
@@ -696,10 +782,10 @@ void BuildForStatementIR(
   std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-  BuildExpressionIR(node.initialization, context, cfg, current_block);
-  std::shared_ptr<Operand> test_operand = BuildExpressionIR(node.condition, context, cfg, test_block);
+  BuildRExpressionIR(node.initialization, context, cfg, current_block);
+  std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.condition, context, cfg, test_block);
   if (node.iteration != nullptr) {
-    BuildExpressionIR(node.iteration, context, cfg, update_block);
+    BuildRExpressionIR(node.iteration, context, cfg, update_block);
   }
   BuildStatementIR(*node.body, context, cfg, body_block);
 
@@ -717,7 +803,7 @@ void BuildIfStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  std::shared_ptr<Operand> test_operand = BuildExpressionIR(node.test, context, cfg, current_block);
+  std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.test, context, cfg, current_block);
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
   std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
@@ -745,7 +831,7 @@ void BuildReturnStatementIR(
   if (node.expression == nullptr) {
     current_block->Push(ReturnOp::Create(nullptr));
   } else {
-    const std::shared_ptr<Operand> expr = BuildExpressionIR(node.expression, context, cfg, current_block);
+    const std::shared_ptr<Operand> expr = BuildRExpressionIR(node.expression, context, cfg, current_block);
     current_block->Push(ReturnOp::Create(expr));
   }
 }

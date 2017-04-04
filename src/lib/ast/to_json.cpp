@@ -79,8 +79,8 @@ std::unique_ptr<rapidjson::Value> AssignmentExpressionToJson(const AssignmentExp
   rapidjson::Value op;
   op.SetString(serialializeAssignmentOperator(node.op).c_str(), allocator);
   result->AddMember("op", op, allocator);
-  result->AddMember("lvalue", *LExpressionToJson(*node.lvalue, allocator), allocator);
-  result->AddMember("rvalue", *RExpressionToJson(*node.rvalue, allocator), allocator);
+  result->AddMember("lvalue", *LExpressionToJson(*node.left, allocator), allocator);
+  result->AddMember("rvalue", *RExpressionToJson(*node.right, allocator), allocator);
   return result;
 }
 

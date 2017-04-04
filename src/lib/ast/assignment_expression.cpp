@@ -3,23 +3,23 @@
 namespace comp {
 namespace ast {
 std::unique_ptr<AssignmentExpression> AssignmentExpression::Create(
-  std::shared_ptr<LExpression> lvalue,
-  std::shared_ptr<RExpression> rvalue,
+  std::shared_ptr<LExpression> left,
+  std::shared_ptr<RExpression> right,
   AssignmentOperator op,
   std::shared_ptr<SourceLocation> location
 ) {
   return std::unique_ptr<AssignmentExpression>(
-    new AssignmentExpression(lvalue, rvalue, op, location));
+    new AssignmentExpression(left, right, op, location));
 }
 AssignmentExpression::AssignmentExpression(
-  std::shared_ptr<LExpression> lvalue,
-  std::shared_ptr<RExpression> rvalue,
+  std::shared_ptr<LExpression> left,
+  std::shared_ptr<RExpression> right,
   AssignmentOperator op,
   std::shared_ptr<SourceLocation> location
 ) :
   RExpression(Type::AssignmentExpression, location),
-  lvalue(lvalue),
-  rvalue(rvalue),
+  left(left),
+  right(right),
   op(op) {
 }
 

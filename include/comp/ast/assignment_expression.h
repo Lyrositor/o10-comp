@@ -21,21 +21,21 @@ enum class AssignmentOperator {
 
 struct AssignmentExpression final : public RExpression {
   static std::unique_ptr<AssignmentExpression> Create(
-    std::shared_ptr<LExpression> lvalue,
-    std::shared_ptr<RExpression> rvalue,
+    std::shared_ptr<LExpression> left,
+    std::shared_ptr<RExpression> right,
     AssignmentOperator op = AssignmentOperator::Simple,
     std::shared_ptr<SourceLocation> location = nullptr);
 
   AssignmentExpression(
-    std::shared_ptr<LExpression> lvalue,
-    std::shared_ptr<RExpression> rvalue,
+    std::shared_ptr<LExpression> left,
+    std::shared_ptr<RExpression> right,
     AssignmentOperator op = AssignmentOperator::Simple,
     std::shared_ptr<SourceLocation> location = nullptr);
 
   ~AssignmentExpression();
 
-  const std::shared_ptr<LExpression> lvalue;
-  const std::shared_ptr<RExpression> rvalue;
+  const std::shared_ptr<LExpression> left;
+  const std::shared_ptr<RExpression> right;
   const AssignmentOperator op;
 };
 }  // namespace ast
