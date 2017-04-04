@@ -1,4 +1,4 @@
-#include <comp/ir/basic_block.h>
+#include <comp/ir/op_grah.h>
 
 namespace comp {
 namespace ir {

@@ -7,7 +7,7 @@
 
 namespace comp {
 namespace ir {
-class BasicBlock {
+class BasicBlock final {
  public:
   enum class Type {
     /**
@@ -49,7 +49,7 @@ class BasicBlock {
   BasicBlock(
     std::vector<std::shared_ptr<Op>> ops = std::vector<std::shared_ptr<Op>>());
 
-  virtual ~BasicBlock();
+  ~BasicBlock();
 
   /**
    * @return A copy of the operations list for thie basic block

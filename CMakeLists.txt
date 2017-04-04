@@ -33,6 +33,7 @@ include_directories("${gmock_SOURCE_DIR}/include/" "${gtest_SOURCE_DIR}/include/
 set(
   TEST_SOURCES
   src/test/as/emit.spec.cpp
+  src/test/ir/optimizer/op_graph.spec.cpp
   src/test/ir/build_ir.spec.cpp
   src/test/ir/builtins.spec.cpp
   src/test/ir/context.spec.cpp
