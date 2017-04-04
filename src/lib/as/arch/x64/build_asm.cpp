@@ -92,7 +92,8 @@ void BuildFunction(
     if (idx < kParameterRegisters.size()) {
       address = ast::MemoryReference::Create(
         RBP,
-        ast::BigIntegerLiteral::Create(-kRegisterSize*(idx + 1)));
+        ast::BigIntegerLiteral::Create(
+          -kRegisterSize * (kParameterRegisters.size() - idx)));
       param_copies.push_back(ast::Instruction::Create(
         MOVQ,
         {kParameterRegisters[idx], address}));
@@ -136,8 +137,8 @@ void BuildFunction(
       {ast::ImmediateOperand::Create(stack_size), RSP}));
 
   // Copy the register parameters
-  for (auto instruction : param_copies) {
-    body.push_back(instruction);
+  for (auto rit = param_copies.rbegin(); rit != param_copies.rend(); rit++) {
+    body.push_back(*rit);
   }
 
   // Generate the function body
@@ -212,6 +213,8 @@ void BuildOp(
         body,
         variables_table);
       break;
+    default:
+      throw Exception("Unexpected operation type");
   }
 }
 
