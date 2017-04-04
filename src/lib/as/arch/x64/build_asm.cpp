@@ -14,6 +14,7 @@ static const std::shared_ptr<ast::Mnemonic>
   ADDQ = ast::Mnemonic::Create("addq"),
   CALL = ast::Mnemonic::Create("call"),
   LEAVEQ = ast::Mnemonic::Create("leaveq"),
+  MOVL = ast::Mnemonic::Create("movl"),
   MOVQ = ast::Mnemonic::Create("movq"),
   NOP = ast::Mnemonic::Create("nop"),
   PUSHQ = ast::Mnemonic::Create("pushq"),
@@ -80,29 +81,37 @@ void BuildFunction(
 
   // Store the memory references of the parameters
   // The first few parameters are passed through the registers specified by
-  // kParameterRegisters (in left-to-right order).
+  // kParameterRegisters (in left-to-right order). On Windows, these are copied
+  // to the shadow space created before the function call; otherwise, they're
+  // added to the function stack.
   // All subsequent parameters are pushed on to the stack before the return
   // address and the old RBP (in right-to-left order).
-  int64_t param_stack_size = 0;
+  int64_t param_stack = kRegisterQSize*2;
+  int64_t stack = 0;
   std::vector<std::shared_ptr<ast::Instruction>> param_copies;
   for (size_t idx = 0; idx < params.size(); idx++) {
     std::shared_ptr<ast::MemoryReference> address;
 
     // Copy the parameter's value if it came from a register
     if (idx < kParameterRegisters.size()) {
+#ifdef WIN32
+      address = ast::MemoryReference::Create(
+        RBP, ast::BigIntegerLiteral::Create(param_stack));
+      param_stack += kRegisterQSize;
+#else
+      stack += kRegisterQSize;
       address = ast::MemoryReference::Create(
         RBP,
         ast::BigIntegerLiteral::Create(
-          -kRegisterSize * (kParameterRegisters.size() - idx)));
+          stack - (kParameterRegisters.size() + 1)*kRegisterQSize));
+#endif  // WIN32
       param_copies.push_back(ast::Instruction::Create(
-        MOVQ,
-        {kParameterRegisters[idx], address}));
+        MOVQ, {kParameterRegisters[idx], address}));
     } else {
       address = ast::MemoryReference::Create(
-        RBP,
-        ast::BigIntegerLiteral::Create(kRegisterSize*2 + param_stack_size));
-      //param_stack_size += GetDataTypeSize(params[idx]->GetDataType()); TODO(Lyrositor) Use the right data type size
-      param_stack_size += kRegisterSize;
+        RBP, ast::BigIntegerLiteral::Create(param_stack));
+      //param_stack += GetDataTypeSize(params[idx]->GetDataType()); TODO(Lyrositor) Use the right data type size
+      param_stack += kRegisterQSize;
     }
     variables_table.Register(params[idx], address);
   }
@@ -110,16 +119,17 @@ void BuildFunction(
   // Store the memory references of the other local variables on the stack
   // The bottom of the stack (highest addresses) are reserved for the register
   // parameters, even if there are none to be copied.
-  int64_t stack_size = kRegisterSize * kParameterRegisters.size();
   for (auto variable : node->GetLocalVariables()) {
     if (variables_table.Contains(variable)) {  // Don't count the parameters
       continue;
     }
-    //stack_size += GetDataTypeSize(variable->GetDataType());  TODO(Lyrositor) Use the right data type size
-    stack_size += kRegisterSize;
-    variables_table.Register(variable, ast::MemoryReference::Create(
-      RBP,
-      ast::BigIntegerLiteral::Create(-stack_size)));
+    //stack += GetDataTypeSize(variable->GetDataType());  TODO(Lyrositor) Use the right data type size
+    stack += kRegisterQSize;
+    variables_table.Register(
+      variable,
+      ast::MemoryReference::Create(
+        RBP,
+        ast::BigIntegerLiteral::Create(-stack)));
   }
 
   // Prolog
@@ -134,7 +144,7 @@ void BuildFunction(
   body.push_back(
     ast::Instruction::Create(
       SUBQ,
-      {ast::ImmediateOperand::Create(stack_size), RSP}));
+      {ast::ImmediateOperand::Create(stack), RSP}));
 
   // Copy the register parameters
   for (auto rit = param_copies.rbegin(); rit != param_copies.rend(); rit++) {
@@ -238,19 +248,19 @@ void BuildCallOp(
   for (size_t idx = 0; idx < op->args.size(); idx++) {
     // Get the source of the parameter
     std::shared_ptr<ast::Operand> source;
-    int64_t data_type_size;
+    // int64_t data_type_size;
     switch (op->args[idx]->operand_type) {
       case ir::Operand::Type::Constant: {
         source = ast::ImmediateOperand::Create(
           std::static_pointer_cast<ir::ConstantOperand>(
             op->args[idx])->value);
-        data_type_size = GetDataTypeSize(ir::GetInt64Type());
+        // data_type_size = GetDataTypeSize(ir::GetInt64Type());
         break;
       }
       case ir::Operand::Type::Variable: {
         auto variable = std::static_pointer_cast<ir::VariableOperand>(
           op->args[idx])->variable;
-        data_type_size = GetDataTypeSize(variable->GetDataType());
+        // data_type_size = GetDataTypeSize(variable->GetDataType());
         source = variables_table.Get(variable);
         break;
       }
@@ -264,8 +274,8 @@ void BuildCallOp(
     } else {
       // Push the parameter's value to a location on the stack
       param_setup.push_back(ast::Instruction::Create(PUSHQ, {source}));
-//      stack_size += data_type_size; // TODO(Lyrositor) Use the appropriate size
-      stack_size += kRegisterSize;
+//     stack_size += data_type_size; TODO(Lyrositor) Use the appropriate size
+      stack_size += kRegisterQSize;
     }
   }
 
@@ -275,13 +285,21 @@ void BuildCallOp(
   }
 
   // Add the call instruction
+#ifdef WIN32
+  // On Windows, the calling convention requires the creation of a shadow space
+  // before the function call on the stack
+  std::shared_ptr<ast::ImmediateOperand> shadow_space =
+    ast::ImmediateOperand::Create(kParameterRegisters.size() * kRegisterQSize);
+  body.push_back(ast::Instruction::Create(SUBQ, {shadow_space, RSP}));
+  stack_size += shadow_space->value;
+#endif  // WIN32
   body.push_back(
     ast::Instruction::Create(
-      CALL,
-      {
-        ast::AddressOperand::Create(
-          ast::GlobalSymbol::Create(op->function->GetName()))
-      }));
+    CALL,
+    {
+      ast::AddressOperand::Create(
+        ast::GlobalSymbol::Create(op->function->GetName()))
+    }));
 
   // Restore the stack to its previous state, if parameters were passed on the
   // stack
@@ -300,7 +318,32 @@ void BuildCopyOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   VariablesTable &variables_table
 ) {
-  // TODO(Lyrositor) Implement
+  // Get the source
+  std::shared_ptr<ast::Operand> source;
+  switch (op->in->operand_type) {
+    case ir::Operand::Type::Variable:
+      source = variables_table.Get(
+        std::static_pointer_cast<ir::VariableOperand>(op->in)->variable);
+      break;
+    case ir::Operand::Type::Constant:
+      source = ast::ImmediateOperand::Create(
+        std::static_pointer_cast<ir::ConstantOperand>(op->in)->value);
+      break;
+  }
+
+  // Get the destination
+  std::shared_ptr<const ir::Variable>
+    variable = std::static_pointer_cast<ir::VariableOperand>(op->out)->variable;
+  std::shared_ptr<ast::Operand> destination = variables_table.Get(variable);
+
+  // Introduce an intermediary register if this is a copy from memory to memory
+  if (source->node_type == ast::Node::Type::MemoryReference &&
+    destination->node_type == ast::Node::Type::MemoryReference) {
+    body.push_back(ast::Instruction::Create(MOVQ, {source, RAX}));
+    body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
+  } else {
+    body.push_back(ast::Instruction::Create(MOVQ, {source, destination}));
+  }
 }
 
 void BuildNoOp(
