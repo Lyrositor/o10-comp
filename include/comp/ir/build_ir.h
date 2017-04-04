@@ -40,7 +40,6 @@ void BuildExpressionStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block);
 
-
 void BuildVariableDeclarationIR(
   const ast::VariableDeclaration &node,
   Context &context,

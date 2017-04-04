@@ -36,7 +36,9 @@ class OpGraph final {
 
   void AddVertex(Vertex vertex);
 
-  void AddEdge(Edge edge);
+  void AddEdge(Vertex source, Vertex target);
+
+  void AddConditionalEdges(Vertex source, Vertex target_if_true,  Vertex target_if_false);
 
   bool HasVertex(Vertex node) const;
 
@@ -48,22 +50,24 @@ class OpGraph final {
   /**
    * The set of vertices
    */
-  std::set<Vertex> vertices;
+  std::set<Vertex> vertices_;
 
   /**
    * The set of edges
    */
-  std::set<Edge> edges;
+  std::set<Edge> edges_;
 
   /**
-   * A map from the source vertex of the edge to the target vertex of the edge
+   * A map from the source vertex to a pair <target_vertex, nullptr> if there is one out
+   * edge or a pair <target_vertex_if_true, target_vertex_if_false> if there are two
+   * out edges.
    */
-  std::map<Vertex, std::unique_ptr<std::set<Vertex>>> out_edges;
+  std::map<Vertex, std::unique_ptr<std::pair<Vertex, Vertex>>> out_edges_;
 
   /**
    * A map from the target vertex of the edge to the source vertex of the edge
    */
-  std::map<Vertex, std::unique_ptr<std::set<Vertex>>> in_edges;
+  std::map<Vertex, std::unique_ptr<std::set<Vertex>>> in_edges_;
 };
 } // namespace optimizer
 } // namespace ir

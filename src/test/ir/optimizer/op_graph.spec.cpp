@@ -21,7 +21,7 @@ TEST(comp__ir__optimizer__op_graph, AddEdge) {
   ASSERT_TRUE(graph->HasVertex(v1));
   ASSERT_TRUE(graph->HasVertex(v2));
   ASSERT_FALSE(graph->HasEdge(e));
-  graph->AddEdge(e);
+  graph->AddEdge(v1, v2);
   ASSERT_TRUE(graph->HasVertex(v1));
   ASSERT_TRUE(graph->HasVertex(v2));
   ASSERT_TRUE(graph->HasEdge(e));
@@ -32,7 +32,7 @@ TEST(comp__ir__build_ir, AddEdgeNoVertices) {
   Vertex v1 = NoOp::Create();
   Vertex v2 = NoOp::Create();
   Edge e = Edge(v1, v2);
-  ASSERT_THROW(graph->AddEdge(e);, std::runtime_error);
+  ASSERT_THROW(graph->AddEdge(v1, v2);, std::runtime_error);
 }
 
 TEST(comp__ir__build_ir, AddEdgeNoTarget) {
@@ -41,7 +41,7 @@ TEST(comp__ir__build_ir, AddEdgeNoTarget) {
   Vertex v2 = NoOp::Create();
   Edge e = Edge(v1, v2);
   graph->AddVertex(v1);
-  ASSERT_THROW(graph->AddEdge(e);, std::runtime_error);
+  ASSERT_THROW(graph->AddEdge(v1, v2);, std::runtime_error);
 }
 
 TEST(comp__ir__build_ir, AddEdgeNoSource) {
@@ -50,7 +50,7 @@ TEST(comp__ir__build_ir, AddEdgeNoSource) {
   Vertex v2 = NoOp::Create();
   Edge e = Edge(v1, v2);
   graph->AddVertex(v2);
-  ASSERT_THROW(graph->AddEdge(e);, std::runtime_error);
+  ASSERT_THROW(graph->AddEdge(v1, v2);, std::runtime_error);
 }
 }  // namespace optimizer
 }  // namespace ir

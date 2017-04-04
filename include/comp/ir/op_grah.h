@@ -73,6 +73,8 @@ class BasicBlock final {
   /**
    * Changes the type to `Final`
    *
+   * This adds a `NoOp` if the operations list is empty.
+   *
    * Requires the `Incomplete` type, otherwise throws a runtine error.
    */
   void SetFinal();
