@@ -177,7 +177,25 @@ std::unique_ptr<rapidjson::Value> ExpressionStatementToJson(const ExpressionStat
 std::unique_ptr<rapidjson::Value> ForStatementToJson(const ForStatement &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "ForStatement", allocator);
-  result->AddMember("initialization", *RExpressionToJson(*node.initialization, allocator), allocator);
+  switch (node.initialization->node_type) {
+    case ast::Node::Type::ForStatExprInit : {
+      std::shared_ptr<ast::ForStatExprInitializer>
+          forInitExpr = std::static_pointer_cast<ast::ForStatExprInitializer>(node.initialization);
+      result->AddMember("initialization", *RExpressionToJson(*(forInitExpr->exprInit), allocator), allocator);
+      break;
+    }
+    case ast::Node::Type::ForStatDeclInit : {
+      std::shared_ptr<ast::ForStatDeclInitializer>
+          forInitDecl = std::static_pointer_cast<ast::ForStatDeclInitializer>(node.initialization);
+      result->AddMember("initialization",
+                        *VariableDeclarationToJson(*(forInitDecl->variableDeclaration), allocator),
+                        allocator);
+      break;
+    }
+    default: {
+      throw std::domain_error("Unexpected Node::Type of ForInitializer in to_json.");
+    }
+  }
   result->AddMember("condition", *RExpressionToJson(*node.condition, allocator), allocator);
   result->AddMember("iteration", *RExpressionToJson(*node.iteration, allocator), allocator);
   result->AddMember("body", *StatementToJson(*node.body, allocator), allocator);

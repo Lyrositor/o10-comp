@@ -410,9 +410,11 @@ forStatement:
         std::shared_ptr<comp::ast::RExpression> condition($5);
         std::shared_ptr<comp::ast::RExpression> iteration($7);
         std::shared_ptr<comp::ast::Statement> body($9);
-        $$ = new comp::ast::ForStatement(initialization, condition, iteration, body, LOCATION(&@1));
+
+        $$ = new comp::ast::ForStatement(comp::ast::ForStatExprInitializer::Create(initialization), condition, iteration, body, LOCATION(&@1));
+        /* AJOUTER UNE REDUCTION POUR ForStatExprInitializer POUR AVOIR UNE LOCATION CORRECTE (null actuellement) */
     }
-    /*| FOR OPEN_PAREN variableDeclaration expression SEMICOLON expression CLOSE_PAREN statement {
+    /* A DECOMMENTER --> | FOR OPEN_PAREN variableDeclaration expression SEMICOLON expression CLOSE_PAREN statement {
         std::shared_ptr<comp::ast::VariableDeclaration> variableDeclaration($2);
         std::shared_ptr<comp::ast::RExpression> initialization($3);
         std::shared_ptr<comp::ast::RExpression> condition($4);

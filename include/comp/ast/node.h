@@ -33,7 +33,9 @@ struct Node {
     UnaryExpression,
     VariableDeclaration,
     VariableDeclarator,
-    WhileStatement
+    WhileStatement,
+    ForStatExprInit,
+    ForStatDeclInit
   };
 
   Node(Type node_type, std::shared_ptr<SourceLocation> location);
