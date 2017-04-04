@@ -6,7 +6,6 @@
 import json
 import os
 import subprocess
-from typing import Set, Tuple
 
 END_TO_END_ROOT = os.path.dirname(os.path.realpath(__file__))
 PROJECT_ROOT = os.path.join(END_TO_END_ROOT, "..")
@@ -70,7 +69,7 @@ class TestConfig():
 
         self.ir = None  # type: IrTestConfig
 
-    def from_json(input, test_dir) -> 'TestConfig':
+    def from_json(input, test_dir):
         doc = json.loads(input)
         config = TestConfig()
 
@@ -142,16 +141,17 @@ class TestCase:
         if not self.config.test_ast and self.config.actual_ast_path is None:
             return "hidden", None
 
-        completed_process = subprocess.run(
-            [o10c.path, "-j", self.config.source_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        process = subprocess.Popen(
+          [o10c.path, "-j", self.config.source_path],
+          stdout=subprocess.PIPE,
+          stderr=subprocess.PIPE
         )
 
-        stdout = completed_process.stdout.decode('utf-8')
-        stderr = completed_process.stderr.decode('utf-8')
+        stdout, stderr = process.communicate()
+        stdout = stdout.decode('utf-8')
+        stderr = stderr.decode('utf-8')
 
-        if completed_process.returncode != 0:
+        if process.returncode != 0:
             if self.config.expect_error == "syntax":
                 return "success", None
             else:
@@ -177,7 +177,7 @@ class TestCase:
             return "error", msg
 
         if self.config.expect_error == "syntax":
-            if completed_process.returncode == 0:
+            if process.returncode == 0:
                 msg = ("Expected syntax error, but got zero return code:\n"
                        "Stdout:\n"
                        "{}\n"
@@ -218,16 +218,17 @@ class TestCase:
         if self.config.ir.disabled:
             return "disabled", None
 
-        completed_process = subprocess.run(
-            [o10c.path, "--dot", self.config.source_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+        process = subprocess.Popen(
+          [o10c.path, "--dot", self.config.source_path],
+          stdout=subprocess.PIPE,
+          stderr=subprocess.PIPE
         )
 
-        stdout = completed_process.stdout.decode('utf-8')
-        stderr = completed_process.stderr.decode('utf-8')
+        stdout, stderr = process.communicate()
+        stdout = stdout.decode('utf-8')
+        stderr = stderr.decode('utf-8')
 
-        if completed_process.returncode != 0:
+        if process.returncode != 0:
             if self.config.expect_error == "syntax":
                 return "success", None
             else:
@@ -258,17 +259,18 @@ class TestCase:
             output_name = "{}.{}.asm".format(self.config.source_path, config_name)
             arguments = [compiler.path] + options + ["--output", output_name, self.config.source_path]
 
-            completed_process = subprocess.run(
-                arguments,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+            process = subprocess.Popen(
+              arguments,
+              stdout=subprocess.PIPE,
+              stderr=subprocess.PIPE
             )
 
-            stdout = completed_process.stdout.decode('utf-8')
-            stderr = completed_process.stderr.decode('utf-8')
+            stdout, stderr = process.communicate()
+            stdout = stdout.decode('utf-8')
+            stderr = stderr.decode('utf-8')
 
             if self.config.expect_error is not None:
-                if completed_process.returncode == 0:
+                if process.returncode == 0:
                     msg = ("Expected compilation error, but got zero return code for {}:\n"
                            "Stdout:\n"
                            "{}\n"
@@ -279,7 +281,7 @@ class TestCase:
                 else:
                     return "success", None
 
-            if completed_process.returncode != 0:
+            if process.returncode != 0:
                 msg = ("Expected successful compilation, but got non-zero return code for {}:\n"
                        "Stdout:\n"
                        "{}\n"
@@ -292,7 +294,7 @@ class TestCase:
 
 
 # Returns a set of directories and a set of other FS nodes
-def dir_content(dir_path) -> Tuple[Set[str], Set[str]]:
+def dir_content(dir_path):
     files = set()
     dirs = set()
     for node_name in os.listdir(dir_path):
