@@ -3,5 +3,8 @@
   "ast": {
     "actual-json": "ast.actual.json",
     "expected-json": "ast.expected.json"
+  },
+  "ir": {
+    "skip": true
   }
 }

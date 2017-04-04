@@ -1,4 +1,7 @@
 {
   "source": "main.c",
-  "expected-ast": "ast.expected.json"
+  "ast": {
+    "actual-json": "ast.actual.json",
+    "expected-json": "ast.expected.json"
+  }
 }

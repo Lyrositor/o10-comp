@@ -1,6 +1,6 @@
 {
   "source": "main.c",
-  "expected-ast": "ast.expected.json",
-  "actual-ast": "ast.actual.json",
-  "error":"syntax"
+  "ast": {
+    "return-code": 1
+  }
 }

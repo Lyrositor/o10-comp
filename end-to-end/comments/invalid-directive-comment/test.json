@@ -1,4 +1,6 @@
 {
   "source": "main.c",
-  "error": "syntax"
+  "ast": {
+    "return-code": 1
+  }
 }

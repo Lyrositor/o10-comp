@@ -24,7 +24,7 @@
 
 #include "error_handling.h"
 
-enum Options { Analyse, Compile, Dot, File, Json, Help, Optimise, Output, Unknown };
+enum Options { Analyse, Ast, Compile, File, Help, Ir, Optimise, Output, Unknown };
 
 static const option::Descriptor kUsage[] = {
   {
@@ -76,18 +76,18 @@ static const option::Descriptor kUsage[] = {
     "  --optimise, -o \tAttempt to optimise the generated code."
   },
   {
-    Json,
-    0,
-    "j",
-    "json",
-    option::Arg::None,
-    "  --json, -j \tDisplay a JSON representation of the generated abstract syntax tree."
-  },
-  {
-    Dot,
+    Ast,
     0,
     "",
-    "dot",
+    "ast",
+    option::Arg::None,
+    "  --ast \tDisplay a JSON representation of the generated abstract syntax tree."
+  },
+  {
+    Ir,
+    0,
+    "",
+    "ir",
     option::Arg::None,
     "  --dot \tEmit a Dot representation of the generated intermediate representation."
   },
@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
     }
 
     // Display a JSON representation of the AST
-    if (options[Json]) {
+    if (options[Ast]) {
       std::unique_ptr<rapidjson::Document> document = comp::ast::ProgramToJson(
         *program_ast);
       rapidjson::StringBuffer json_buffer;
@@ -189,13 +189,13 @@ int main(int argc, char **argv) {
       std::cout << json_buffer.GetString() << std::endl;
     }
 
-    if (!(options[Compile] || options[Dot])) {
+    if (!(options[Compile] || options[Ir])) {
       return main_exit(EXIT_SUCCESS, buffer, options);
     }
 
     std::shared_ptr<comp::ir::Program> program_ir = comp::ir::BuildProgramIR(
       *program_ast);
-    if (options[Dot]) {
+    if (options[Ir]) {
       std::unique_ptr<comp::dot::ast::Graph> program_graph = comp::ir::ProgramToDot(
         *program_ir);
       comp::dot::EmitGraph(*program_graph, std::cout);

@@ -1,3 +1,4 @@
 *.asm
-*.actual.json
 *.actual.dot
+*.actual.json
+*.actual.png

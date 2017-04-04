@@ -39,22 +39,19 @@
           },
           {
             "node_type": "ForStatement",
-            "initializer": {
-              "node_type": "ExpressionForInitializer",
-              "expression": {
-                "node_type": "AssignmentExpression",
-                "op": "=",
-                "lvalue": {
-                  "node_type": "Identifier",
-                  "name": "i"
-                },
-                "rvalue": {
-                  "node_type": "Int64Literal",
-                  "value": 0
-                }
+            "initialization": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "Identifier",
+                "name": "i"
+              },
+              "rvalue": {
+                "node_type": "Int64Literal",
+                "value": 0
               }
             },
-            "test": {
+            "condition": {
               "node_type": "BinaryExpression",
               "op": "<",
               "left": {
@@ -66,7 +63,7 @@
                 "value": 3
               }
             },
-            "update": {
+            "iteration": {
               "node_type": "UnaryExpression",
               "op": "PostfixIncrement",
               "expression": {

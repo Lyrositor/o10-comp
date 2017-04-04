@@ -1,9 +1,11 @@
 {
   "source": "main.c",
-  "ir": {
-    "actual-dot": "ir.actual.dot"
+  "ast": {
+    "actual-json": "ast.actual.json",
+    "expected-json": "ast.expected.json"
   },
-  "expected-ast": "ast.expected.json",
-  "actual-ast": "ast.actual.json",
-  "assembly": true
+  "ir": {
+    "actual-dot": "ir.actual.dot",
+    "actual-png": "ir.actual.png"
+  }
 }

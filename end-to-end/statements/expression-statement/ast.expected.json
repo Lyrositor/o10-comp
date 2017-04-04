@@ -1,36 +1,36 @@
 {
-    "node_type": "Program",
-    "body": [
-        {
-            "node_type": "Function",
-            "return_type": {
-                "node_type": "IdentifierDataType",
-                "identifier": {
-                    "node_type": "Identifier",
-                    "name": "int64_t"
-                }
-            },
-            "parameters": [],
-            "body": {
-                "node_type": "BlockStatement",
-                "body": [
-                    {
-                        "node_type": "ExpressionStatement",
-                        "expression": {
-                            "node_type": "BinaryExpression",
-                            "op": "+",
-                            "left": {
-                                "node_type": "Identifier",
-                                "name": "a"
-                            },
-                            "right": {
-                                "node_type": "Identifier",
-                                "name": "b"
-                            }
-                        }
-                    }
-                ]
-            }
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "int64_t"
         }
-    ]
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "BinaryExpression",
+              "op": "+",
+              "left": {
+                "node_type": "Identifier",
+                "name": "a"
+              },
+              "right": {
+                "node_type": "Identifier",
+                "name": "b"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

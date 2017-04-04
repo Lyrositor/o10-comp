@@ -3,6 +3,7 @@
   "expected-ast": "ast.expected.json",
   "actual-ast": "ast.actual.json",
   "ir": {
-    "actual-dot": "ir.actual.dot"
+    "actual-dot": "ir.actual.dot",
+    "actual-png": "ir.actual.png"
   }
 }

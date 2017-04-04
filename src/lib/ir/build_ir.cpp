@@ -22,6 +22,9 @@ std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node) {
         }
         break;
       }
+      case ast::Node::Type::VariableDeclaration: {
+        throw std::domain_error("Not implemented: global variable declarations");
+      }
       default: {
         throw std::domain_error("Unexpected node type in root context");
       }
