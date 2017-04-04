@@ -25,7 +25,6 @@ std::shared_ptr<const ast::Node> Variable::GetAstNode() const {
   return this->ast_node_;
 }
 
-
 Variable::~Variable() {
 }
 }  // namespace ir

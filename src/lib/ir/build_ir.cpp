@@ -773,32 +773,36 @@ void BuildForStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  if (node.condition == nullptr) {
+  if (node.test == nullptr) {
     throw std::runtime_error("Not implemented: infinite loops");
+  }
+  if (node.initializer != nullptr) {
+    switch (node.initializer->node_type) {
+      case ast::Node::Type::DeclarationForInitializer : {
+        std::shared_ptr<ast::DeclarationForInitializer>
+          initializer = std::static_pointer_cast<ast::DeclarationForInitializer>(node.initializer);
+        BuildVariableDeclarationIR(*initializer->declaration, context, cfg, current_block);
+        break;
+      }
+      case ast::Node::Type::ExpressionForInitializer : {
+        std::shared_ptr<ast::ExpressionForInitializer>
+          initializer = std::static_pointer_cast<ast::ExpressionForInitializer>(node.initializer);
+        BuildRExpressionIR(initializer->expression, context, cfg, current_block);
+        break;
+      }
+      default: {
+        throw std::domain_error("Unexpected Node::Type of ForInitializer in build_ir.");
+      }
+    }
   }
 
   std::shared_ptr<BasicBlock> test_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> update_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
-  switch (node.initialization->node_type) {
-    case ast::Node::Type::ForStatExprInit :{
-      std::shared_ptr<ast::ForStatExprInitializer> forInitExpr = std::static_pointer_cast<ast::ForStatExprInitializer>(node.initialization);
-      BuildRExpressionIR( forInitExpr->exprInit, context, cfg, current_block);
-      break;
-    }
-    case ast::Node::Type::ForStatDeclInit : {
-      std::shared_ptr<ast::ForStatDeclInitializer> forInitDecl = std::static_pointer_cast<ast::ForStatDeclInitializer>(node.initialization);
-      BuildVariableDeclarationIR( *(forInitDecl->variableDeclaration), context, cfg, current_block);
-      break;
-    }
-    default: {
-      throw std::domain_error("Unexpected Node::Type of ForInitializer in build_ir.");
-    }
-  }
-  std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.condition, context, cfg, test_block);
-  if (node.iteration != nullptr) {
-    BuildRExpressionIR(node.iteration, context, cfg, update_block);
+  std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.test, context, cfg, test_block);
+  if (node.update != nullptr) {
+    BuildRExpressionIR(node.update, context, cfg, update_block);
   }
   BuildStatementIR(*node.body, context, cfg, body_block);
 

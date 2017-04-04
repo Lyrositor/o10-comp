@@ -1,6 +1,5 @@
 {
   "source": "main.c",
   "expected-ast": "ast.expected.json",
-  "actual-ast": "ast.actual.json",
-  "disabled": true
+  "actual-ast": "ast.actual.json"
 }

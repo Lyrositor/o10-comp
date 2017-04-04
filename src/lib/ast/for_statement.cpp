@@ -3,82 +3,83 @@
 
 namespace comp {
 namespace ast {
-
-// FOR STATEMENT
-std::unique_ptr<ForStatement> ForStatement::Create(
-  std::shared_ptr<ForStatementInitializer> initialization,
-  std::shared_ptr<RExpression> condition,
-  std::shared_ptr<RExpression> iteration,
-  std::shared_ptr<Statement> body,
-  std::shared_ptr<SourceLocation> location
-) {
-  return std::unique_ptr<ForStatement>(
-    new ForStatement(initialization, condition, iteration, body, location));
-}
-
-ForStatement::ForStatement(
-  std::shared_ptr<ForStatementInitializer> initialization,
-  std::shared_ptr<RExpression> condition,
-  std::shared_ptr<RExpression> iteration,
-  std::shared_ptr<Statement> body,
-  std::shared_ptr<SourceLocation> location
-) :
-  Statement(Type::ForStatement, location),
-  initialization(initialization),
-  condition(condition),
-  iteration(iteration),
-  body(body) {
-}
-
-// FOR_STATEMENT_INITIALIZER
-ForStatementInitializer::ForStatementInitializer(
+// ForStatementInitializer
+ForInitializer::ForInitializer(
     Type initializerType,
     std::shared_ptr<SourceLocation> location
 ) :
     Node(initializerType,location) {
 }
-ForStatementInitializer::~ForStatementInitializer() {
+ForInitializer::~ForInitializer() {
 }
 
-// FOR_STAT_EXPR_INITIALIZER
-ForStatExprInitializer::ForStatExprInitializer(
-    std::shared_ptr<RExpression> exprInit,
+// ExpressionForInitializer
+std::unique_ptr<ExpressionForInitializer> ExpressionForInitializer::Create(
+  std::shared_ptr<RExpression> expression,
+  std::shared_ptr<SourceLocation> location
+) {
+  return std::unique_ptr<ExpressionForInitializer>(
+    new ExpressionForInitializer(expression, location));
+}
+
+ExpressionForInitializer::ExpressionForInitializer(
+    std::shared_ptr<RExpression> expression,
     std::shared_ptr<SourceLocation> location
 ) :
-    ForStatementInitializer(Type::ForStatExprInit, location),
-    exprInit(exprInit) {
+    ForInitializer(Type::ExpressionForInitializer, location),
+    expression(expression) {
 }
 
-std::unique_ptr<ForStatExprInitializer> ForStatExprInitializer::Create(
-    std::shared_ptr<RExpression> exprInit,
-    std::shared_ptr<SourceLocation> location
+ExpressionForInitializer::~ExpressionForInitializer() {
+}
+
+// DeclarationForInitializer
+std::unique_ptr<DeclarationForInitializer> DeclarationForInitializer::Create(
+  std::shared_ptr<VariableDeclaration> declaration,
+  std::shared_ptr<SourceLocation> location
 ) {
-  return std::unique_ptr<ForStatExprInitializer>(
-      new ForStatExprInitializer(exprInit, location));
+  return std::unique_ptr<DeclarationForInitializer>(
+    new DeclarationForInitializer(declaration, location));
 }
 
-ForStatExprInitializer::~ForStatExprInitializer() {
-}
-
-
-// FOR_STAT_DECL_INITIALIZER
-ForStatDeclInitializer::ForStatDeclInitializer(
-    std::shared_ptr<VariableDeclaration> variableDeclaration,
+DeclarationForInitializer::DeclarationForInitializer(
+    std::shared_ptr<VariableDeclaration> declaration,
     std::shared_ptr<SourceLocation> location
 ) :
-    ForStatementInitializer(Type::ForStatDeclInit, location),
-    variableDeclaration(variableDeclaration) {
+    ForInitializer(Type::DeclarationForInitializer, location),
+    declaration(declaration) {
 }
 
-std::unique_ptr<ForStatDeclInitializer> ForStatDeclInitializer::Create(
-    std::shared_ptr<VariableDeclaration> variableDeclaration,
-    std::shared_ptr<SourceLocation> location
+DeclarationForInitializer::~DeclarationForInitializer() {
+}
+
+// ForStatement
+std::unique_ptr<ForStatement> ForStatement::Create(
+  std::shared_ptr<ForInitializer> initialization,
+  std::shared_ptr<RExpression> test,
+  std::shared_ptr<RExpression> update,
+  std::shared_ptr<Statement> body,
+  std::shared_ptr<SourceLocation> location
 ) {
-  return std::unique_ptr<ForStatDeclInitializer>(
-      new ForStatDeclInitializer(variableDeclaration, location));
+  return std::unique_ptr<ForStatement>(
+    new ForStatement(initialization, test, update, body, location));
 }
 
-ForStatDeclInitializer::~ForStatDeclInitializer() {
+ForStatement::ForStatement(
+  std::shared_ptr<ForInitializer> initializer,
+  std::shared_ptr<RExpression> test,
+  std::shared_ptr<RExpression> update,
+  std::shared_ptr<Statement> body,
+  std::shared_ptr<SourceLocation> location
+) :
+  Statement(Type::ForStatement, location),
+  initializer(initializer),
+  test(test),
+  update(update),
+  body(body) {
+}
+
+ForStatement::~ForStatement() {
 }
 }  // namespace ast
 }  // namespace comp

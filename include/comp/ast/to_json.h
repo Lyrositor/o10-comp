@@ -15,8 +15,11 @@ std::unique_ptr<rapidjson::Value> BlockStatementToJson(const BlockStatement &nod
 std::unique_ptr<rapidjson::Value> CallExpressionToJson(const CallExpression &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> DataTypeToJson(const DataType &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> DeclarationToJson(const Declaration &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> DeclarationForInitializerToJson(const DeclarationForInitializer &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> DeclaratorToJson(const Declarator &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ExpressionForInitializerToJson(const ExpressionForInitializer &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> ExpressionStatementToJson(const ExpressionStatement &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ForInitializerToJson(const ForInitializer &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> ForStatementToJson(const ForStatement &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> FunctionToJson(const Function &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> IdentifierToJson(const Identifier &node, rapidjson::Document::AllocatorType &allocator);

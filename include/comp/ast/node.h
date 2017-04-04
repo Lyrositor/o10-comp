@@ -16,6 +16,8 @@ struct Node {
     BlockStatement,
     CallExpression,
     ConditionalExpression,
+    DeclarationForInitializer,
+    ExpressionForInitializer,
     ExpressionStatement,
     ForStatement,
     Function,
@@ -33,9 +35,7 @@ struct Node {
     UnaryExpression,
     VariableDeclaration,
     VariableDeclarator,
-    WhileStatement,
-    ForStatExprInit,
-    ForStatDeclInit
+    WhileStatement
   };
 
   Node(Type node_type, std::shared_ptr<SourceLocation> location);

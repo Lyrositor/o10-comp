@@ -152,7 +152,7 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 [VariableDeclarator]: #variabledeclarator
 
 - _[Declarator]_
-- _[Declarator]_ `=` _[Expression]_
+- _[Declarator]_ `=` _[AssignmentExpression]_
 
 ## Expression
 [Expression]: #expression
@@ -293,8 +293,8 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 ## CallExpressionArguments
 [CallExpressionArguments]: #callexpressionarguments
 
-- _[CallExpressionArguments]_ `,` _[Expression]_
-- _[Expression]_
+- _[CallExpressionArguments]_ `,` _[AssignmentExpression]_
+- _[AssignmentExpression]_
 
 ## Statement
 [Statement]: #statement
@@ -332,11 +332,17 @@ that the return type can be restricted to only _[IdentifierDataType]_.
 ## ForStatement
 [ForStatement]: #forstatement
 
-- `for` `(` _[ExpressionOrVoid]_ `;`  _[ExpressionOrVoid]_  `;` _[ExpressionOrVoid]_ `)` _[Statement]_
-- `for` `(` _[VariableDeclaration]_ _[ExpressionOrVoid]_  `;` _[ExpressionOrVoid]_ `)` _[Statement]_
+- `for` `(` _[ForInitializer]_ _[OptionalExpression]_  `;` _[OptionalExpression]_ `)` _[Statement]_
 
-## ExpressionOrVoid
-[ExpressionOrVoid]: #expressionorvoid
+## ForInitializer
+[ForInitializer]: #forinitializer
+
+- _[Expression]_ `;`
+- _[VariableDeclaration]_
+- `;`
+
+## OptionalExpression
+[OptionalExpression]: #optionalexpression
 
 - _[Expression]_
 - ε
