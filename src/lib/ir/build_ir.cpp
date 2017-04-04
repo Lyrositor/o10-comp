@@ -781,8 +781,21 @@ void BuildForStatementIR(
   std::shared_ptr<BasicBlock> update_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
-
-  BuildRExpressionIR(node.initialization, context, cfg, current_block);
+  switch (node.initialization->node_type) {
+    case ast::Node::Type::ForStatExprInit :{
+      std::shared_ptr<ast::ForStatExprInitializer> forInitExpr = std::static_pointer_cast<ast::ForStatExprInitializer>(node.initialization);
+      BuildRExpressionIR( forInitExpr->exprInit, context, cfg, current_block);
+      break;
+    }
+    case ast::Node::Type::ForStatDeclInit : {
+      std::shared_ptr<ast::ForStatDeclInitializer> forInitDecl = std::static_pointer_cast<ast::ForStatDeclInitializer>(node.initialization);
+      BuildVariableDeclarationIR( *(forInitDecl->variableDeclaration), context, cfg, current_block);
+      break;
+    }
+    default: {
+      throw std::domain_error("Unexpected Node::Type of ForInitializer in build_ir.");
+    }
+  }
   std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.condition, context, cfg, test_block);
   if (node.iteration != nullptr) {
     BuildRExpressionIR(node.iteration, context, cfg, update_block);
