@@ -44,6 +44,8 @@ struct Node {
 
   const Type node_type;
   const std::shared_ptr<SourceLocation> location;
+
+  static std::string ToString(Type type);
 };
 }  // namespace ast
 }  // namespace comp

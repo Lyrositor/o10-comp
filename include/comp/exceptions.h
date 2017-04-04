@@ -48,7 +48,13 @@ class UnexpectedTokenError : public SyntaxException {
 class UnexpectedNodeTypeError : public SyntaxException {
  public:
   UnexpectedNodeTypeError(
+    const std::string &nodeType,
     const std::shared_ptr<ast::SourceLocation> location);
+
+  std::string GetNodeType() const;
+
+ private:
+  const std::string nodeType_;
 
 };
 
@@ -56,6 +62,9 @@ class UnexpectedNodeValueError : public SyntaxException {
  public:
   UnexpectedNodeValueError(
     const std::string &node,
+    const std::shared_ptr<ast::SourceLocation> location);
+
+  UnexpectedNodeValueError(
     const std::shared_ptr<ast::SourceLocation> location);
 
   std::string GetNode() const;
@@ -67,7 +76,16 @@ class UnexpectedNodeValueError : public SyntaxException {
 class MismatchedTypesLeftRightError : public CompilationException {
  public:
   MismatchedTypesLeftRightError(
-      const std::shared_ptr<ast::SourceLocation> location);
+    const std::string &left,
+    const std::string &right,
+    const std::shared_ptr<ast::SourceLocation> location);
+
+  std::string GetLeft() const;
+  std::string GetRight() const;
+
+ private:
+  const std::string left_;
+  const std::string right_;
 };
 
 class FunctionAlreadyDefinedError : public CompilationException {
@@ -124,12 +142,17 @@ class UnexpectedNodeTypeInRootError : public SyntaxException {
  public:
   UnexpectedNodeTypeInRootError(
     const std::shared_ptr<ast::SourceLocation> location);
+
 };
 
 class ArrayLengthNotLiteralError : public SyntaxException {
  public:
   ArrayLengthNotLiteralError(
+    const std::string &lengthType,
     const std::shared_ptr<ast::SourceLocation> location);
+  std::string GetLengthType() const;
+ private:
+  const std::string lengthType_;
 };
 
 class CannotSpecifySizeError : public SyntaxException {

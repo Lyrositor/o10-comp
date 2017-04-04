@@ -124,7 +124,8 @@ std::shared_ptr<const DataType> ResolveDataTypeType(const ast::DataType &data_ty
             break;
           default:
             // Currently, we only support literals to specify array size
-            throw comp::ArrayLengthNotLiteralError(data_type.location);
+            throw comp::ArrayLengthNotLiteralError(comp::ast::Node::ToString(arrayDataType.size->node_type),
+                                                   data_type.location);
         }
         return ArrayDataType::Create(ResolveDataTypeType(*arrayDataType.item_type, context), size);
       } else {
@@ -136,7 +137,7 @@ std::shared_ptr<const DataType> ResolveDataTypeType(const ast::DataType &data_ty
       return context.ResolveDataType(identifierDeclarator.identifier->name);
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(data_type.location);
+      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(data_type.node_type),data_type.location);
     }
   }
 }
@@ -161,7 +162,7 @@ std::shared_ptr<const DataType> ResolveDeclaratorType(const std::shared_ptr<cons
       return base_type;
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(declarator.location);
+      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(declarator.node_type),declarator.location);
     }
   }
 }
@@ -177,7 +178,7 @@ std::shared_ptr<const DataType> ResolveParameterType(const ast::Parameter &param
       return ResolveDataTypeType(*anonymousParameter.data_type, context);
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(parameter.location);
+      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(parameter.node_type),parameter.location);
     }
   }
 }
@@ -191,7 +192,7 @@ std::string ResolveDeclaratorName(const ast::Declarator &declarator) {
       return static_cast<const ast::IdentifierDeclarator &>(declarator).identifier->name;
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(declarator.location);
+      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(declarator.node_type),declarator.location);
     }
   }
 }
@@ -206,7 +207,7 @@ std::string ResolveParameterName(const ast::Parameter &parameter) {
       return "";
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(parameter.location);
+      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(parameter.node_type),parameter.location);
     }
   }
 }
@@ -288,7 +289,7 @@ void BuildStatementIR(
       break;
     }
     default: {
-      throw comp::UnexpectedNodeValueError("node.node_type",node.location);
+      throw comp::UnexpectedNodeValueError(comp::ast::Node::ToString(node.node_type),node.location);
     }
   }
 }
@@ -443,7 +444,7 @@ std::shared_ptr<Operand> BuildRExpressionIR(
         current_block);
     }
     default: {
-      throw comp::UnexpectedNodeValueError("node.expression->node_type",node.location);
+      throw comp::UnexpectedNodeValueError(comp::ast::Node::ToString(node.node_type),node.location);
     }
   }
 }
@@ -651,7 +652,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
       break;
     }
     default: {
-      throw comp::UnexpectedNodeValueError("node.op",node.location);
+      throw comp::UnexpectedNodeValueError(node.location);
     }
   }
 

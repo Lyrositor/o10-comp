@@ -20,13 +20,17 @@ std::shared_ptr<ast::SourceLocation> CompilationException::GetLocation() const {
 
 std::string CompilationException::PrintLocation(const std::shared_ptr<comp::ast::SourceLocation> location){
   std::stringstream msg;
-  //size_t a1=location->start.line;
-  //int b1;
-  //b1 = (int)a1;
-  //size_t a2=location->start.line;
-  //int b2;
-  //b2 = (int)a2;
-  msg << "at line " <<  ", column "  << ".";
+  if (location == nullptr) {
+    msg << "at unknown location.";
+  }else{
+    size_t a1=location->start.line;
+    int b1;
+    b1 = (int)a1;
+    size_t a2=location->start.line;
+    int b2;
+    b2 = (int)a2;
+    msg << "at line " << b1 <<  ", column "  << b2 << ".";
+  }
   return msg.str();
 }
 
@@ -52,14 +56,19 @@ std::string UnexpectedTokenError::GetToken() const {
 }
 
 UnexpectedNodeTypeError::UnexpectedNodeTypeError(
+  const std::string &nodeType,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   SyntaxException(
-    std::string("Unexpected node type")
+    std::string("Unexpected node type") + ": '" + nodeType + "'"
       + CompilationException::PrintLocation(location),
-    location){
+    location),
+    nodeType_(nodeType){
 }
 
+std::string UnexpectedNodeTypeError::GetNodeType() const {
+  return nodeType_;
+}
 
 UnexpectedNodeValueError::UnexpectedNodeValueError(
   const std::string &node,
@@ -72,17 +81,36 @@ UnexpectedNodeValueError::UnexpectedNodeValueError(
     node_(node) {
 }
 
+UnexpectedNodeValueError::UnexpectedNodeValueError(
+  const std::shared_ptr<ast::SourceLocation> location
+) :
+  SyntaxException(
+    std::string("Unexpected node value")
+      + CompilationException::PrintLocation(location),
+    location) {
+}
+
 std::string UnexpectedNodeValueError::GetNode() const {
   return node_;
 }
 
 MismatchedTypesLeftRightError::MismatchedTypesLeftRightError(
+  const std::string &left,
+  const std::string &right,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Mismatched types for left and right operands")
+    std::string("Mismatched types for left and right operands") + ": '" + left + "','" + right + "'"
       + CompilationException::PrintLocation(location),
-    location){
+    location),
+    left_(left),right_(right){
+}
+
+std::string MismatchedTypesLeftRightError::GetLeft() const {
+  return left_;
+}
+std::string MismatchedTypesLeftRightError::GetRight() const {
+  return right_;
 }
 
 FunctionAlreadyDefinedError::FunctionAlreadyDefinedError(
@@ -164,22 +192,30 @@ UnexpectedNodeTypeInRootError::UnexpectedNodeTypeInRootError(
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   SyntaxException(
-    std::string("Unexpected node type in root context."), location){
+    std::string("Unexpected node type in root context."),
+    location){
 }
 
 ArrayLengthNotLiteralError::ArrayLengthNotLiteralError(
+  const std::string &lengthType,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   SyntaxException(
-    std::string("Array length not a literal") + CompilationException::PrintLocation(location),
-    location){
+    std::string("Array length not a literal")  + ": '" + lengthType + "'"
+      + CompilationException::PrintLocation(location),
+    location),
+  lengthType_(lengthType){
+}
+
+std::string ArrayLengthNotLiteralError::GetLengthType() const {
+  return lengthType_;
 }
 
 CannotSpecifySizeError::CannotSpecifySizeError(
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   SyntaxException(
-    std::string("Cannot specify size")
+    std::string("Cannot specify size of array")
       + CompilationException::PrintLocation(location),
     location){
 }
@@ -189,7 +225,7 @@ InvalidIdentifierError::InvalidIdentifierError(
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   SyntaxException(
-    std::string("Cannot specify size") + ": '" + identifier + "'"
+    std::string("Invalid identifier") + ": '" + identifier + "'"
       + CompilationException::PrintLocation(location),
     location),
   identifier_(identifier) {
