@@ -91,7 +91,7 @@ std::shared_ptr<Operand> BasicBlock::GetTest() const {
   if (last_op->op_type != Op::Type::TestOp) {
     throw std::runtime_error("Basic Block with `ConditionalJump` type does not end with a `TestOp` operation");
   }
-  std::shared_ptr<Operand> test_operand = static_cast<TestOp &>(*last_op).test;
+  std::shared_ptr<Operand> test_operand = std::static_pointer_cast<TestOp>(last_op)->test;
   if (test_operand == nullptr) {
     throw std::runtime_error("Basic Block with `ConditionalJump` ends with a `TestOp` containing the `nullptr`");
   }
@@ -132,7 +132,7 @@ std::shared_ptr<Operand> BasicBlock::GetReturnValue() const {
   if (last_op->op_type != Op::Type::ReturnOp) {
     throw std::runtime_error("Basic Block with `Return` type does not end with a `ReturnOp` operation");
   }
-  return static_cast<ReturnOp &>(*last_op).in;
+  return std::static_pointer_cast<ReturnOp>(last_op)->in;
 }
 
 BasicBlock::~BasicBlock() {
