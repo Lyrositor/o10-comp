@@ -28,7 +28,7 @@ class GlobalOptions:
         self.clang_path = DEFAULT_CLANG_PATH
         self.dot_path = DEFAULT_DOT_PATH
         self.gcc_path = DEFAULT_GCC_PATH
-        self.o10c_path = os.environ["O10C_PATH"] if "O10_COMP_PATH" in os.environ else DEFAULT_O10C_PATH
+        self.o10c_path = os.environ["O10C_PATH"] if "O10C_PATH" in os.environ else DEFAULT_O10C_PATH
         self.no_dot = False
 
 
@@ -217,7 +217,7 @@ class TestCase:
 
         if process.returncode == 0:
             try:
-                actual_ast_doc = json.loads(stdout)
+                actual_ast_doc = json.loads(utf8_stdout)
             except json.decoder.JSONDecodeError as err:
                 msg = ("Unable to parse the AST returned by the compiler:\n"
                        "stdout:\n"
