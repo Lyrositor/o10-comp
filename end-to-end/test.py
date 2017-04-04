@@ -326,6 +326,7 @@ def dir_content(dir_path):
             files.add(abs_path)
     return files, dirs
 
+
 def discover_tests(tests_dir, recursive=True):
     """
     Yields the test cases in the provided directory
@@ -421,7 +422,7 @@ class TestReport:
 def main():
     args = CLI_PARSER.parse_args()  # type: argparse.Namespace
 
-    GlobalOptions.no_dot = args.no_dot
+    GLOBAL_OPTIONS.no_dot = args.no_dot
 
     test_report = TestReport()
 

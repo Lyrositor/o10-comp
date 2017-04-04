@@ -1,0 +1,7 @@
+{
+  "source": "main.c",
+  "ast": {
+    "skip": true,
+    "return-code": 1
+  }
+}

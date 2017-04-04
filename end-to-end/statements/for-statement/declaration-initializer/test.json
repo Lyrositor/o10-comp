@@ -1,6 +1,7 @@
 {
   "source": "main.c",
   "ast": {
-    "skip": true
+    "actual-json": "ast.actual.json",
+    "expected-json": "ast.expected.json"
   }
 }

@@ -628,7 +628,7 @@ equalityExpression:
     std::shared_ptr<comp::ast::RExpression> relationalExpression($3);
     $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Equality, equalityExpression, relationalExpression, LOCATION(&@1));
   }
-  | equalityExpression OR_ASSIGN_OPERATOR relationalExpression {
+  | equalityExpression NOT_EQUAL_OPERATOR relationalExpression {
     std::shared_ptr<comp::ast::RExpression> equalityExpression($1);
     std::shared_ptr<comp::ast::RExpression> relationalExpression($3);
     $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::Inequality, equalityExpression, relationalExpression, LOCATION(&@1));

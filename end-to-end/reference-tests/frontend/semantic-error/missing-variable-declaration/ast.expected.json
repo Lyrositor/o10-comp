@@ -1,0 +1,36 @@
+{
+    "node_type": "Program",
+    "body": [
+        {
+            "node_type": "Function",
+            "return_type": {
+                "node_type": "IdentifierDataType",
+                "identifier": {
+                    "node_type": "Identifier",
+                    "name": "void"
+                }
+            },
+            "parameters": [],
+            "body": {
+                "node_type": "BlockStatement",
+                "body": [
+                    {
+                        "node_type": "ExpressionStatement",
+                        "expression": {
+                            "node_type": "AssignmentExpression",
+                            "op": "=",
+                            "lvalue": {
+                                "node_type": "Identifier",
+                                "name": "a"
+                            },
+                            "rvalue": {
+                                "node_type": "Int64Literal",
+                                "value": 1
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

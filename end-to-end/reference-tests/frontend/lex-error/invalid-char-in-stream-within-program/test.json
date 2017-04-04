@@ -1,0 +1,6 @@
+{
+  "source": "main.c",
+  "ast": {
+    "return-code": 1
+  }
+}

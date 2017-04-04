@@ -31,7 +31,7 @@ test.memory:
 test.end-to-end:
 	mkdir -p build/
 	cd build/ && cmake .. && make o10c
-	python3 end-to-end/test.py
+	python3 end-to-end/test.py --no-dot
 
 coverage:
 	mkdir -p build/

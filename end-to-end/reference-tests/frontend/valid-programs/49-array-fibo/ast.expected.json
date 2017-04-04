@@ -1,0 +1,233 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "int32_t"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "ArrayDeclarator",
+                  "declarator": {
+                    "node_type": "IdentifierDeclarator",
+                    "identifier": {
+                      "node_type": "Identifier",
+                      "name": "a"
+                    }
+                  },
+                  "size": {
+                    "node_type": "Int64Literal",
+                    "value": 10
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          },
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "int32_t"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "SubscriptExpression",
+                "array": {
+                  "node_type": "Identifier",
+                  "name": "a"
+                },
+                "index": {
+                  "node_type": "Int64Literal",
+                  "value": 0
+                }
+              },
+              "rvalue": {
+                "node_type": "Int64Literal",
+                "value": 1
+              }
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "SubscriptExpression",
+                "array": {
+                  "node_type": "Identifier",
+                  "name": "a"
+                },
+                "index": {
+                  "node_type": "Int64Literal",
+                  "value": 1
+                }
+              },
+              "rvalue": {
+                "node_type": "Int64Literal",
+                "value": 1
+              }
+            }
+          },
+          {
+            "node_type": "ForStatement",
+            "initializer": {
+              "node_type": "ExpressionForInitializer",
+              "expression": {
+                "node_type": "AssignmentExpression",
+                "op": "=",
+                "lvalue": {
+                  "node_type": "Identifier",
+                  "name": "i"
+                },
+                "rvalue": {
+                  "node_type": "Int64Literal",
+                  "value": 2
+                }
+              }
+            },
+            "test": {
+              "node_type": "BinaryExpression",
+              "op": "<",
+              "left": {
+                "node_type": "Identifier",
+                "name": "i"
+              },
+              "right": {
+                "node_type": "Int64Literal",
+                "value": 10
+              }
+            },
+            "update": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "Identifier",
+                "name": "i"
+              },
+              "rvalue": {
+                "node_type": "BinaryExpression",
+                "op": "+",
+                "left": {
+                  "node_type": "Identifier",
+                  "name": "i"
+                },
+                "right": {
+                  "node_type": "Int64Literal",
+                  "value": 1
+                }
+              }
+            },
+            "body": {
+              "node_type": "BlockStatement",
+              "body": [
+                {
+                  "node_type": "ExpressionStatement",
+                  "expression": {
+                    "node_type": "AssignmentExpression",
+                    "op": "=",
+                    "lvalue": {
+                      "node_type": "SubscriptExpression",
+                      "array": {
+                        "node_type": "Identifier",
+                        "name": "a"
+                      },
+                      "index": {
+                        "node_type": "Identifier",
+                        "name": "i"
+                      }
+                    },
+                    "rvalue": {
+                      "node_type": "BinaryExpression",
+                      "op": "+",
+                      "left": {
+                        "node_type": "SubscriptExpression",
+                        "array": {
+                          "node_type": "Identifier",
+                          "name": "a"
+                        },
+                        "index": {
+                          "node_type": "BinaryExpression",
+                          "op": "-",
+                          "left": {
+                            "node_type": "Identifier",
+                            "name": "i"
+                          },
+                          "right": {
+                            "node_type": "Int64Literal",
+                            "value": 1
+                          }
+                        }
+                      },
+                      "right": {
+                        "node_type": "SubscriptExpression",
+                        "array": {
+                          "node_type": "Identifier",
+                          "name": "a"
+                        },
+                        "index": {
+                          "node_type": "BinaryExpression",
+                          "op": "-",
+                          "left": {
+                            "node_type": "Identifier",
+                            "name": "i"
+                          },
+                          "right": {
+                            "node_type": "Int64Literal",
+                            "value": 2
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

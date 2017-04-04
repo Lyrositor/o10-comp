@@ -1,0 +1,74 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "int32_t"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "a"
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "Identifier",
+                "name": "a"
+              },
+              "rvalue": {
+                "node_type": "Int64Literal",
+                "value": 3
+              }
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "%=",
+              "lvalue": {
+                "node_type": "Identifier",
+                "name": "a"
+              },
+              "rvalue": {
+                "node_type": "Int64Literal",
+                "value": 2
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
