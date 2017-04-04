@@ -16,6 +16,11 @@ struct Instruction final : public Statement {
     std::shared_ptr<Mnemonic> mnemonic,
     std::vector<std::shared_ptr<Operand>> operands = {});
 
+  static std::unique_ptr<Instruction> Create(
+    std::shared_ptr<Mnemonic> mnemonic,
+    int64_t op1_value,
+    std::shared_ptr<Operand> op2);
+
   Instruction(
     std::shared_ptr<Mnemonic> mnemonic,
     std::vector<std::shared_ptr<Operand>> operands);

@@ -2,25 +2,31 @@
 
 #include <comp/as/arch/x64/stddef.h>
 #include <comp/ir/builtins.h>
-#include <comp/utils.h>
+#include <comp/ast.h>
 #include <comp/exceptions.h>
-#include <queue>
+#include <comp/utils.h>
 
 namespace comp {
 namespace as {
 namespace arch {
 namespace x64 {
+// Define the x86-64 mnemonics to be used
 static const std::shared_ptr<ast::Mnemonic>
   ADDQ = ast::Mnemonic::Create("addq"),
   CALL = ast::Mnemonic::Create("call"),
+  CMP = ast::Mnemonic::Create("cmp"),
   LEAVEQ = ast::Mnemonic::Create("leaveq"),
-  MOVL = ast::Mnemonic::Create("movl"),
   MOVQ = ast::Mnemonic::Create("movq"),
+  MOVZBQ = ast::Mnemonic::Create("movzbq"),
+  NEG = ast::Mnemonic::Create("neg"),
   NOP = ast::Mnemonic::Create("nop"),
+  NOT = ast::Mnemonic::Create("not"),
   PUSHQ = ast::Mnemonic::Create("pushq"),
   RETQ = ast::Mnemonic::Create("retq"),
+  SETE = ast::Mnemonic::Create("sete"),
   SUBQ = ast::Mnemonic::Create("subq");
 
+// Define the x86-64 to be used
 static const std::shared_ptr<ast::RegisterOperand>
   R8 = ast::RegisterOperand::Create("r8"),
   R9 = ast::RegisterOperand::Create("r9"),
@@ -40,8 +46,11 @@ static const std::shared_ptr<ast::RegisterOperand>
   RSP = ast::RegisterOperand::Create("rsp"),
 
   RDI = ast::RegisterOperand::Create("rdi"),
-  RSI = ast::RegisterOperand::Create("rsi");
+  RSI = ast::RegisterOperand::Create("rsi"),
 
+  AL = ast::RegisterOperand::Create("al");
+
+// Define the registers to be used to pass parameters
 static const std::vector<std::shared_ptr<ast::RegisterOperand>>
 #ifdef WIN32
   kParameterRegisters = {RCX, RDX, R8, R9};
@@ -318,23 +327,8 @@ void BuildCopyOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   VariablesTable &variables_table
 ) {
-  // Get the source
-  std::shared_ptr<ast::Operand> source;
-  switch (op->in->operand_type) {
-    case ir::Operand::Type::Variable:
-      source = variables_table.Get(
-        std::static_pointer_cast<ir::VariableOperand>(op->in)->variable);
-      break;
-    case ir::Operand::Type::Constant:
-      source = ast::ImmediateOperand::Create(
-        std::static_pointer_cast<ir::ConstantOperand>(op->in)->value);
-      break;
-  }
-
-  // Get the destination
-  std::shared_ptr<const ir::Variable>
-    variable = std::static_pointer_cast<ir::VariableOperand>(op->out)->variable;
-  std::shared_ptr<ast::Operand> destination = variables_table.Get(variable);
+  auto source = BuildOperand(op->in, variables_table);
+  auto destination = BuildOperand(op->out, variables_table);
 
   // Introduce an intermediary register if this is a copy from memory to memory
   if (source->node_type == ast::Node::Type::MemoryReference &&
@@ -370,7 +364,48 @@ void BuildUnaryOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   VariablesTable &variables_table
 ) {
-  // TODO(Lyrositor) Implement
+  auto source = BuildOperand(op->in1, variables_table);
+  auto destination = BuildOperand(op->out, variables_table);
+  switch (op->unaryOperator) {
+    case ir::UnaryOp::UnaryOperator::BitwiseComplement:
+      body.insert(
+        body.end(),
+        {
+          ast::Instruction::Create(MOVQ, {source, RAX}),
+          ast::Instruction::Create(NOT, {RAX})
+        });
+      break;
+    case ir::UnaryOp::UnaryOperator::LogicalNegation:
+      body.insert(body.end(), {
+        ast::Instruction::Create(CMP, 0, source),
+        ast::Instruction::Create(SETE, {AL}),
+        ast::Instruction::Create(MOVZBQ, {AL, RAX})
+      });
+      break;
+    case ir::UnaryOp::UnaryOperator::UnaryMinus:
+      body.insert(
+        body.end(),
+        {
+          ast::Instruction::Create(MOVQ, {source, RAX}),
+          ast::Instruction::Create(NEG, {RAX})
+        });
+      break;
+  }
+  body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
+}
+
+std::shared_ptr<ast::Operand> BuildOperand(
+  std::shared_ptr<ir::Operand> op,
+  VariablesTable &variables_table
+) {
+  switch (op->operand_type) {
+    case ir::Operand::Type::Variable:
+      return variables_table.Get(
+        std::static_pointer_cast<ir::VariableOperand>(op)->variable);
+    case ir::Operand::Type::Constant:
+      return ast::ImmediateOperand::Create(
+        std::static_pointer_cast<ir::ConstantOperand>(op)->value);
+  }
 }
 }  // namespace x64
 }  // namespace arch
