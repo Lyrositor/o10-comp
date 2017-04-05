@@ -4,6 +4,7 @@
 #include <comp/ir/control_flow_graph.h>
 #include <comp/exceptions.h>
 #include <comp/utils.h>
+#include <iostream>
 
 namespace comp {
 namespace ir {
@@ -557,10 +558,10 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  const std::shared_ptr<Operand> left = BuildRExpressionIR(node->left, context, cfg, current_block);
-  const std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
-  const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
-  const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
+  std::shared_ptr<Operand> left_operand = BuildRExpressionIR(node->left, context, cfg, current_block);
+  std::shared_ptr<Operand> right_operand = BuildRExpressionIR(node->right, context, cfg, current_block);
+  const std::shared_ptr<const DataType> left_type = GetOperandType(*left_operand);
+  const std::shared_ptr<const DataType> right_type = GetOperandType(*right_operand);
 
   std::shared_ptr<VariableOperand> result_operand;
 
@@ -578,7 +579,6 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     }
     if (*right_type != *result_type) {
       const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(context.CreateVariable(result_type));
-      right_block->Push(CastOp::Create(casted_right, right_operand));
       right_operand = casted_right;
     }
     result_operand = VariableOperand::Create(context.CreateVariable(result_type, node));
@@ -586,71 +586,71 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
 
   switch (node->op) {
     case ast::BinaryOperator::Addition: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Addition, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Addition, left_operand, right_operand));
       break;
     }
     case ast::BinaryOperator::BitwiseAnd: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseAnd, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseAnd, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::BitwiseOr: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseOr, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseOr, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::BitwiseXor: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseXor, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::BitwiseXor, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::Comma: {
-      current_block->Push(CopyOp::Create(result_operand, right));
+      current_block->Push(CopyOp::Create(result_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::Division: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Division, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Division, left_operand, right_operand));
       break;
     }
     case ast::BinaryOperator::Equality: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Equality, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Equality, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::GreaterThan: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::GreaterThan, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::GreaterThan, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::GreaterThanOrEqual: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::GreaterThanOrEqual, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::GreaterThanOrEqual, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::Inequality: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Inequality, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Inequality, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::LeftShift: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LeftShift, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LeftShift, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::LessThan: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LessThan, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LessThan, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::LessThanOrEqualTo: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LessThanOrEqualTo, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::LessThanOrEqualTo, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::Multiplication: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Multiplication, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Multiplication, left_operand, right_operand));
       break;
     }
     case ast::BinaryOperator::Remainder: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Remainder, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Remainder, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::RightShift: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::RightShift, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::RightShift, left_operand, right_operand));
       break;
     };
     case ast::BinaryOperator::Subtraction: {
-      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Subtraction, left, right));
+      current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Subtraction, left_operand, right_operand));
       break;
     }
     default: {
@@ -675,7 +675,8 @@ std::shared_ptr<Operand> BuildCallExpressionIR(
         std::static_pointer_cast<ast::Identifier>(node->callee)->name);
       break;
     default:
-      //throw Exception("Invalid callee node type for function call");  // TODO(Lyrositor) Uncomment once exceptions are fixed
+      // TODO(Lyrositor) Uncomment once exceptions are fixed
+      //throw Exception("Invalid callee node type for function call");
       throw std::domain_error("Invalid callee node type for function call");
   }
 
@@ -735,11 +736,20 @@ std::shared_ptr<Operand> BuildLogicalExpressionIR(
   right_block->Push(CopyOp::Create(result_operand, right_operand));
 
   // Branching
-  if (node->op == ast::BinaryOperator::LogicalOr) {
-    current_block->SetConditionalJump(result_operand, next_block, right_block);
-  } else { // LogicalAnd
-    current_block->SetConditionalJump(result_operand, right_block, next_block);
+  switch (node->op) {
+    case ast::LogicalOperator ::LogicalOr: {
+      current_block->SetConditionalJump(result_operand, next_block, right_block);
+      break;
+    }
+    case ast::LogicalOperator ::LogicalAnd: {
+      current_block->SetConditionalJump(result_operand, right_block, next_block);
+      break;
+    }
+    default: {
+      throw std::runtime_error("Unexpected value for `node->op` in `BuildLogicalExpressionIR`");
+    }
   }
+
   right_block->SetJump(next_block);
 
   current_block = next_block;

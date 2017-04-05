@@ -90,10 +90,10 @@
                   }
                 },
                 "initial_value": {
-                  "node_type": "BinaryExpression",
+                  "node_type": "LogicalExpression",
                   "op": "||",
                   "left": {
-                    "node_type": "BinaryExpression",
+                    "node_type": "LogicalExpression",
                     "op": "||",
                     "left": {
                       "node_type": "Identifier",
@@ -132,10 +132,10 @@
                   }
                 },
                 "initial_value": {
-                  "node_type": "BinaryExpression",
+                  "node_type": "LogicalExpression",
                   "op": "&&",
                   "left": {
-                    "node_type": "BinaryExpression",
+                    "node_type": "LogicalExpression",
                     "op": "||",
                     "left": {
                       "node_type": "Identifier",
@@ -174,14 +174,14 @@
                   }
                 },
                 "initial_value": {
-                  "node_type": "BinaryExpression",
+                  "node_type": "LogicalExpression",
                   "op": "||",
                   "left": {
                     "node_type": "Identifier",
                     "name": "a"
                   },
                   "right": {
-                    "node_type": "BinaryExpression",
+                    "node_type": "LogicalExpression",
                     "op": "&&",
                     "left": {
                       "node_type": "Identifier",
@@ -216,10 +216,10 @@
                   }
                 },
                 "initial_value": {
-                  "node_type": "BinaryExpression",
+                  "node_type": "LogicalExpression",
                   "op": "&&",
                   "left": {
-                    "node_type": "BinaryExpression",
+                    "node_type": "LogicalExpression",
                     "op": "&&",
                     "left": {
                       "node_type": "Identifier",
@@ -262,13 +262,13 @@
                   }
                 },
                 "initial_value": {
-                  "node_type": "BinaryExpression",
+                  "node_type": "LogicalExpression",
                   "op": "||",
                   "left": {
                     "node_type": "UnaryExpression",
                     "op": "LogicalNegation",
                     "expression": {
-                      "node_type": "BinaryExpression",
+                      "node_type": "LogicalExpression",
                       "op": "&&",
                       "left": {
                         "node_type": "BinaryExpression",
@@ -297,7 +297,7 @@
                     }
                   },
                   "right": {
-                    "node_type": "BinaryExpression",
+                    "node_type": "LogicalExpression",
                     "op": "&&",
                     "left": {
                       "node_type": "BinaryExpression",

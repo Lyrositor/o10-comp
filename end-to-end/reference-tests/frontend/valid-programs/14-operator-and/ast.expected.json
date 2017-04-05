@@ -47,7 +47,7 @@
                 "name": "a"
               },
               "rvalue": {
-                "node_type": "BinaryExpression",
+                "node_type": "LogicalExpression",
                 "op": "&&",
                 "left": {
                   "node_type": "Int64Literal",
