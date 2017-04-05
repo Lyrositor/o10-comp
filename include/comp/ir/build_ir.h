@@ -72,6 +72,12 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block);
 
+std::shared_ptr<Operand> BuildLogicalExpressionIR(
+    const std::shared_ptr<ast::LogicalExpression> node,
+    Context &context,
+    std::shared_ptr<ControlFlowGraph> &cfg,
+    std::shared_ptr<BasicBlock> &current_block);
+
 std::shared_ptr<Operand> BuildCallExpressionIR(
   const std::shared_ptr<ast::CallExpression> node,
   Context &context,

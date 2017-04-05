@@ -4,7 +4,6 @@
 #include <comp/ir/control_flow_graph.h>
 #include <comp/exceptions.h>
 #include <comp/utils.h>
-#include <iostream>
 
 namespace comp {
 namespace ir {
@@ -419,6 +418,13 @@ std::shared_ptr<Operand> BuildRExpressionIR(
         std::dynamic_pointer_cast<ast::Int64Literal>(node),
         context);
     }
+    case ast::Node::Type::LogicalExpression: {
+      return BuildLogicalExpressionIR(
+        std::dynamic_pointer_cast<ast::LogicalExpression>(node),
+        context,
+        cfg,
+        current_block);
+    }
     case ast::Node::Type::SubscriptExpression: {
       return BuildSubscriptExpressionIR(
         std::dynamic_pointer_cast<ast::SubscriptExpression>(node),
@@ -551,57 +557,8 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-
-  if (node->op == ast::BinaryOperator::LogicalAnd || node->op == ast::BinaryOperator::LogicalOr) {
-    std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
-    const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
-
-    std::shared_ptr<Operand> left_operand = BuildRExpressionIR(node->left, context, cfg, current_block);
-    std::shared_ptr<Operand> right_operand = BuildRExpressionIR(node->right, context, cfg, right_block);
-
-    const std::shared_ptr<const DataType> left_type = GetOperandType(*left_operand);
-    const std::shared_ptr<const DataType> right_type = GetOperandType(*right_operand);
-
-    std::shared_ptr<VariableOperand> result_operand;
-
-    if (*right_type == *left_type) {
-      result_operand = VariableOperand::Create(context.CreateVariable(left_type, node));
-    } else if(node->op == ast::BinaryOperator::Comma) {
-      // TODO: check if this is legal
-      result_operand = VariableOperand::Create(context.CreateVariable(right_type, node));
-    } else {
-      const std::shared_ptr<const DataType> result_type = left_type->GetCommonType(*right_type);
-      if (*left_type != *result_type) {
-        const std::shared_ptr<VariableOperand> casted_left = VariableOperand::Create(context.CreateVariable(result_type));
-        current_block->Push(CastOp::Create(casted_left, left_operand));
-        left_operand = casted_left;
-      }
-      if (*right_type != *result_type) {
-        const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(context.CreateVariable(result_type));
-        right_block->Push(CastOp::Create(casted_right, right_operand));
-        right_operand = casted_right;
-      }
-      result_operand = VariableOperand::Create(context.CreateVariable(result_type, node));
-    }
-
-    current_block->Push(CopyOp::Create(result_operand, left_operand));
-    right_block->Push(CopyOp::Create(result_operand, right_operand));
-
-    // Branching
-    if (node->op == ast::BinaryOperator::LogicalOr) {
-      current_block->SetConditionalJump(result_operand, next_block, right_block);
-    } else { // LogicalAnd
-      current_block->SetConditionalJump(result_operand, right_block, next_block);
-    }
-    right_block->SetJump(next_block);
-
-    current_block = next_block;
-
-    return result_operand;
-  }
-
-  std::shared_ptr<Operand> left = BuildRExpressionIR(node->left, context, cfg, current_block);
-  std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
+  const std::shared_ptr<Operand> left = BuildRExpressionIR(node->left, context, cfg, current_block);
+  const std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
   const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
   const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
 
@@ -609,17 +566,20 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
 
   if (*right_type == *left_type) {
     result_operand = VariableOperand::Create(context.CreateVariable(left_type, node));
+  } else if(node->op == ast::BinaryOperator::Comma) {
+    // TODO: check if this is legal
+    result_operand = VariableOperand::Create(context.CreateVariable(right_type, node));
   } else {
     const std::shared_ptr<const DataType> result_type = left_type->GetCommonType(*right_type);
     if (*left_type != *result_type) {
       const std::shared_ptr<VariableOperand> casted_left = VariableOperand::Create(context.CreateVariable(result_type));
-      current_block->Push(CastOp::Create(casted_left, left));
-      left = casted_left;
+      current_block->Push(CastOp::Create(casted_left, left_operand));
+      left_operand = casted_left;
     }
     if (*right_type != *result_type) {
       const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(context.CreateVariable(result_type));
-      current_block->Push(CastOp::Create(casted_right, right));
-      right = casted_right;
+      right_block->Push(CastOp::Create(casted_right, right_operand));
+      right_operand = casted_right;
     }
     result_operand = VariableOperand::Create(context.CreateVariable(result_type, node));
   }
@@ -736,6 +696,57 @@ std::shared_ptr<Operand> BuildCallExpressionIR(
 
   return tmp_operand;
 }
+
+std::shared_ptr<Operand> BuildLogicalExpressionIR(
+    const std::shared_ptr<ast::LogicalExpression> node,
+    Context &context,
+    std::shared_ptr<ControlFlowGraph> &cfg,
+    std::shared_ptr<BasicBlock> &current_block
+) {
+  std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
+  const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
+
+  std::shared_ptr<Operand> left_operand = BuildRExpressionIR(node->left, context, cfg, current_block);
+  std::shared_ptr<Operand> right_operand = BuildRExpressionIR(node->right, context, cfg, right_block);
+
+  const std::shared_ptr<const DataType> left_type = GetOperandType(*left_operand);
+  const std::shared_ptr<const DataType> right_type = GetOperandType(*right_operand);
+
+  std::shared_ptr<VariableOperand> result_operand;
+
+  if (*right_type == *left_type) {
+    result_operand = VariableOperand::Create(context.CreateVariable(left_type, node));
+  } else {
+    const std::shared_ptr<const DataType> result_type = left_type->GetCommonType(*right_type);
+    if (*left_type != *result_type) {
+      const std::shared_ptr<VariableOperand> casted_left = VariableOperand::Create(context.CreateVariable(result_type));
+      current_block->Push(CastOp::Create(casted_left, left_operand));
+      left_operand = casted_left;
+    }
+    if (*right_type != *result_type) {
+      const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(context.CreateVariable(result_type));
+      right_block->Push(CastOp::Create(casted_right, right_operand));
+      right_operand = casted_right;
+    }
+    result_operand = VariableOperand::Create(context.CreateVariable(result_type, node));
+  }
+
+  current_block->Push(CopyOp::Create(result_operand, left_operand));
+  right_block->Push(CopyOp::Create(result_operand, right_operand));
+
+  // Branching
+  if (node->op == ast::BinaryOperator::LogicalOr) {
+    current_block->SetConditionalJump(result_operand, next_block, right_block);
+  } else { // LogicalAnd
+    current_block->SetConditionalJump(result_operand, right_block, next_block);
+  }
+  right_block->SetJump(next_block);
+
+  current_block = next_block;
+
+  return result_operand;
+}
+
 
 std::shared_ptr<Operand> BuildUnaryExpressionIR(
   const std::shared_ptr<ast::UnaryExpression> node,

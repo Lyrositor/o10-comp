@@ -1,6 +1,6 @@
 #pragma once
 
-#include "expression.h"
+#include "comp/ast/expression.h"
 
 namespace comp {
 namespace ast {
@@ -9,17 +9,17 @@ enum class LogicalOperator {
   LogicalOr, // left || right
 };
 
-struct LogicalExpression : public RExpression {
+struct LogicalExpression final : public RExpression {
   static std::unique_ptr<LogicalExpression> Create(
-      LogicalOperator op,
-      std::shared_ptr<RExpression> left,
-      std::shared_ptr<RExpression> right,
-      std::shared_ptr<SourceLocation> location = nullptr);
+    LogicalOperator op,
+    std::shared_ptr<RExpression> left,
+    std::shared_ptr<RExpression> right,
+    std::shared_ptr<SourceLocation> location = nullptr);
 
   LogicalExpression(
-      LogicalOperator op,
+    LogicalOperator op,
   std::shared_ptr<RExpression> left,
-      std::shared_ptr<RExpression> right,
+    std::shared_ptr<RExpression> right,
   std::shared_ptr<SourceLocation> location = nullptr);
 
   ~LogicalExpression();

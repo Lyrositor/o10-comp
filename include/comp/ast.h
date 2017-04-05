@@ -20,6 +20,7 @@
 #include "comp/ast/int64_literal.h"
 #include "comp/ast/literal.h"
 #include "comp/ast/identifier_data_type.h"
+#include "comp/ast/logical_expression.h"
 #include "comp/ast/node.h"
 #include "comp/ast/null_statement.h"
 #include "comp/ast/parameter.h"
