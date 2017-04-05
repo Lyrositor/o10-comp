@@ -444,7 +444,7 @@ std::shared_ptr<Operand> BuildRExpressionIR(
         current_block);
     }
     default: {
-      throw comp::UnexpectedNodeValueError(comp::ast::Node::ToString(node.node_type),node.location);
+      throw comp::UnexpectedNodeValueError(comp::ast::Node::ToString(node->node_type),node->location);
     }
   }
 }
@@ -652,7 +652,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
       break;
     }
     default: {
-      throw comp::UnexpectedNodeValueError(node.location);
+      throw comp::UnexpectedNodeValueError(node->location);
     }
   }
 
