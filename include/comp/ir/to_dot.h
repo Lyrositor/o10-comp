@@ -9,15 +9,22 @@
 namespace comp {
 namespace ir {
 
-class IdentifiersTable {
+class IdentifiersTable final {
  public:
-  size_t GetFunctionIdentifier(const FunctionSymbol &f);
-  size_t GetVariableIdentifier(const Variable &v);
-  size_t GetBasicBlockIdentifier(const BasicBlock &bb);
+  IdentifiersTable();
+  ~IdentifiersTable();
+
+  std::string GetBasicBlockId(const BasicBlock &bb);
+  std::string GetFunctionId(const FunctionSymbol &function_synbol);
+  std::string GetVariableId(const Variable &v);
 
  private:
-  size_t counter = 0;
-  std::map<const void*, size_t> identifers_map;
+  size_t basic_blocks_counter;
+  std::map<const BasicBlock*, size_t> basic_blocks_map;
+  size_t functions_counter;
+  std::map<const FunctionSymbol*, size_t> functions_map;
+  size_t variables_counter;
+  std::map<const Variable*, size_t> variables_map;
 };
 
 void EmitVariableOperand(const VariableOperand &node, std::ostream &out, IdentifiersTable &it);

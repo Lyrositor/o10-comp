@@ -9,33 +9,40 @@
 
 namespace comp {
 namespace ir {
-size_t IdentifiersTable::GetFunctionIdentifier(const FunctionSymbol &f){
-  const void* fvoid = static_cast<const void*>(&f);
-  if(identifers_map.find(fvoid)==identifers_map.end()) {
-    identifers_map[fvoid] = counter++;
-  }
-  return identifers_map[static_cast<const void*>(fvoid)];
+
+IdentifiersTable::IdentifiersTable(
+) :
+  basic_blocks_counter(0), basic_blocks_map(),
+  variables_counter(0),  variables_map(),
+  functions_counter(0), functions_map() {
 }
 
-size_t IdentifiersTable::GetVariableIdentifier(const Variable &v){
-  const void* vvoid = static_cast<const void*>(&v);
-  if(identifers_map.find(vvoid)==identifers_map.end()) {
-    identifers_map[vvoid] = counter++;
-  }
-  return identifers_map[vvoid];
+IdentifiersTable::~IdentifiersTable() {
 }
 
-size_t IdentifiersTable::GetBasicBlockIdentifier(const BasicBlock &bb){
-  const void* bbvoid = static_cast<const void*>(&bb);
-  if(identifers_map.find(bbvoid)==identifers_map.end()) {
-    identifers_map[bbvoid] = counter++;
+std::string IdentifiersTable::GetFunctionId(const FunctionSymbol &function_symbol){
+  if(functions_map.find(&function_symbol) == functions_map.end()) {
+    functions_map[&function_symbol] = functions_counter++;
   }
-  return identifers_map[bbvoid];
+  return std::string("cluster") + std::to_string(functions_map[&function_symbol]);
 }
 
+std::string IdentifiersTable::GetVariableId(const Variable &variable){
+  if(variables_map.find(&variable) == variables_map.end()) {
+    variables_map[&variable] = variables_counter++;
+  }
+  return std::string("var") + std::to_string(variables_map[&variable]);
+}
+
+std::string IdentifiersTable::GetBasicBlockId(const BasicBlock &basic_block){
+  if(basic_blocks_map.find(&basic_block) == basic_blocks_map.end()) {
+    basic_blocks_map[&basic_block] = basic_blocks_counter++;
+  }
+  return std::string("bb") + std::to_string(basic_blocks_map[&basic_block]);
+}
 
 void EmitVariableOperand(const VariableOperand &node, std::ostream &out, IdentifiersTable &it) {
-  out << "var" << it.GetVariableIdentifier(*node.variable.get());
+  out << it.GetVariableId(*node.variable);
 }
 
 void EmitIndirectOperand(const IndirectOperand &node, std::ostream &out, IdentifiersTable &it) {
@@ -217,16 +224,14 @@ std::string BasicBlockToString(const BasicBlock &node,IdentifiersTable &it) {
   return result.str();
 }
 
-std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlock &node,IdentifiersTable &it) {
+std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlock &node, IdentifiersTable &it) {
   std::vector<std::shared_ptr<dot::ast::Assignment>> attributes;
 
   std::string ops = BasicBlockToString(node,it);
   attributes.push_back(dot::ast::Assignment::Create("label", ops));
   attributes.push_back(dot::ast::Assignment::Create("shape", "rectangle"));
 
-  std::stringstream ss;
-  ss << "bb" << it.GetBasicBlockIdentifier(node);
-  std::string id = ss.str() ;
+  std::string id = it.GetBasicBlockId(node);
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
 
   switch (node.GetType()) {
@@ -242,10 +247,7 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
     }
     case BasicBlock::Type::Jump: {
       result.push_back(dot::ast::NodeStatement::Create(id, attributes));
-      std::stringstream ss;
-      ss << "bb" << it.GetBasicBlockIdentifier(*node.GetBranch().get());
-      std::string stringss = ss.str() ;
-      result.push_back(dot::ast::EdgeStatement::Create({id, stringss }, {}));
+      result.push_back(dot::ast::EdgeStatement::Create({id, it.GetBasicBlockId(*node.GetBranch())}, {}));
       break;
     }
     case BasicBlock::Type::ConditionalJump: {
@@ -253,20 +255,14 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
       std::shared_ptr<BasicBlock> branch_if_true = node.GetBranchIfTrue();
       std::shared_ptr<BasicBlock> branch_if_false = node.GetBranchIfFalse();
       std::vector<std::string> false_edge;
-      std::stringstream ss;
-      ss << "bb" << it.GetBasicBlockIdentifier(*branch_if_true.get());
-      std::string stringss = ss.str() ;
       result.push_back(
         dot::ast::EdgeStatement::Create(
-          {id, stringss},
+          {id, it.GetBasicBlockId(*branch_if_true)},
           {dot::ast::Assignment::Create("color", "#45a03b")})
       );
-      std::stringstream ss2;
-      ss2 << "bb" << it.GetBasicBlockIdentifier(*branch_if_false.get());
-      std::string stringss2 = ss2.str() ;
       result.push_back(
         dot::ast::EdgeStatement::Create(
-          {id, stringss2},
+          {id, it.GetBasicBlockId(*branch_if_false)},
           {dot::ast::Assignment::Create("color", "#a52f29")})
       );
       break;
@@ -284,7 +280,7 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
   return result;
 }
 
-std::vector<std::shared_ptr<dot::ast::Statement>> ControlFlowGraphToDot(const ControlFlowGraph &node,IdentifiersTable &it) {
+std::vector<std::shared_ptr<dot::ast::Statement>> ControlFlowGraphToDot(const ControlFlowGraph &node, IdentifiersTable &it) {
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
   std::set<std::shared_ptr<BasicBlock>> basic_blocks = node.GetBasicBlocks();
   for (auto basic_block : basic_blocks) {
@@ -307,9 +303,7 @@ std::vector<std::shared_ptr<dot::ast::Statement>> FunctionSymbolToDot(const Func
   body.push_back(dot::ast::AssignmentStatement::Create("label", name + " @Function"));
 
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
-  std::stringstream ss;
-  ss << "cluster" << it.GetFunctionIdentifier(node);
-  std::string id = ss.str() ;
+  std::string id = it.GetFunctionId(node);
   result.push_back(dot::ast::SubgraphStatement::Create(std::shared_ptr<std::string>(new std::string(id)), body));
   return result;
 }
