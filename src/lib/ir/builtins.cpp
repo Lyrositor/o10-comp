@@ -10,7 +10,7 @@ static const std::shared_ptr<const VoidDataType>
   kVoidType(new VoidDataType());
 
 static const std::shared_ptr<const Uint8DataType>
-  kCharType(new Uint8DataType());
+  kUint8Type(new Uint8DataType());
 
 static const std::shared_ptr<const Int32DataType>
   kInt32Type(new Int32DataType());
@@ -22,14 +22,14 @@ static const std::shared_ptr<FunctionSymbol>
   kGetcharFunction = FunctionSymbol::Create(
   "getchar",
   std::vector<std::shared_ptr<const Variable>>(),
-  kCharType
+  kUint8Type
 );
 
 static const std::shared_ptr<FunctionSymbol>
   kPutcharFunction = FunctionSymbol::Create(
   "putchar",
   std::vector<std::shared_ptr<const Variable>>(
-    {Variable::Create(kCharType, nullptr)}),
+    {Variable::Create(kUint8Type, nullptr)}),
   kVoidType
 );
 
@@ -40,7 +40,7 @@ static const FunctionsTable kBuiltInFunctions = {
 
 static const DataTypesTable kBuiltInDataTypes = {
   {"void", kVoidType},
-  {"char", kCharType},
+  {"char", kUint8Type},
   {"int32_t", kInt32Type},
   {"int64_t", kInt64Type}
 };
@@ -51,8 +51,8 @@ const std::shared_ptr<const VoidDataType> GetVoidType() {
   return kVoidType;
 }
 
-const std::shared_ptr<const Uint8DataType> GetCharType() {
-  return kCharType;
+const std::shared_ptr<const Uint8DataType> GetUint8Type() {
+  return kUint8Type;
 }
 
 const std::shared_ptr<const Int32DataType> GetInt32Type() {

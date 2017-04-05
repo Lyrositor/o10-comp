@@ -12,6 +12,7 @@ add_library(
   program_symbol.cpp
   symbol_table.cpp
   to_dot.cpp
+  value.cpp
   variable.cpp
 )
 target_link_libraries(ir dot)

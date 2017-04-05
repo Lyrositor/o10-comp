@@ -13,7 +13,7 @@ TEST(comp__ir__builtins, resolveBuiltinTypes) {
   EXPECT_EQ(GetVoidType(), void_type);
   EXPECT_EQ(GetInt32Type(), int32_type);
   EXPECT_EQ(GetInt64Type(), int64_type);
-  EXPECT_EQ(GetCharType(), char_type);
+  EXPECT_EQ(GetUint8Type(), char_type);
   EXPECT_NO_THROW(context.ResolveFunction("getchar"));
   EXPECT_NO_THROW(context.ResolveFunction("putchar"));
 }
