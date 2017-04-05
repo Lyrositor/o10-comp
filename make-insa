@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Configures the environment for INSA machines, then runs make
+
+export CC=gcc-5
+export CXX=g++-5
+make --no-print-directory "$@"

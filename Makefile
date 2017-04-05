@@ -22,17 +22,17 @@ test: test.unit test.memory test.end-to-end
 
 test.unit:
 	mkdir -p build/
-	cd build/ && cmake .. && make comp_test && ./comp_test
+	cd build/ && cmake .. && make --no-print-directory comp_test && ./comp_test
 
 test.memory:
 	mkdir -p build/
-	cd build/ && cmake .. && make comp_test && valgrind --leak-check=full --error-exitcode=1 ./comp_test
+	cd build/ && cmake .. && make --no-print-directory comp_test && valgrind --leak-check=full --error-exitcode=1 ./comp_test
 
 test.end-to-end:
 	mkdir -p build/
-	cd build/ && cmake .. && make o10c
+	cd build/ && cmake .. && make --no-print-directory o10c
 	python3 end-to-end/test.py
 
 coverage:
 	mkdir -p build/
-	cd build/ && cmake .. && make comp_coverage
+	cd build/ && cmake .. && make --no-print-directory comp_coverage
