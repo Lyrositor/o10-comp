@@ -123,6 +123,58 @@ class IrTestConfig():
         return config
 
 
+class RunTestConfig():
+    def __init__(self):
+        self.skip = False
+        self.hidden = False
+        self.actual_assembly_path = None
+        self.actual_stdout_path = None
+        self.actual_stderr_path = None
+        self.executable_path = None
+        self.expected_assembly_path = None
+        self.expected_stdout_path = None
+        self.expected_stderr_path = None
+        self.expected_return_code = None
+        self.stdin_path = None
+
+
+    @staticmethod
+    def from_json(doc, test_dir):
+        config = RunTestConfig()
+        if "skip" in doc and doc["skip"]:
+            config.skip = True
+            return config
+        if "hidden" in doc and doc["hidden"]:
+            config.hidden = True
+            return config
+
+        config.actual_assembly_path = os.path.join(test_dir, doc["actual-assembly"])
+        config.executable_path = os.path.join(test_dir, doc["executable"])
+
+        if "return-code" in doc:
+            config.expected_return_code = doc["return-code"]
+
+        if "actual-stdout" in doc:
+            config.actual_stdout_path = os.path.join(test_dir, doc["actual-stdout"])
+
+        if "actual-stderr" in doc:
+            config.actual_stderr_path = os.path.join(test_dir, doc["actual-stderr"])
+
+        if "expected-assembly" in doc:
+            config.expected_assembly_path = os.path.join(test_dir, doc["expected-assembly"])
+
+        if "expected-stdout" in doc:
+            config.expected_stdout_path = os.path.join(test_dir, doc["expected-stdout"])
+
+        if "return-code" in doc:
+            config.expected_return_code = os.path.join(test_dir, doc["return-code"])
+
+        if "stdin" in doc:
+            config.stdin_path = os.path.join(test_dir, doc["stdin"])
+
+        return config
+
+
 class TestConfig():
     def __init__(self):
         self.skip = False
@@ -130,6 +182,7 @@ class TestConfig():
         self.source_path = None  # type: str
         self.ast = None  # type: AstTestConfig
         self.ir = None  # type: IrTestConfig
+        self.run = None  # type: RunTestConfig
 
     @staticmethod
     def from_json(doc, test_dir):
@@ -151,6 +204,9 @@ class TestConfig():
 
         if "ir" in doc:
             config.ir = IrTestConfig.from_json(doc["ir"], test_dir)
+
+        if "run" in doc:
+            config.run = RunTestConfig.from_json(doc["run"], test_dir)
 
         return config
 
@@ -181,13 +237,16 @@ class TestCase:
                 result["ast"] = ("skipped", None)
             if self.config.ir is not None and not self.config.ir.hidden:
                 result["ir"] = ("skipped", None)
+            if self.config.run is not None and not self.config.run.hidden:
+                result["run"] = ("skipped", None)
             if len(result.items()) == 0:
                 result["*"] = ("skipped", None)
             return result
         else:
             return {
                 "ast": self.test_ast(),
-                "ir": self.test_ir()
+                "ir": self.test_ir(),
+                "run": self.test_run()
             }
 
     def test_ast(self):
@@ -197,9 +256,9 @@ class TestCase:
             return "skipped", None
 
         process = subprocess.Popen(
-          [GLOBAL_OPTIONS.o10c_path, "--ast", self.config.source_path],
-          stdout=subprocess.PIPE,
-          stderr=subprocess.PIPE
+            [GLOBAL_OPTIONS.o10c_path, "--ast", self.config.source_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
         )
 
         stdout, stderr = process.communicate()
@@ -303,6 +362,107 @@ class TestCase:
                                ).format(utf8_dot_stdout, utf8_dot_stderr)
                         return "failed", msg
 
+
+        return "ok", None
+
+    def test_run(self):
+        if self.config.run is None or self.config.run.hidden:
+            return "hidden", None
+        elif self.config.run.skip:
+            return "skipped", None
+
+        compiler_process = subprocess.Popen(
+            [GLOBAL_OPTIONS.o10c_path, "-c", self.config.source_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        compiler_process.communicate()
+
+        if compiler_process.returncode is not None and compiler_process.returncode != 0:
+            stdout, stderr = compiler_process.communicate()
+            msg = ("Compilation failed:\n"
+                   "stdout:\n"
+                   "{}\n"
+                   "stderr:\n"
+                   "{}"
+                   ).format(stdout.decode("UTF-8"), stderr.decode("UTF-8"))
+            return "failed", msg
+
+        compiler_process = subprocess.Popen(
+            [GLOBAL_OPTIONS.gcc_path, "-ggdb", "-x", "assembler", "-s", self.config.run.actual_assembly_path, "-o", self.config.run.executable_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        compiler_process.communicate()
+
+        if compiler_process.returncode is not None and compiler_process.returncode != 0:
+            stdout, stderr = compiler_process.communicate()
+            msg = ("Link failed:\n"
+                   "stdout:\n"
+                   "{}\n"
+                   "stderr:\n"
+                   "{}"
+                   ).format(stdout.decode("UTF-8"), stderr.decode("UTF-8"))
+            return "failed", msg
+
+        process = subprocess.Popen(
+            [self.config.run.executable_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        stdout, stderr = process.communicate()
+
+        if self.config.run.actual_stdout_path is not None:
+            with open(self.config.run.actual_stdout_path, "w") as actual_stdout_file:
+                actual_stdout_file.buffer.write(stdout)
+
+        if self.config.run.actual_stdout_path is not None:
+            with open(self.config.run.actual_stdout_path, "w") as actual_stdout_file:
+                actual_stdout_file.buffer.write(stdout)
+
+        if self.config.run.expected_return_code is not None:
+            if process.returncode != self.config.run.expected_return_code:
+                utf8_stdout = stdout.decode("UTF-8")
+                utf8_stderr = stderr.decode("UTF-8")
+
+                msg = ("Unexpected return code. Actual: {}, Expected: {}\n"
+                       "stdout:\n"
+                       "{}\n"
+                       "stderr:\n"
+                       "{}"
+                       ).format(process.returncode, self.config.run.expected_return_code, utf8_stdout, utf8_stderr)
+                return "failed", msg
+
+        if self.config.run.expected_stdout_path is not None:
+            with open(self.config.run.expected_stdout_path, "rb") as expected_stdout_file:
+                expected_stdout = expected_stdout_file.read()
+                if expected_stdout != stdout:
+                    utf8_expected_stdout = expected_stdout.decode("UTF-8")
+                    utf8_actual_stdout = stdout.decode("UTF-8")
+                    msg = ("Actual STDOUT does not match the expected STDOUT:\n"
+                           "Expected:\n"
+                           "{}\n"
+                           "Actual:\n"
+                           "{}"
+                           ).format(utf8_expected_stdout, utf8_actual_stdout)
+                    return "failed", msg
+
+        if self.config.run.expected_stderr_path is not None:
+            with open(self.config.run.expected_stderr_path, "rb") as expected_stderr_file:
+                expected_stderr = expected_stderr_file.read()
+                if expected_stderr != stderr:
+                    utf8_expected_stderr = expected_stderr.decode("UTF-8")
+                    utf8_actual_stderr = stderr.decode("UTF-8")
+                    msg = ("Actual STDERR does not match the expected STDERR:\n"
+                           "Expected:\n"
+                           "{}\n"
+                           "Actual:\n"
+                           "{}"
+                           ).format(utf8_expected_stderr, utf8_actual_stderr)
+                    return "failed", msg
 
         return "ok", None
 

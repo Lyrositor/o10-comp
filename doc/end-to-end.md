@@ -74,7 +74,7 @@ Do not test the AST, but report it with the `SKIPPED` status.
 
 Do not test the AST.
 
-### `ast.actual`
+### `ast.actual-json`
 
 - Type: **string**
 - Optional
@@ -84,7 +84,7 @@ If this value is defined, the result of the AST will be written in the supplied 
 This will be a valid JSON file.
 The conventional value is `ast.actual.json`.
 
-### `ast.expected`
+### `ast.expected-json`
 
 - Type: **string**
 - Optional
@@ -173,6 +173,15 @@ Change this value to `1` to expect errors.
 Compile the source to assembly with `o10c` and then build an executable with `gcc`.
 Test this compiled program.
 
+### `run.actual-stderr`
+
+- Type: **string**
+- Optional
+
+Path to the file containing the actual standard error, relative to the configuration file.
+If this value is defined, the standard error will be written to this file.
+The conventional value is `stderr.actual`.
+
 ### `run.actual-stdout`
 
 - Type: **string**
@@ -189,12 +198,28 @@ The conventional value is `stdout.actual`.
 
 Do not test the compiled program, but report it with the `SKIPPED` status.
 
+### `run.executable`
+
+- Type: boolean`
+- Required
+
+Path to the executable, relative to the configuration file.
+
 ### `run.hidden`
 
 - Type: **boolean**
 - Optional, default value: `false`
 
 Do not test the compiled program.
+
+### `run.actual-stdout`
+
+- Type: **string**
+- Optional
+
+Path to the file containing the actual standard output, relative to the configuration file.
+If this value is defined, the standard output will be written to this file.
+The conventional value is `stdout.actual`.
 
 ### `run.expected-stdout`
 
@@ -206,9 +231,26 @@ If this value is defined, the standard output will be compared to this file.
 If the content does not match, the test will fail.
 The conventional value is `stdout.expected`.
 
+### `run.expected-stderr`
+
+- Type: **string**
+- Optional
+
+Path to the file containing the expected standard error, relative to the configuration file.
+If this value is defined, the standard error will be compared to this file.
+If the content does not match, the test will fail.
+The conventional value is `stderr.expected`.
+
 ### `run.return-code`
 
 - Type: **number**
 - Optional, default value: `0`
 
 Expected return code.
+
+### `run.stdin`
+
+- Type: **string**
+- Optional
+
+If defined, path to a file to pipe on the standard input, relative to the configuration file.
