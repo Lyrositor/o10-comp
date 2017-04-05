@@ -26,6 +26,7 @@ struct Node {
     IdentifierDeclarator,
     IfStatement,
     Int64Literal,
+    LogicalExpression,
     NullStatement,
     NamedParameter,
     Program,

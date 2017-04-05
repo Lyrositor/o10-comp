@@ -34,4 +34,4 @@ add_library(
   variable_declaration.cpp
   variable_declarator.cpp
   while_statement.cpp
-)
+  logical_expression.cpp)
