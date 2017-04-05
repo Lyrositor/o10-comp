@@ -1,7 +1,8 @@
 #include <comp/as/emit.h>
+
 #include <comp/ast.h>
 #include <comp/as/ast.h>
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 
 namespace comp {
 namespace as {

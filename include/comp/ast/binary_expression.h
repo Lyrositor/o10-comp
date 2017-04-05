@@ -5,24 +5,26 @@
 namespace comp {
 namespace ast {
 enum class BinaryOperator {
-  Addition, // left + right
-  BitwiseAnd, // left & right
-  BitwiseOr, // left | right
-  BitwiseXor, // left ^ right
-  Comma, // left, right
-  Division, // left / right
-  Equality, // left == right
-  GreaterThan, // left > right
-  GreaterThanOrEqual, // left >= right
-  Inequality, // left != right
-  LeftShift, // left << right
-  LessThan, // left < right
-  LessThanOrEqualTo, // left <= right
-  Multiplication, // left * right
-  Remainder, // left % right
-  RightShift, // left >> right
-  Subtraction // left - right
+  Addition,  // left + right
+  BitwiseAnd,  // left & right
+  BitwiseOr,  // left | right
+  BitwiseXor,  // left ^ right
+  Comma,  // left, right
+  Division,  // left / right
+  Equality,  // left == right
+  GreaterThan,  // left > right
+  GreaterThanOrEqual,  // left >= right
+  Inequality,  // left != right
+  LeftShift,  // left << right
+  LessThan,  // left < right
+  LessThanOrEqualTo,  // left <= right
+  Multiplication,  // left * right
+  Remainder,  // left % right
+  RightShift,  // left >> right
+  Subtraction  // left - right
 };
+
+std::string BinaryOperatorToString(BinaryOperator op);
 
 /**
  * Represents an expression obtained by applying a binary operator.

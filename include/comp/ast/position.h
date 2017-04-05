@@ -20,6 +20,9 @@ struct Position final {
 
 struct SourceLocation final {
   static std::shared_ptr<SourceLocation> Create(const YYLTYPE *yylloc);
+  static std::shared_ptr<SourceLocation> Create(
+    const Position &start,
+    const Position &end);
   SourceLocation(const Position &start, const Position &end);
 
   ~SourceLocation();

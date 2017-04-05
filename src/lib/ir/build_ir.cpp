@@ -1,5 +1,7 @@
 #include <comp/ir/build_ir.h>
 
+#include <iostream>
+
 #include <comp/ir/builtins.h>
 #include <comp/ir/control_flow_graph.h>
 #include <comp/ir/op.h>
@@ -27,7 +29,7 @@ std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node) {
         throw std::domain_error("Not implemented: global variable declarations");
       }
       default: {
-        throw comp::UnexpectedNodeTypeInRootError(program_node.location);
+        throw UnexpectedNodeTypeError(*declaration);
       }
     }
   }
@@ -43,7 +45,7 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   for (auto parameter : node.parameters) {
     std::shared_ptr<const DataType> data_type = ResolveParameterType(*parameter, context);
     std::string name = ResolveParameterName(*parameter);
-    parameters.push_back(Variable::Create(data_type, nullptr)); // TODO: parameter
+    parameters.push_back(Variable::Create(data_type, parameter));
   }
 
   // Create the IR of the function's return type
@@ -65,23 +67,25 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
 
   // Ensure this function is not being declared twice or defined twice
   if (node.body == nullptr) {
-    throw comp::FunctionAlreadyDeclaredError(node.identifier->name,node.location);
+    throw FunctionAlreadyDeclaredError(node);
   }
   if (function->GetBody() != nullptr) {
-    throw comp::FunctionAlreadyDefinedError(node.identifier->name,node.location);
+    throw FunctionAlreadyDefinedError(node);
   }
 
   // Check that the function signatures match
   if (parameters.size() != function->GetParameters().size()) {
-    throw comp::FunctionParameterListDoesNotMatchError(node.identifier->name,node.location);
+    throw FunctionParameterListDoesNotMatchError(node);
   }
   if (return_type != function->GetReturnType()) {
-    throw comp::FunctionReturnTypeDoesNotMatchError(node.identifier->name,node.location);
+    throw FunctionReturnTypeDoesNotMatchError(node);
   }
   for (size_t i = 0; i < parameters.size(); i++) {
     if (parameters[i]->GetDataType() !=
       function->GetParameters()[i]->GetDataType()) {
-      throw comp::FunctionParameterTypeDoesNotMatchError(node.identifier->name,node.location);
+      throw FunctionParameterTypeDoesNotMatchError(
+        *std::static_pointer_cast<const ast::Parameter>(
+          parameters[i]->GetAstNode()));
     }
   }
   // Create the child context
@@ -124,8 +128,7 @@ std::shared_ptr<const DataType> ResolveDataTypeType(const ast::DataType &data_ty
             break;
           default:
             // Currently, we only support literals to specify array size
-            throw comp::ArrayLengthNotLiteralError(comp::ast::Node::ToString(arrayDataType.size->node_type),
-                                                   data_type.location);
+            throw ArrayLengthNotLiteralError(arrayDataType);
         }
         return ArrayDataType::Create(ResolveDataTypeType(*arrayDataType.item_type, context), size);
       } else {
@@ -137,7 +140,7 @@ std::shared_ptr<const DataType> ResolveDataTypeType(const ast::DataType &data_ty
       return context.ResolveDataType(identifierDeclarator.identifier->name);
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(data_type.node_type),data_type.location);
+      throw UnexpectedNodeTypeError(data_type);
     }
   }
 }
@@ -162,7 +165,7 @@ std::shared_ptr<const DataType> ResolveDeclaratorType(const std::shared_ptr<cons
       return base_type;
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(declarator.node_type),declarator.location);
+      throw UnexpectedNodeTypeError(declarator);
     }
   }
 }
@@ -178,7 +181,7 @@ std::shared_ptr<const DataType> ResolveParameterType(const ast::Parameter &param
       return ResolveDataTypeType(*anonymousParameter.data_type, context);
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(parameter.node_type),parameter.location);
+      throw UnexpectedNodeTypeError(parameter);
     }
   }
 }
@@ -192,7 +195,7 @@ std::string ResolveDeclaratorName(const ast::Declarator &declarator) {
       return static_cast<const ast::IdentifierDeclarator &>(declarator).identifier->name;
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(declarator.node_type),declarator.location);
+      throw UnexpectedNodeTypeError(declarator);
     }
   }
 }
@@ -207,7 +210,7 @@ std::string ResolveParameterName(const ast::Parameter &parameter) {
       return "";
     }
     default: {
-      throw comp::UnexpectedNodeTypeError(comp::ast::Node::ToString(parameter.node_type),parameter.location);
+      throw UnexpectedNodeTypeError(parameter);
     }
   }
 }
@@ -289,7 +292,7 @@ void BuildStatementIR(
       break;
     }
     default: {
-      throw comp::UnexpectedNodeValueError(comp::ast::Node::ToString(node.node_type),node.location);
+      throw UnexpectedNodeTypeError(node);
     }
   }
 }
@@ -444,7 +447,7 @@ std::shared_ptr<Operand> BuildRExpressionIR(
         current_block);
     }
     default: {
-      throw comp::UnexpectedNodeValueError(comp::ast::Node::ToString(node->node_type),node->location);
+      throw UnexpectedNodeTypeError(*node);
     }
   }
 }
@@ -652,7 +655,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
       break;
     }
     default: {
-      throw comp::UnexpectedNodeValueError(node->location);
+      throw UnexpectedNodeTypeError(*node);
     }
   }
 

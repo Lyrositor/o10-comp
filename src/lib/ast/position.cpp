@@ -21,6 +21,13 @@ std::shared_ptr<SourceLocation> SourceLocation::Create(
   ));
 }
 
+std::shared_ptr<SourceLocation> SourceLocation::Create(
+  const Position &start,
+  const Position &end
+) {
+  return std::unique_ptr<SourceLocation>(new SourceLocation(start, end));
+}
+
 SourceLocation::SourceLocation(const Position &start, const Position &end) :
   start(start), end(end) {
 }

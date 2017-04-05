@@ -13,7 +13,7 @@ void PrintException(const std::exception &exception) {
 }
 
 void PrintSyntaxException(
-  const comp::SyntaxException &exception,
+  const comp::CompilationException &exception,
   const std::string &content,
   const std::string &filename) {
   std::shared_ptr<comp::ast::SourceLocation> l = exception.GetLocation();

@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 
-#include <comp/exceptions.h>
 #include <comp/utils.h>
 
 namespace comp {

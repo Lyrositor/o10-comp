@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <comp/ir/build_ir.h>
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 
 namespace comp {
 namespace ir {

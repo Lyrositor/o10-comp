@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <stdlib.h>
 #include <comp/ast.h>
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 #include <comp/parser/parser_config.h>
 
 // Generated with bison by CMake (parser.tab.hpp is in the build directory)

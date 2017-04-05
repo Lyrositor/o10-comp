@@ -1,10 +1,9 @@
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 
 #include <sstream>
 #include <unordered_map>
 
 namespace comp {
-
 Exception::Exception(const std::string &message) : runtime_error(message) {
 }
 
@@ -18,22 +17,6 @@ std::shared_ptr<ast::SourceLocation> CompilationException::GetLocation() const {
   return location_;
 }
 
-std::string CompilationException::PrintLocation(const std::shared_ptr<comp::ast::SourceLocation> location){
-  std::stringstream msg;
-  if (location == nullptr) {
-    msg << "at unknown location.";
-  }else{
-    size_t a1=location->start.line;
-    int b1;
-    b1 = (int)a1;
-    size_t a2=location->start.line;
-    int b2;
-    b2 = (int)a2;
-    msg << "at line " << b1 <<  ", column "  << b2 << ".";
-  }
-  return msg.str();
-}
-
 SyntaxException::SyntaxException(
   const std::string &message,
   const std::shared_ptr<ast::SourceLocation> location
@@ -44,54 +27,20 @@ UnexpectedTokenError::UnexpectedTokenError(
   const std::string &token,
   const std::shared_ptr<ast::SourceLocation> location
 ) :
+  SyntaxException("Unexpected token: '" + token + "'", location) {
+}
+
+UnexpectedNodeTypeError::UnexpectedNodeTypeError(const ast::Node &node) :
   SyntaxException(
-    std::string("Unexpected token") + ": '" + token + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-    token_(token) {
+    "Unexpected node type: '" + ast::Node::ToString(node.node_type) + "'",
+    node.location) {
 }
 
-std::string UnexpectedTokenError::GetToken() const {
-  return token_;
-}
-
-UnexpectedNodeTypeError::UnexpectedNodeTypeError(
-  const std::string &nodeType,
-  const std::shared_ptr<ast::SourceLocation> location
-) :
+UnexpectedBinaryOperatorError::UnexpectedBinaryOperatorError(
+  const ast::BinaryExpression &op) :
   SyntaxException(
-    std::string("Unexpected node type") + ": '" + nodeType + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-    nodeType_(nodeType){
-}
-
-std::string UnexpectedNodeTypeError::GetNodeType() const {
-  return nodeType_;
-}
-
-UnexpectedNodeValueError::UnexpectedNodeValueError(
-  const std::string &node,
-  const std::shared_ptr<ast::SourceLocation> location
-) :
-  SyntaxException(
-    std::string("Unexpected node value") + ": '" + node + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-    node_(node) {
-}
-
-UnexpectedNodeValueError::UnexpectedNodeValueError(
-  const std::shared_ptr<ast::SourceLocation> location
-) :
-  SyntaxException(
-    std::string("Unexpected node value")
-      + CompilationException::PrintLocation(location),
-    location) {
-}
-
-std::string UnexpectedNodeValueError::GetNode() const {
-  return node_;
+    "unexpected binary operator: '" + ast::BinaryOperatorToString(op.op) + "'",
+    op.location) {
 }
 
 MismatchedTypesLeftRightError::MismatchedTypesLeftRightError(
@@ -100,140 +49,74 @@ MismatchedTypesLeftRightError::MismatchedTypesLeftRightError(
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   CompilationException(
-    std::string("Mismatched types for left and right operands") + ": '" + left + "','" + right + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-    left_(left),right_(right){
-}
-
-std::string MismatchedTypesLeftRightError::GetLeft() const {
-  return left_;
-}
-std::string MismatchedTypesLeftRightError::GetRight() const {
-  return right_;
+    std::string("mismatched types for left and right operands: '")
+      + left + "','" + right + "'",
+    location) {
 }
 
 FunctionAlreadyDefinedError::FunctionAlreadyDefinedError(
-  const std::string &function,
-  const std::shared_ptr<ast::SourceLocation> location
+  const ast::Function &function
 ) :
   CompilationException(
-    std::string("Function already defined")
-      + ": '" + function + "'" + CompilationException::PrintLocation(location),
-    location),
-    function_(function) {
-}
-
-std::string FunctionAlreadyDefinedError::GetFunction() const {
-  return function_;
+    "function already defined: '" + function.identifier->name + "'",
+    function.identifier->location) {
 }
 
 FunctionAlreadyDeclaredError::FunctionAlreadyDeclaredError(
-  const std::string &function,
-  const std::shared_ptr<ast::SourceLocation> location
-) :
+  const ast::Function &function) :
   CompilationException(
-    std::string("Function already declared")
-      + ": '" + function + "'" + CompilationException::PrintLocation(location),
-    location),
-    function_(function) {
-}
-
-std::string FunctionAlreadyDeclaredError::GetFunction() const {
-  return function_;
+    "function already declared: '" + function.identifier->name + "'",
+    function.identifier->location) {
 }
 
 FunctionParameterListDoesNotMatchError::FunctionParameterListDoesNotMatchError(
-  const std::string &function,
-  const std::shared_ptr<ast::SourceLocation> location
-) :
+  const ast::Function &function) :
   CompilationException(
-    std::string("Function's parameter list does not match the declared list") + ": '" + function + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-    function_(function) {
-}
-
-std::string FunctionParameterListDoesNotMatchError::GetFunction() const {
-  return function_;
+    "function's defined parameter list does not match the declared list: '"
+      + function.identifier->name + "'",
+    ast::SourceLocation::Create(
+      function.identifier->location->end,
+      function.body->location->start)) {
 }
 
 FunctionReturnTypeDoesNotMatchError::FunctionReturnTypeDoesNotMatchError(
-  const std::string &function,
-  const std::shared_ptr<ast::SourceLocation> location
+  const ast::Function &function
 ) :
   CompilationException(
-    std::string("Function's return type does not match the declared type") + ": '" + function + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-    function_(function) {
-}
-
-std::string FunctionReturnTypeDoesNotMatchError::GetFunction() const {
-  return function_;
+    "function's defined return type does not match the declared type",
+    function.return_type->location) {
 }
 
 FunctionParameterTypeDoesNotMatchError::FunctionParameterTypeDoesNotMatchError(
-  const std::string &function,
-  const std::shared_ptr<ast::SourceLocation> location
+  const ast::Parameter &parameter
 ) :
   CompilationException(
-    std::string("Function's parameter type does not match the declared type") + ": '" + function + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-    function_(function) {
-}
-
-std::string FunctionParameterTypeDoesNotMatchError::GetFunction() const {
-  return function_;
-}
-
-UnexpectedNodeTypeInRootError::UnexpectedNodeTypeInRootError(
-  const std::shared_ptr<ast::SourceLocation> location
-) :
-  SyntaxException(
-    std::string("Unexpected node type in root context."),
-    location){
+    "function's defined parameter type does not match the declared type",
+    parameter.location) {
 }
 
 ArrayLengthNotLiteralError::ArrayLengthNotLiteralError(
-  const std::string &lengthType,
-  const std::shared_ptr<ast::SourceLocation> location
+  const ast::ArrayDataType &data_type
 ) :
   SyntaxException(
-    std::string("Array length not a literal")  + ": '" + lengthType + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-  lengthType_(lengthType){
-}
-
-std::string ArrayLengthNotLiteralError::GetLengthType() const {
-  return lengthType_;
+    "array length not a literal: '"
+      + ast::Node::ToString(data_type.size->node_type) + "'",
+    data_type.size->location) {
 }
 
 CannotSpecifySizeError::CannotSpecifySizeError(
   const std::shared_ptr<ast::SourceLocation> location
 ) :
   SyntaxException(
-    std::string("Cannot specify size of array")
-      + CompilationException::PrintLocation(location),
-    location){
+    std::string("cannot specify size of array"),
+    location) {
 }
 
 InvalidIdentifierError::InvalidIdentifierError(
-  const std::string &identifier,
-  const std::shared_ptr<ast::SourceLocation> location
+  const ast::Identifier &identifier
 ) :
   SyntaxException(
-    std::string("Invalid identifier") + ": '" + identifier + "'"
-      + CompilationException::PrintLocation(location),
-    location),
-  identifier_(identifier) {
+    "invalid identifier: '" + identifier.name + "'",
+    identifier.location) {
 }
-
-std::string InvalidIdentifierError::GetIdentifier() const {
-  return identifier_;
-}
-
-
 }  // namespace comp

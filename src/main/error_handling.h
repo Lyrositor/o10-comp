@@ -4,12 +4,12 @@
 #include <memory>
 #include <string>
 
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 
 void PrintException(const std::exception &exception);
 
 void PrintSyntaxException(
-  const comp::SyntaxException &exception,
+  const comp::CompilationException &exception,
   const std::string &content,
   const std::string &filename);
 

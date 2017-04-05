@@ -3,7 +3,6 @@
 #include <string>
 
 #include <comp/ast.h>
-#include <comp/exceptions.h>
 #include <comp/parser/parser_config.h>
 #include <comp/utils.h>
 

@@ -16,7 +16,7 @@
 #include <comp/as/arch/x64/build_asm.h>
 #include <comp/ir/build_ir.h>
 #include <comp/ir/program.h>
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 #include <comp/parser.h>
 #include <comp/dot/ast.h>
 #include <comp/ir/to_dot.h>
@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
         program_asm = comp::as::arch::x64::BuildProgram(*program_ir);
       comp::as::EmitProgram(*program_asm, ofs);
     }
-  } catch (comp::SyntaxException &e) {
+  } catch (comp::CompilationException &e) {
     PrintSyntaxException(e, content, filename);
     return main_exit(EXIT_FAILURE, buffer, options);
   } catch (std::exception &e) {

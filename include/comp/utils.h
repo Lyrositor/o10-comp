@@ -1,5 +1,7 @@
 #pragma once
 
+#include "comp/utils/exceptions.h"
+
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 struct EnumClassHash {
