@@ -773,6 +773,42 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
       current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::UnaryMinus, expr));
       break;
     }
+    case ast::UnaryOperator::Address: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::Address, expr));
+      break;
+    }
+    case ast::UnaryOperator::BitwiseComplement: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::BitwiseComplement, expr));
+      break;
+    }
+    case ast::UnaryOperator::Indirection: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::Indirection, expr));
+      break;
+    }
+    case ast::UnaryOperator::LogicalNegation: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::LogicalNegation, expr));
+      break;
+    }
+    case ast::UnaryOperator::PostfixDecrement: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PostfixDecrement, expr));
+      break;
+    }
+    case ast::UnaryOperator::PostfixIncrement: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PostfixIncrement, expr));
+      break;
+    }
+    case ast::UnaryOperator::PrefixDecrement: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PrefixDecrement, expr));
+      break;
+    }
+    case ast::UnaryOperator::PrefixIncrement: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PrefixIncrement, expr));
+      break;
+    }
+    case ast::UnaryOperator::UnaryPlus: {
+      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::UnaryPlus, expr));
+      break;
+    }
     default: {
       throw std::domain_error("Unexpected value for node.op");
     }

@@ -125,9 +125,16 @@ struct BinOp final : public Op {
  */
 struct UnaryOp final : public Op {
   enum class UnaryOperator {
+    Address, // &expression
     BitwiseComplement, // ~expression
+    Indirection, // *expression
     LogicalNegation, // !expression
+    PostfixDecrement, // expression--
+    PostfixIncrement, // expression++
+    PrefixDecrement, // --expression
+    PrefixIncrement, // ++expression
     UnaryMinus, // -expression
+    UnaryPlus // +expression
   };
 
   static std::unique_ptr<UnaryOp> Create(std::shared_ptr<WritableOperand> out, UnaryOperator unaryOperator, std::shared_ptr<Operand> in1);
