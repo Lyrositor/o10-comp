@@ -18,6 +18,7 @@
 #include "comp/as/ast/integer_literal.h"
 #include "comp/as/ast/literal.h"
 #include "comp/as/ast/local_symbol.h"
+#include "comp/as/ast/logical_expression.h"
 #include "comp/as/ast/memory_reference.h"
 #include "comp/as/ast/mnemonic.h"
 #include "comp/as/ast/node.h"

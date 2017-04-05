@@ -18,8 +18,6 @@ enum class BinaryOperator {
   LeftShift, // left << right
   LessThan, // left < right
   LessThanOrEqualTo, // left <= right
-  LogicalAnd, // left && right
-  LogicalOr, // left || right
   Multiplication, // left * right
   Remainder, // left % right
   RightShift, // left >> right

@@ -576,7 +576,7 @@ logicalORExpression:
   logicalORExpression OR_OPERATOR logicalANDExpression {
     std::shared_ptr<comp::ast::RExpression> logicalOrExpression($1);
     std::shared_ptr<comp::ast::RExpression> logicalAndExpression($3);
-    $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::LogicalOr, logicalOrExpression, logicalAndExpression, LOCATION(&@1));
+    $$ = new comp::ast::LogicalExpression(comp::ast::LogicalOperator::LogicalOr, logicalOrExpression, logicalAndExpression, LOCATION(&@1));
   }
   | logicalANDExpression {
     $$ = $1;
@@ -586,7 +586,7 @@ logicalANDExpression:
   logicalANDExpression AND_OPERATOR inclusiveORExpression {
     std::shared_ptr<comp::ast::RExpression> logicalAndExpression($1);
     std::shared_ptr<comp::ast::RExpression> inclusiveOrExpression($3);
-    $$ = new comp::ast::BinaryExpression(comp::ast::BinaryOperator::LogicalAnd, logicalAndExpression, inclusiveOrExpression, LOCATION(&@1));
+    $$ = new comp::ast::LogicalExpression(comp::ast::LogicalOperator::LogicalAnd, logicalAndExpression, inclusiveOrExpression, LOCATION(&@1));
   }
   | inclusiveORExpression {
     $$ = $1;

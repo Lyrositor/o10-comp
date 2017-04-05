@@ -18,8 +18,6 @@ enum class BinaryOperator {
   GreaterThanOrEqual, // left >= right
   LessThan, // left < right
   LessThanOrEqual, // left <= right
-  LogicalAnd, // left && right
-  LogicalOr, // left || right
   Multiplication, // left * right
   NotEqual, // left != right
   Remainder, // left % right

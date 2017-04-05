@@ -132,6 +132,13 @@ abstract class LExpression extends RExpression {
 abstract class Literal extends RExpression {
 }
 
+class LogicalExpression << (S,#ffbb33) >>  extends RExpression {
+  +const LogicalOperator op
+  +const std::shared_ptr<RExpression> left
+  +const std::shared_ptr<RExpression> right
+  {static} +std::unique_ptr<LogicalExpression> Create()
+}
+
 class IdentifierDataType << (S,#ffbb33) >>  extends DataType {
   +const std::shared_ptr<Identifier> identifier
   {static} +std::unique_ptr<IdentifierDataType> Create()
@@ -158,6 +165,7 @@ enum comp::ast::Node::Type {
   IfStatement
   Int64Literal
   IdentifierDataType
+  LogicalExpression
   NamedParameter
   NullStatement
   Program

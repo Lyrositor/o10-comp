@@ -190,6 +190,10 @@ void EmitExpression(const ast::AddressExpression &node, std::ostream &out) {
       EmitLocalSymbol(static_cast<const ast::LocalSymbol &>(node), out);
       break;
     }
+    case ast::Node::Type::LogicalExpression: {
+      EmitLogicalExpression(static_cast<const ast::LogicalExpression &>(node), out);
+      break;
+    }
     default: {
       throw std::domain_error("Unexpected value for `node.node_type`");
     }
@@ -241,8 +245,6 @@ std::string serializeBinaryOperator(const ast::BinaryOperator op) {
     case ast::BinaryOperator::GreaterThanOrEqual: return ">=";
     case ast::BinaryOperator::LessThan: return "<";
     case ast::BinaryOperator::LessThanOrEqual: return "<=";
-    case ast::BinaryOperator::LogicalAnd: return "&&";
-    case ast::BinaryOperator::LogicalOr: return "||";
     case ast::BinaryOperator::Multiplication: return "*";
     case ast::BinaryOperator::NotEqual: return "!=";
     case ast::BinaryOperator::Remainder: return "%";
@@ -255,11 +257,31 @@ std::string serializeBinaryOperator(const ast::BinaryOperator op) {
   }
 }
 
+std::string serializeLogicalOperator(const ast::LogicalOperator op) {
+  switch (op) {
+    case ast::LogicalOperator::LogicalAnd: return "&&";
+    case ast::LogicalOperator::LogicalOr: return "||";
+    default: {
+      throw std::domain_error("Unexpected value for `for`");
+    }
+  }
+}
+
 void EmitBinaryExpression(const ast::BinaryExpression &node, std::ostream &out) {
   out << "(";
   EmitExpression(*node.left, out);
   out << " ";
   out << serializeBinaryOperator(node.op);
+  out << " ";
+  EmitExpression(*node.right, out);
+  out << ")";
+}
+
+void EmitLogicalExpression(const ast::LogicalExpression &node, std::ostream &out) {
+  out << "(";
+  EmitExpression(*node.left, out);
+  out << " ";
+  out << serializeLogicalOperator(node.op);
   out << " ";
   EmitExpression(*node.right, out);
   out << ")";

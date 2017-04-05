@@ -99,12 +99,20 @@ std::string serialializeBinaryOperator(const BinaryOperator op) {
     case BinaryOperator::LeftShift: return "<<";
     case BinaryOperator::LessThan: return "<";
     case BinaryOperator::LessThanOrEqualTo: return "<=";
-    case BinaryOperator::LogicalAnd: return "&&";
-    case BinaryOperator::LogicalOr: return "||";
     case BinaryOperator::Multiplication: return "*";
     case BinaryOperator::Remainder: return "%";
     case BinaryOperator::RightShift: return ">>";
     case BinaryOperator::Subtraction: return "-";
+    default: {
+      throw std::domain_error("Unexpected value for `op`");
+    }
+  }
+}
+
+std::string serialializeLogicalOperator(const LogicalOperator op) {
+  switch (op) {
+    case LogicalOperator::LogicalAnd: return "&&";
+    case LogicalOperator::LogicalOr: return "||";
     default: {
       throw std::domain_error("Unexpected value for `op`");
     }
@@ -310,6 +318,17 @@ std::unique_ptr<rapidjson::Value> LiteralDataTypeToJson(const IdentifierDataType
   return result;
 }
 
+std::unique_ptr<rapidjson::Value> LogicalExpressionToJson(const LogicalExpression &node, rapidjson::Document::AllocatorType &allocator) {
+  std::unique_ptr<rapidjson::Value> result = create_object_value();
+  result->AddMember("node_type", "LogicalExpression", allocator);
+  rapidjson::Value op;
+  op.SetString(serialializeLogicalOperator(node.op).c_str(), allocator);
+  result->AddMember("op", op, allocator);
+  result->AddMember("left", *RExpressionToJson(*node.left, allocator), allocator);
+  result->AddMember("right", *RExpressionToJson(*node.right, allocator), allocator);
+  return result;
+}
+
 std::unique_ptr<rapidjson::Value> NamedParameterToJson(const NamedParameter &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "NamedParameter", allocator);
@@ -370,6 +389,9 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
     }
     case Node::Type::Int64Literal: {
       return Int64LiteralToJson(static_cast<const Int64Literal &>(node), allocator);
+    }
+    case Node::Type::LogicalExpression: {
+      return LogicalExpressionToJson(static_cast<const LogicalExpression &>(node), allocator);
     }
     case Node::Type::NullStatement: {
       return NullStatementToJson(static_cast<const NullStatement &>(node), allocator);

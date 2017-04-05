@@ -26,6 +26,7 @@ std::unique_ptr<rapidjson::Value> IdentifierToJson(const Identifier &node, rapid
 std::unique_ptr<rapidjson::Value> IdentifierDeclaratorToJson(const IdentifierDeclarator &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> IfStatementToJson(const IfStatement &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> Int64LiteralToJson(const Int64Literal &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> LogicalExpressionToJson(const LogicalExpression &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> LExpressionToJson(const LExpression &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> LiteralToJson(const Literal &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> LiteralDataTypeToJson(const IdentifierDataType &node, rapidjson::Document::AllocatorType &allocator);

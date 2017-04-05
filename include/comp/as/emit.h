@@ -48,6 +48,8 @@ void EmitBigIntegerLiteral(const ast::BigIntegerLiteral &node, std::ostream &out
 
 void EmitBinaryExpression(const ast::BinaryExpression &node, std::ostream &out);
 
+void EmitLogicalExpression(const ast::LogicalExpression &node, std::ostream &out);
+
 void EmitCurrentAddress(const ast::CurrentAddress &node, std::ostream &out);
 
 void EmitIntegerLiteral(const ast::IntegerLiteral &node, std::ostream &out);
