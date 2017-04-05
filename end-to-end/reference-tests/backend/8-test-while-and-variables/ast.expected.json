@@ -1,0 +1,153 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [
+        {
+          "node_type": "AnonymousParameter",
+          "data_type": {
+            "node_type": "IdentifierDataType",
+            "identifier": {
+              "node_type": "Identifier",
+              "name": "void"
+            }
+          }
+        }
+      ],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "char"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "i"
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "Identifier",
+                "name": "i"
+              },
+              "rvalue": {
+                "node_type": "Uint8Literal",
+                "value": 65
+              }
+            }
+          },
+          {
+            "node_type": "WhileStatement",
+            "condition": {
+              "node_type": "BinaryExpression",
+              "op": "<",
+              "left": {
+                "node_type": "Identifier",
+                "name": "i"
+              },
+              "right": {
+                "node_type": "BinaryExpression",
+                "op": "+",
+                "left": {
+                  "node_type": "Uint8Literal",
+                  "value": 90
+                },
+                "right": {
+                  "node_type": "Int64Literal",
+                  "value": 1
+                }
+              }
+            },
+            "body": {
+              "node_type": "BlockStatement",
+              "body": [
+                {
+                  "node_type": "ExpressionStatement",
+                  "expression": {
+                    "node_type": "CallExpression",
+                    "callee": {
+                      "node_type": "Identifier",
+                      "name": "putchar"
+                    },
+                    "arguments": [
+                      {
+                        "node_type": "Identifier",
+                        "name": "i"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "node_type": "ExpressionStatement",
+                  "expression": {
+                    "node_type": "AssignmentExpression",
+                    "op": "=",
+                    "lvalue": {
+                      "node_type": "Identifier",
+                      "name": "i"
+                    },
+                    "rvalue": {
+                      "node_type": "BinaryExpression",
+                      "op": "+",
+                      "left": {
+                        "node_type": "Identifier",
+                        "name": "i"
+                      },
+                      "right": {
+                        "node_type": "Int64Literal",
+                        "value": 1
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "Uint8Literal",
+                  "value": 10
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

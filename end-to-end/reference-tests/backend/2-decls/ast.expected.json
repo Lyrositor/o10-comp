@@ -1,0 +1,90 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "int64_t"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "x"
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          },
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "int64_t"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "y"
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          },
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "int64_t"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "z"
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

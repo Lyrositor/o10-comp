@@ -419,50 +419,49 @@ class TestCase:
             with open(self.config.run.actual_stdout_path, "w") as actual_stdout_file:
                 actual_stdout_file.buffer.write(stdout)
 
-        if self.config.run.actual_stdout_path is not None:
-            with open(self.config.run.actual_stdout_path, "w") as actual_stdout_file:
-                actual_stdout_file.buffer.write(stdout)
+        if self.config.run.actual_stderr_path is not None:
+            with open(self.config.run.actual_stderr_path, "w") as actual_stderr_file:
+                actual_stderr_file.buffer.write(stderr)
 
         if self.config.run.expected_return_code is not None:
             if process.returncode != self.config.run.expected_return_code:
-                utf8_stdout = stdout.decode("UTF-8")
-                utf8_stderr = stderr.decode("UTF-8")
-
                 msg = ("Unexpected return code. Actual: {}, Expected: {}\n"
                        "stdout:\n"
                        "{}\n"
                        "stderr:\n"
                        "{}"
-                       ).format(process.returncode, self.config.run.expected_return_code, utf8_stdout, utf8_stderr)
+                       ).format(process.returncode, self.config.run.expected_return_code, repr(stdout), repr(stderr))
                 return "failed", msg
 
         if self.config.run.expected_stdout_path is not None:
-            with open(self.config.run.expected_stdout_path, "rb") as expected_stdout_file:
-                expected_stdout = expected_stdout_file.read()
-                if expected_stdout != stdout:
-                    utf8_expected_stdout = expected_stdout.decode("UTF-8")
-                    utf8_actual_stdout = stdout.decode("UTF-8")
-                    msg = ("Actual STDOUT does not match the expected STDOUT:\n"
-                           "Expected:\n"
-                           "{}\n"
-                           "Actual:\n"
-                           "{}"
-                           ).format(utf8_expected_stdout, utf8_actual_stdout)
-                    return "failed", msg
+            try:
+                with open(self.config.run.expected_stdout_path, "rb") as expected_stdout_file:
+                    expected_stdout = expected_stdout_file.read()
+                    if expected_stdout != stdout:
+                        msg = ("Actual STDOUT does not match the expected STDOUT:\n"
+                               "Expected:\n"
+                               "{}\n"
+                               "Actual:\n"
+                               "{}"
+                               ).format(repr(expected_stdout), repr(stdout))
+                        return "failed", msg
+            except:
+                return "failed", "Unable to read file: {}".format(self.config.run.expected_stdout_path)
 
         if self.config.run.expected_stderr_path is not None:
-            with open(self.config.run.expected_stderr_path, "rb") as expected_stderr_file:
-                expected_stderr = expected_stderr_file.read()
-                if expected_stderr != stderr:
-                    utf8_expected_stderr = expected_stderr.decode("UTF-8")
-                    utf8_actual_stderr = stderr.decode("UTF-8")
-                    msg = ("Actual STDERR does not match the expected STDERR:\n"
-                           "Expected:\n"
-                           "{}\n"
-                           "Actual:\n"
-                           "{}"
-                           ).format(utf8_expected_stderr, utf8_actual_stderr)
-                    return "failed", msg
+            try:
+                with open(self.config.run.expected_stderr_path, "rb") as expected_stderr_file:
+                    expected_stderr = expected_stderr_file.read()
+                    if expected_stderr != stderr:
+                        msg = ("Actual STDERR does not match the expected STDERR:\n"
+                               "Expected:\n"
+                               "{}\n"
+                               "Actual:\n"
+                               "{}"
+                               ).format(repr(expected_stderr), repr(stderr))
+                        return "failed", msg
+            except:
+                return "failed", "Unable to read file: {}".format(self.config.run.expected_stderr_path)
 
         return "ok", None
 

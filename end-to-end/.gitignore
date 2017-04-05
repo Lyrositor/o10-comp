@@ -2,5 +2,6 @@
 *.actual.dot
 *.actual.json
 *.actual.png
+*.actual.stderr
 *.actual.stdout
 *.o10c

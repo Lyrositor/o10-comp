@@ -1,0 +1,69 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "Uint8Literal",
+                  "value": 79
+                }
+              ]
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "Uint8Literal",
+                  "value": 75
+                }
+              ]
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "Uint8Literal",
+                  "value": 32
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
