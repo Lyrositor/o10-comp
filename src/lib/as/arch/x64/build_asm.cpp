@@ -113,9 +113,7 @@ void BuildFunction(
 #else
       stack += kRegisterQSize;
       address = ast::MemoryReference::Create(
-        RBP,
-        ast::BigIntegerLiteral::Create(
-          stack - (kParameterRegisters.size() + 1)*kRegisterQSize));
+        RBP, ast::BigIntegerLiteral::Create(-stack));
 #endif  // WIN32
       param_copies.push_back(ast::Instruction::Create(
         MOVQ, {kParameterRegisters[idx], address}));
@@ -158,9 +156,16 @@ void BuildFunction(
       SUBQ,
       {ast::ImmediateOperand::Create(stack), RSP}));
 
-  // Copy the register parameters
-  for (auto rit = param_copies.rbegin(); rit != param_copies.rend(); rit++) {
-    body.push_back(*rit);
+  // Copy the register parameters, in reverse order on Windows
+#ifdef WIN32
+  auto it = param_copies.rbegin();
+  auto end = param_copies.rend();
+#else
+  auto it = param_copies.begin();
+  auto end = param_copies.end();
+#endif  // WIN32
+  for (; it != end; it++) {
+    body.push_back(*it);
   }
 
   // Generate the function body
