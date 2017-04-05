@@ -15,6 +15,9 @@ static const std::shared_ptr<ast::Mnemonic>
   ADDQ = ast::Mnemonic::Create("addq"),
   CALL = ast::Mnemonic::Create("call"),
   CMP = ast::Mnemonic::Create("cmp"),
+  CQTO = ast::Mnemonic::Create("cqto"),
+  IDIVQ = ast::Mnemonic::Create("idivq"),
+  IMULQ = ast::Mnemonic::Create("imulq"),
   LEAVEQ = ast::Mnemonic::Create("leaveq"),
   MOVQ = ast::Mnemonic::Create("movq"),
   MOVZBQ = ast::Mnemonic::Create("movzbq"),
@@ -242,7 +245,44 @@ void BuildBinOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   VariablesTable &variables_table
 ) {
-  // TODO(Lyrositor) Implement
+  auto source1 = BuildOperand(op->in1, variables_table);
+  auto source2 = BuildOperand(op->in2, variables_table);
+  auto destination = BuildOperand(op->out, variables_table);
+  body.push_back(ast::Instruction::Create(MOVQ, {source1, RAX}));
+  switch (op->binary_operator) {
+    case ir::BinOp::BinaryOperator::Addition:
+      body.push_back(ast::Instruction::Create(ADDQ, {source2, RAX}));
+      break;
+    case ir::BinOp::BinaryOperator::Subtraction:
+      body.push_back(ast::Instruction::Create(SUBQ, {source2, RAX}));
+      break;
+    case ir::BinOp::BinaryOperator::Multiplication:
+      body.push_back(ast::Instruction::Create(IMULQ, {source2, RAX}));
+      break;
+    case ir::BinOp::BinaryOperator::Division:
+      body.insert(
+        body.end(),
+        {
+          ast::Instruction::Create(CQTO),
+          ast::Instruction::Create(IDIVQ, {source2})
+        });
+      break;
+    case ir::BinOp::BinaryOperator::BitwiseAnd:
+    case ir::BinOp::BinaryOperator::BitwiseOr:
+    case ir::BinOp::BinaryOperator::BitwiseXor:
+    case ir::BinOp::BinaryOperator::Equality:
+    case ir::BinOp::BinaryOperator::GreaterThan:
+    case ir::BinOp::BinaryOperator::GreaterThanOrEqual:
+    case ir::BinOp::BinaryOperator::Inequality:
+    case ir::BinOp::BinaryOperator::LeftShift:
+    case ir::BinOp::BinaryOperator::LessThan:
+    case ir::BinOp::BinaryOperator::LessThanOrEqualTo:
+    case ir::BinOp::BinaryOperator::Remainder:
+    case ir::BinOp::BinaryOperator::RightShift:
+      // TODO(Lyrositor) Implement other binary operators
+      break;
+  }
+  body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
 }
 
 void BuildCallOp(

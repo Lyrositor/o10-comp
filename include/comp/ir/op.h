@@ -104,7 +104,7 @@ struct BinOp final : public Op {
   virtual ~BinOp();
 
   std::shared_ptr<VariableOperand> out;
-  BinaryOperator binaryOperator;
+  BinaryOperator binary_operator;
   std::shared_ptr<Operand> in1;
   std::shared_ptr<Operand> in2;
 };

@@ -84,7 +84,7 @@ std::string BinaryOperatorToString(const BinOp::BinaryOperator &node) {
 
 void EmitBinOp(const BinOp &node, std::ostream &out, IdentifiersTable &it) {
   EmitVariableOperand(*node.out, out, it);
-  out << " := " << BinaryOperatorToString(node.binaryOperator) << "(";
+  out << " := " << BinaryOperatorToString(node.binary_operator) << "(";
   EmitOperand(*node.in1, out, it);
   out << ", ";
   EmitOperand(*node.in2, out, it);

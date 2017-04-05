@@ -75,7 +75,7 @@ BinOp::BinOp(
 ) :
   Op(Op::Type::BinOp),
   out(out),
-  binaryOperator(binaryOperator),
+  binary_operator(binaryOperator),
   in1(in1),
   in2(in2) {
 }
