@@ -34,24 +34,22 @@
                   }
                 },
                 "initial_value": {
-                  "node_type": "BinaryExpression",
-                  "op": ",",
-                  "left": {
-                    "node_type": "Int64Literal",
-                    "value": 1
-                  },
-                  "right": {
-                    "node_type": "AssignmentExpression",
-                    "op": "=",
-                    "lvalue": {
-                      "node_type": "Identifier",
-                      "name": "b"
-                    },
-                    "rvalue": {
-                      "node_type": "Int64Literal",
-                      "value": 0
-                    }
+                  "node_type": "Int64Literal",
+                  "value": 1
+                }
+              },
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "b"
                   }
+                },
+                "initial_value": {
+                  "node_type": "Int64Literal",
+                  "value": 0
                 }
               }
             ]

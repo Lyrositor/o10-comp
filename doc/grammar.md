@@ -106,7 +106,7 @@ a given function signature without producing "unused variable" warnings.
 
 - _[Identifier]_
 - _[Identifier]_ `[` `]`
-- _[Identifier]_ `[` _[Expression]_ `]`
+- _[Identifier]_ `[` _[AssignmentExpression]_ `]`
 
 For the fixed-size array declaration (third rule), the size can be any const expression.
 We keep it as this in the grammar but using anything but a literal will throw a semantic error.

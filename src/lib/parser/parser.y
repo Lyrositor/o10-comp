@@ -235,7 +235,7 @@ declarator:
     std::shared_ptr<comp::ast::Identifier> identifier($1);
     $$ = new comp::ast::ArrayDeclarator(comp::ast::IdentifierDeclarator::Create(identifier, identifier->location), nullptr, LOCATION(&@1));
   }
-  | identifier OPEN_BRACKET expression CLOSE_BRACKET {
+  | identifier OPEN_BRACKET assignmentExpression CLOSE_BRACKET {
     std::shared_ptr<comp::ast::Identifier> identifier($1);
     std::shared_ptr<comp::ast::RExpression> size($3);
     $$ = new comp::ast::ArrayDeclarator(comp::ast::IdentifierDeclarator::Create(identifier), size, LOCATION(&@1));
@@ -282,7 +282,7 @@ variableDeclarator:
       std::shared_ptr<comp::ast::Declarator> declarator($1);
       $$ = new comp::ast::VariableDeclarator(declarator, nullptr, LOCATION(&@1));
   }
-  | declarator SIMPLE_ASSIGNMENT_OPERATOR expression {
+  | declarator SIMPLE_ASSIGNMENT_OPERATOR assignmentExpression {
       std::shared_ptr<comp::ast::Declarator> decl($1);
       std::shared_ptr<comp::ast::RExpression> expression($3);
       $$ = new comp::ast::VariableDeclarator(decl, expression, LOCATION(&@1));
