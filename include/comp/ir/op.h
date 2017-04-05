@@ -154,6 +154,8 @@ struct CopyOp final : public Op {
 
 /**
  * Leave the function and return the `in` value or nothing if `in` is a nullptr
+ *
+ * `in` is a nullptr when the function has a `void` return type.
  */
 struct ReturnOp final : public Op {
   static std::unique_ptr<ReturnOp> Create(std::shared_ptr<Operand> in);

@@ -164,14 +164,9 @@ void BuildFunction(
   }
 
   // Generate the function body
+  // The epilog will be generated when a return statement is encountered; this
+  // is a guarantee by the IR
   BuildBasicBlock(node->GetBody()->GetSource(), body, variables_table);
-
-  // Epilog
-  // TODO(Lyrositor) If there are multiple blocks, add a return label here
-  body.insert(body.end(), {
-    ast::Instruction::Create(LEAVEQ),
-    ast::Instruction::Create(RETQ)
-  });
 
   // Generate every subsequent block
   std::set<std::shared_ptr<ir::BasicBlock>>
@@ -359,7 +354,9 @@ void BuildCallOp(
         {ast::ImmediateOperand::Create(stack_size), RSP}));
   }
 
-  // TODO(Lyrositor) Handle return values
+  // Store the return value
+  auto destination = BuildOperand(op->out, variables_table);
+  body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
 }
 
 void BuildCopyOp(
@@ -396,7 +393,18 @@ void BuildReturnOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   VariablesTable &variables_table
 ) {
-  // TODO(Lyrositor) Implement
+  // Return the value if this is a typed return
+  if (op->in != nullptr) {
+    body.push_back(
+      ast::Instruction::Create(
+        MOVQ, {BuildOperand(op->in, variables_table), RAX}));
+  }
+
+  // Epilog
+  body.insert(body.end(), {
+    ast::Instruction::Create(LEAVEQ),
+    ast::Instruction::Create(RETQ)
+  });
 }
 
 void BuildUnaryOp(
