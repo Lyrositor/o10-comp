@@ -142,7 +142,7 @@ std::string UnaryOperatorToString(const UnaryOp::UnaryOperator &node) {
 
 void EmitUnaryOp(const UnaryOp &node, std::ostream &out, IdentifiersTable &it) {
   EmitVariableOperand(*node.out, out, it);
-  out << " := " << UnaryOperatorToString(node.unaryOperator) << "(";
+  out << " := " << UnaryOperatorToString(node.unary_operator) << "(";
   EmitOperand(*node.in1, out,it);
   out << ");";
 }

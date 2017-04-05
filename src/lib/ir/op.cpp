@@ -95,7 +95,7 @@ UnaryOp::UnaryOp(std::shared_ptr<VariableOperand> out,
 ) :
   Op(Op::Type::UnaryOp),
   out(out),
-  unaryOperator(unaryOperator),
+  unary_operator(unaryOperator),
   in1(in1) {
 }
 

@@ -124,7 +124,7 @@ struct UnaryOp final : public Op {
   virtual ~UnaryOp();
 
   std::shared_ptr<VariableOperand> out;
-  UnaryOperator unaryOperator;
+  UnaryOperator unary_operator;
   std::shared_ptr<Operand> in1;
 };
 

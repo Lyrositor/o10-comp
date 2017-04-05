@@ -10,24 +10,36 @@ namespace comp {
 namespace as {
 namespace arch {
 namespace x64 {
+#define INSTR(...) ast::Instruction::Create(__VA_ARGS__)
+
 // Define the x86-64 mnemonics to be used
 static const std::shared_ptr<ast::Mnemonic>
   ADDQ = ast::Mnemonic::Create("addq"),
-  CALL = ast::Mnemonic::Create("call"),
-  CMP = ast::Mnemonic::Create("cmp"),
+  ANDQ = ast::Mnemonic::Create("andq"),
+  CALLQ = ast::Mnemonic::Create("callq"),
+  CMPQ = ast::Mnemonic::Create("cmpq"),
   CQTO = ast::Mnemonic::Create("cqto"),
   IDIVQ = ast::Mnemonic::Create("idivq"),
   IMULQ = ast::Mnemonic::Create("imulq"),
   LEAVEQ = ast::Mnemonic::Create("leaveq"),
   MOVQ = ast::Mnemonic::Create("movq"),
   MOVZBQ = ast::Mnemonic::Create("movzbq"),
-  NEG = ast::Mnemonic::Create("neg"),
+  NEGQ = ast::Mnemonic::Create("negq"),
   NOP = ast::Mnemonic::Create("nop"),
-  NOT = ast::Mnemonic::Create("not"),
+  NOTQ = ast::Mnemonic::Create("notq"),
+  ORQ = ast::Mnemonic::Create("orq"),
   PUSHQ = ast::Mnemonic::Create("pushq"),
   RETQ = ast::Mnemonic::Create("retq"),
+  SALQ = ast::Mnemonic::Create("salq"),
+  SARQ = ast::Mnemonic::Create("sarq"),
   SETE = ast::Mnemonic::Create("sete"),
-  SUBQ = ast::Mnemonic::Create("subq");
+  SETG = ast::Mnemonic::Create("setg"),
+  SETGE = ast::Mnemonic::Create("setge"),
+  SETL = ast::Mnemonic::Create("setl"),
+  SETLE = ast::Mnemonic::Create("setle"),
+  SETNE = ast::Mnemonic::Create("setne"),
+  SUBQ = ast::Mnemonic::Create("subq"),
+  XORQ = ast::Mnemonic::Create("xorq");
 
 // Define the x86-64 to be used
 static const std::shared_ptr<ast::RegisterOperand>
@@ -51,7 +63,8 @@ static const std::shared_ptr<ast::RegisterOperand>
   RDI = ast::RegisterOperand::Create("rdi"),
   RSI = ast::RegisterOperand::Create("rsi"),
 
-  AL = ast::RegisterOperand::Create("al");
+  AL = ast::RegisterOperand::Create("al"),
+  CL = ast::RegisterOperand::Create("cl");
 
 // Define the registers to be used to pass parameters
 static const std::vector<std::shared_ptr<ast::RegisterOperand>>
@@ -115,8 +128,7 @@ void BuildFunction(
       address = ast::MemoryReference::Create(
         RBP, ast::BigIntegerLiteral::Create(-stack));
 #endif  // WIN32
-      param_copies.push_back(ast::Instruction::Create(
-        MOVQ, {kParameterRegisters[idx], address}));
+      param_copies.push_back(INSTR(MOVQ, {kParameterRegisters[idx], address}));
     } else {
       address = ast::MemoryReference::Create(
         RBP, ast::BigIntegerLiteral::Create(param_stack));
@@ -148,13 +160,10 @@ void BuildFunction(
   body.insert(body.end(), {
     ast::GlobalDirective::Create(symbol),
     ast::EmptyStatement::Create({symbol}),
-    ast::Instruction::Create(PUSHQ, {RBP}),
-    ast::Instruction::Create(MOVQ, {RSP, RBP})
+    INSTR(PUSHQ, {RBP}),
+    INSTR(MOVQ, {RSP, RBP})
   });
-  body.push_back(
-    ast::Instruction::Create(
-      SUBQ,
-      {ast::ImmediateOperand::Create(stack), RSP}));
+  body.push_back(INSTR(SUBQ, stack, RSP));
 
   // Copy the register parameters, in reverse order on Windows
 #ifdef WIN32
@@ -211,6 +220,9 @@ void BuildOp(
         body,
         variables_table);
       break;
+    case ir::Op::Type::CastOp:
+      // TODO(Lyrositor) Implement cast op
+      break;
     case ir::Op::Type::CopyOp:
       BuildCopyOp(
         std::static_pointer_cast<ir::CopyOp>(op),
@@ -229,14 +241,15 @@ void BuildOp(
         body,
         variables_table);
       break;
+    case ir::Op::Type::TestOp:
+      // TODO(Lyrositor) Implement test op
+      break;
     case ir::Op::Type::UnaryOp:
       BuildUnaryOp(
         std::static_pointer_cast<ir::UnaryOp>(op),
         body,
         variables_table);
       break;
-    default:
-      throw Exception("Unexpected operation type");
   }
 }
 
@@ -248,41 +261,79 @@ void BuildBinOp(
   auto source1 = BuildOperand(op->in1, variables_table);
   auto source2 = BuildOperand(op->in2, variables_table);
   auto destination = BuildOperand(op->out, variables_table);
-  body.push_back(ast::Instruction::Create(MOVQ, {source1, RAX}));
+  body.push_back(INSTR(MOVQ, {source1, RAX}));
   switch (op->binary_operator) {
     case ir::BinOp::BinaryOperator::Addition:
-      body.push_back(ast::Instruction::Create(ADDQ, {source2, RAX}));
-      break;
-    case ir::BinOp::BinaryOperator::Subtraction:
-      body.push_back(ast::Instruction::Create(SUBQ, {source2, RAX}));
-      break;
-    case ir::BinOp::BinaryOperator::Multiplication:
-      body.push_back(ast::Instruction::Create(IMULQ, {source2, RAX}));
-      break;
-    case ir::BinOp::BinaryOperator::Division:
-      body.insert(
-        body.end(),
-        {
-          ast::Instruction::Create(CQTO),
-          ast::Instruction::Create(IDIVQ, {source2})
-        });
+      body.push_back(INSTR(ADDQ, {source2, RAX}));
       break;
     case ir::BinOp::BinaryOperator::BitwiseAnd:
+      body.push_back(INSTR(ANDQ, {source2, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::BitwiseOr:
+      body.push_back(INSTR(ORQ, {source2, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::BitwiseXor:
+      body.push_back(INSTR(XORQ, {source2, RAX}));
+      break;
+    case ir::BinOp::BinaryOperator::Division:
+      body.push_back(INSTR(CQTO));
+      body.push_back(INSTR(IDIVQ, {source2}));
+      break;
     case ir::BinOp::BinaryOperator::Equality:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETE, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::GreaterThan:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETG, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::GreaterThanOrEqual:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETGE, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::Inequality:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETNE, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::LeftShift:
+      body.push_back(INSTR(MOVQ, {source2, RCX}));
+      body.push_back(INSTR(SALQ, {CL, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::LessThan:
+      body.insert(body.end(), {
+        INSTR(CMPQ, {source2, RAX}),
+        INSTR(SETL, {AL}),
+        INSTR(MOVZBQ, {AL, RAX})
+      });
+      break;
     case ir::BinOp::BinaryOperator::LessThanOrEqualTo:
+      body.insert(body.end(), {
+        INSTR(CMPQ, {source2, RAX}),
+        INSTR(SETLE, {AL}),
+        INSTR(MOVZBQ, {AL, RAX})
+      });
+      break;
+    case ir::BinOp::BinaryOperator::Multiplication:
+      body.push_back(INSTR(IMULQ, {source2, RAX}));
+      break;
+    case ir::BinOp::BinaryOperator::Subtraction:
+      body.push_back(INSTR(SUBQ, {source2, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::Remainder:
+      body.push_back(INSTR(CQTO));
+      body.push_back(INSTR(IDIVQ, {source2}));
+      body.push_back(INSTR(MOVQ, {RDX, RAX}));
+      break;
     case ir::BinOp::BinaryOperator::RightShift:
-      // TODO(Lyrositor) Implement other binary operators
+      body.push_back(INSTR(MOVQ, {source2, RCX}));
+      body.push_back(INSTR(SARQ, {CL, RAX}));
       break;
   }
-  body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
+  body.push_back(INSTR(MOVQ, {RAX, destination}));
 }
 
 void BuildCallOp(
@@ -318,11 +369,10 @@ void BuildCallOp(
     if (idx < kParameterRegisters.size()) {
       // Copy the parameter's value to its destination register
       std::shared_ptr<ast::Operand> destination = kParameterRegisters[idx];
-      param_setup.push_back(
-        ast::Instruction::Create(MOVQ, {source, destination}));
+      param_setup.push_back(INSTR(MOVQ, {source, destination}));
     } else {
       // Push the parameter's value to a location on the stack
-      param_setup.push_back(ast::Instruction::Create(PUSHQ, {source}));
+      param_setup.push_back(INSTR(PUSHQ, {source}));
 //     stack_size += data_type_size; TODO(Lyrositor) Use the appropriate size
       stack_size += kRegisterQSize;
     }
@@ -339,12 +389,12 @@ void BuildCallOp(
   // before the function call on the stack
   std::shared_ptr<ast::ImmediateOperand> shadow_space =
     ast::ImmediateOperand::Create(kParameterRegisters.size() * kRegisterQSize);
-  body.push_back(ast::Instruction::Create(SUBQ, {shadow_space, RSP}));
+  body.push_back(INSTR(SUBQ, {shadow_space, RSP}));
   stack_size += shadow_space->value;
 #endif  // WIN32
   body.push_back(
-    ast::Instruction::Create(
-    CALL,
+    INSTR(
+    CALLQ,
     {
       ast::AddressOperand::Create(
         ast::GlobalSymbol::Create(op->function->GetName()))
@@ -354,14 +404,12 @@ void BuildCallOp(
   // stack
   if (stack_size > 0) {
     body.push_back(
-      ast::Instruction::Create(
-        ADDQ,
-        {ast::ImmediateOperand::Create(stack_size), RSP}));
+      INSTR(ADDQ, {ast::ImmediateOperand::Create(stack_size), RSP}));
   }
 
   // Store the return value
   auto destination = BuildOperand(op->out, variables_table);
-  body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
+  body.push_back(INSTR(MOVQ, {RAX, destination}));
 }
 
 void BuildCopyOp(
@@ -375,10 +423,10 @@ void BuildCopyOp(
   // Introduce an intermediary register if this is a copy from memory to memory
   if (source->node_type == ast::Node::Type::MemoryReference &&
     destination->node_type == ast::Node::Type::MemoryReference) {
-    body.push_back(ast::Instruction::Create(MOVQ, {source, RAX}));
-    body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
+    body.push_back(INSTR(MOVQ, {source, RAX}));
+    body.push_back(INSTR(MOVQ, {RAX, destination}));
   } else {
-    body.push_back(ast::Instruction::Create(MOVQ, {source, destination}));
+    body.push_back(INSTR(MOVQ, {source, destination}));
   }
 }
 
@@ -390,7 +438,7 @@ void BuildNoOp(
   UNUSED(op);
   UNUSED(body);
   UNUSED(variables_table);
-  body.push_back(ast::Instruction::Create(NOP));
+  body.push_back(INSTR(NOP));
 }
 
 void BuildReturnOp(
@@ -400,15 +448,13 @@ void BuildReturnOp(
 ) {
   // Return the value if this is a typed return
   if (op->in != nullptr) {
-    body.push_back(
-      ast::Instruction::Create(
-        MOVQ, {BuildOperand(op->in, variables_table), RAX}));
+    body.push_back(INSTR(MOVQ, {BuildOperand(op->in, variables_table), RAX}));
   }
 
   // Epilog
   body.insert(body.end(), {
-    ast::Instruction::Create(LEAVEQ),
-    ast::Instruction::Create(RETQ)
+    INSTR(LEAVEQ),
+    INSTR(RETQ)
   });
 }
 
@@ -419,32 +465,24 @@ void BuildUnaryOp(
 ) {
   auto source = BuildOperand(op->in1, variables_table);
   auto destination = BuildOperand(op->out, variables_table);
-  switch (op->unaryOperator) {
+  switch (op->unary_operator) {
     case ir::UnaryOp::UnaryOperator::BitwiseComplement:
       body.insert(
         body.end(),
-        {
-          ast::Instruction::Create(MOVQ, {source, RAX}),
-          ast::Instruction::Create(NOT, {RAX})
-        });
+        {INSTR(MOVQ, {source, RAX}), INSTR(NOTQ, {RAX})});
       break;
     case ir::UnaryOp::UnaryOperator::LogicalNegation:
-      body.insert(body.end(), {
-        ast::Instruction::Create(CMP, 0, source),
-        ast::Instruction::Create(SETE, {AL}),
-        ast::Instruction::Create(MOVZBQ, {AL, RAX})
-      });
+      body.insert(
+        body.end(),
+        {INSTR(CMPQ, 0, source), INSTR(SETE, {AL}), INSTR(MOVZBQ, {AL, RAX})});
       break;
     case ir::UnaryOp::UnaryOperator::UnaryMinus:
       body.insert(
         body.end(),
-        {
-          ast::Instruction::Create(MOVQ, {source, RAX}),
-          ast::Instruction::Create(NEG, {RAX})
-        });
+        {INSTR(MOVQ, {source, RAX}), INSTR(NEGQ, {RAX})});
       break;
   }
-  body.push_back(ast::Instruction::Create(MOVQ, {RAX, destination}));
+  body.push_back(INSTR(MOVQ, {RAX, destination}));
 }
 
 std::shared_ptr<ast::Operand> BuildOperand(
