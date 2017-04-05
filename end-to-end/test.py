@@ -167,7 +167,7 @@ class RunTestConfig():
             config.expected_stdout_path = os.path.join(test_dir, doc["expected-stdout"])
 
         if "return-code" in doc:
-            config.expected_return_code = os.path.join(test_dir, doc["return-code"])
+            config.expected_return_code = doc["return-code"]
 
         if "stdin" in doc:
             config.stdin_path = os.path.join(test_dir, doc["stdin"])
@@ -372,15 +372,14 @@ class TestCase:
             return "skipped", None
 
         compiler_process = subprocess.Popen(
-            [GLOBAL_OPTIONS.o10c_path, "-c", self.config.source_path],
+            [GLOBAL_OPTIONS.o10c_path, "-c", "--output={}".format(self.config.run.actual_assembly_path), self.config.source_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
 
-        compiler_process.communicate()
+        stdout, stderr = compiler_process.communicate()
 
         if compiler_process.returncode is not None and compiler_process.returncode != 0:
-            stdout, stderr = compiler_process.communicate()
             msg = ("Compilation failed:\n"
                    "stdout:\n"
                    "{}\n"
@@ -395,10 +394,9 @@ class TestCase:
             stderr=subprocess.PIPE
         )
 
-        compiler_process.communicate()
+        stdout, stderr = compiler_process.communicate()
 
         if compiler_process.returncode is not None and compiler_process.returncode != 0:
-            stdout, stderr = compiler_process.communicate()
             msg = ("Link failed:\n"
                    "stdout:\n"
                    "{}\n"

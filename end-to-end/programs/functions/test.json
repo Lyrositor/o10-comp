@@ -1,4 +1,21 @@
 {
   "source": "main.c",
-  "skip": true
+  "ast": {
+    "actual-json": "ast.actual.json",
+    "expected-json": "ast.expected.json"
+  },
+  "ir": {
+    "actual-dot": "ir.actual.dot",
+    "actual-png": "ir.actual.png"
+  },
+  "run": {
+    "actual-assembly": "main.actual.asm",
+    "expected-assembly": "main.expected.asm",
+    "executable": "main.o10c",
+    "actual-stdout": "run.actual.stdout",
+    "actual-stderr": "run.actual.stderr",
+    "expected-stdout": "run.expected.stdout",
+    "expected-stderr": "run.expected.stderr",
+    "return-code": 30
+  }
 }

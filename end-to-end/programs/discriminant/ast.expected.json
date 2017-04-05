@@ -34,8 +34,12 @@
                   }
                 },
                 "initial_value": {
-                  "node_type": "Int64Literal",
-                  "value": 2
+                  "node_type": "UnaryExpression",
+                  "op": "UnaryMinus",
+                  "expression": {
+                    "node_type": "Int64Literal",
+                    "value": 2
+                  }
                 }
               }
             ]
@@ -91,7 +95,7 @@
                 },
                 "initial_value": {
                   "node_type": "Int64Literal",
-                  "value": 3
+                  "value": 1
                 }
               }
             ]

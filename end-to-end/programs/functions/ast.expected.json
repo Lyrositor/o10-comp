@@ -1,0 +1,107 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "int64_t"
+        }
+      },
+      "parameters": [
+        {
+          "node_type": "NamedParameter",
+          "data_type": {
+            "node_type": "IdentifierDataType",
+            "identifier": {
+              "node_type": "Identifier",
+              "name": "int32_t"
+            }
+          },
+          "declarator": {
+            "node_type": "IdentifierDeclarator",
+            "identifier": {
+              "node_type": "Identifier",
+              "name": "a"
+            }
+          }
+        },
+        {
+          "node_type": "NamedParameter",
+          "data_type": {
+            "node_type": "IdentifierDataType",
+            "identifier": {
+              "node_type": "Identifier",
+              "name": "int32_t"
+            }
+          },
+          "declarator": {
+            "node_type": "IdentifierDeclarator",
+            "identifier": {
+              "node_type": "Identifier",
+              "name": "b"
+            }
+          }
+        }
+      ],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "ReturnStatement",
+            "expression": {
+              "node_type": "BinaryExpression",
+              "op": "+",
+              "left": {
+                "node_type": "Identifier",
+                "name": "a"
+              },
+              "right": {
+                "node_type": "Identifier",
+                "name": "b"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "int64_t"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "ReturnStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "add"
+              },
+              "arguments": [
+                {
+                  "node_type": "Int64Literal",
+                  "value": 10
+                },
+                {
+                  "node_type": "Int64Literal",
+                  "value": 20
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
