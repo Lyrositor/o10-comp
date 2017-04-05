@@ -20,6 +20,11 @@ class IdentifiersTable {
   std::map<const void*, size_t> identifers_map;
 };
 
+void EmitVariableOperand(const VariableOperand &node, std::ostream &out, IdentifiersTable &it);
+void EmitIndirectOperand(const IndirectOperand &node, std::ostream &out, IdentifiersTable &it);
+void EmitOperand(const Operand &node, std::ostream &out, IdentifiersTable &it);
+void EmitConstantOperand(const ConstantOperand &node, std::ostream &out);
+std::string BinaryOperatorToString(const BinOp::BinaryOperator &node);
 void EmitOp(const Op &node, std::ostream &out);
 void EmitBasicBlock(const BasicBlock &node, std::ostream &out);
 std::string BasicBlockToString(const BasicBlock &node);

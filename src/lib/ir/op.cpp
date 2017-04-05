@@ -14,6 +14,12 @@ Operand::Operand(Type operand_type) : operand_type(operand_type) {
 Operand::~Operand() {
 }
 
+WritableOperand::WritableOperand(Type operand_type) : Operand(operand_type) {
+}
+
+WritableOperand::~WritableOperand() {
+}
+
 std::unique_ptr<VariableOperand> VariableOperand::Create(const std::shared_ptr<const Variable> variable) {
   return std::unique_ptr<VariableOperand>(new VariableOperand(variable));
 }
@@ -21,7 +27,7 @@ std::unique_ptr<VariableOperand> VariableOperand::Create(const std::shared_ptr<c
 VariableOperand::VariableOperand(
   const std::shared_ptr<const Variable> variable
 ) :
-  Operand(Type::Variable),
+  WritableOperand(Type::Variable),
   variable(variable) {
 }
 
@@ -36,6 +42,20 @@ ConstantOperand::ConstantOperand(int64_t value) : Operand(Type::Constant), value
 }
 
 ConstantOperand::~ConstantOperand() {
+}
+
+std::unique_ptr<IndirectOperand> IndirectOperand::Create(
+  const std::shared_ptr<const Operand> address) {
+  return std::unique_ptr<IndirectOperand>(new IndirectOperand(address));
+}
+
+IndirectOperand::IndirectOperand(
+  const std::shared_ptr<const Operand> address
+) :
+  WritableOperand(Type::Indirect), address(address) {
+}
+
+IndirectOperand::~IndirectOperand() {
 }
 
 std::unique_ptr<CallOp> CallOp::Create(
@@ -60,7 +80,7 @@ CallOp::~CallOp() {
 }
 
 std::unique_ptr<BinOp> BinOp::Create(
-  std::shared_ptr<VariableOperand> out,
+  std::shared_ptr<WritableOperand> out,
   BinaryOperator binaryOperator,
   std::shared_ptr<Operand> in1,
   std::shared_ptr<Operand> in2) {
@@ -68,7 +88,7 @@ std::unique_ptr<BinOp> BinOp::Create(
 }
 
 BinOp::BinOp(
-  std::shared_ptr<VariableOperand> out,
+  std::shared_ptr<WritableOperand> out,
   BinaryOperator binaryOperator,
   std::shared_ptr<Operand> in1,
   std::shared_ptr<Operand> in2
@@ -83,13 +103,13 @@ BinOp::BinOp(
 BinOp::~BinOp() {
 }
 
-std::unique_ptr<UnaryOp> UnaryOp::Create(std::shared_ptr<VariableOperand> out,
+std::unique_ptr<UnaryOp> UnaryOp::Create(std::shared_ptr<WritableOperand> out,
                                          UnaryOp::UnaryOperator unaryOperator,
                                          std::shared_ptr<Operand> in1) {
   return std::unique_ptr<UnaryOp>(new UnaryOp(out, unaryOperator, in1));
 }
 
-UnaryOp::UnaryOp(std::shared_ptr<VariableOperand> out,
+UnaryOp::UnaryOp(std::shared_ptr<WritableOperand> out,
                  UnaryOp::UnaryOperator unaryOperator,
                  std::shared_ptr<Operand> in1
 ) :
@@ -118,12 +138,12 @@ CastOp::CastOp(
 CastOp::~CastOp() {
 }
 
-std::unique_ptr<CopyOp> CopyOp::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
+std::unique_ptr<CopyOp> CopyOp::Create(std::shared_ptr<WritableOperand> out, std::shared_ptr<Operand> in) {
   return std::unique_ptr<CopyOp>(new CopyOp(out, in));
 }
 
 CopyOp::CopyOp(
-  std::shared_ptr<VariableOperand> out,
+  std::shared_ptr<WritableOperand> out,
   std::shared_ptr<Operand> in
 ) :
   Op(Op::Type::CopyOp),

@@ -4,24 +4,13 @@
 #include <vector>
 #include "variable.h"
 
-
-
 namespace comp{
 namespace ir {
-//enum class RegisterType {
-//  Int8,
-//  Int16,
-//  Int32,
-//  Int64,
-//  Address,
-//  Float32,
-//  Float64,
-//};
-
 struct Operand {
   enum class Type {
     Variable,
-    Constant
+    Constant,
+    Indirect
   };
   Operand(Type operand_type);
 
@@ -30,7 +19,12 @@ struct Operand {
   const Type operand_type;
 };
 
-struct VariableOperand final: Operand {
+struct WritableOperand: Operand {
+  WritableOperand(Type operand_type);
+  virtual ~WritableOperand() = 0;
+};
+
+struct VariableOperand final: WritableOperand {
   static std::unique_ptr<VariableOperand> Create(const std::shared_ptr<const Variable> variable);
   VariableOperand(const std::shared_ptr<const Variable> variable);
   ~VariableOperand();
@@ -42,6 +36,23 @@ struct ConstantOperand final: Operand {
   ConstantOperand(int64_t value);
   ~ConstantOperand();
   int64_t value;
+};
+
+/**
+ * This operand represents an indirect memory access.
+ * ```
+ * a := Copy(IndirectOperand(b));
+ * ```
+ *
+ * `a` receives the value at the memory address `b`.
+ */
+struct IndirectOperand final: WritableOperand {
+  static std::unique_ptr<IndirectOperand> Create(
+    const std::shared_ptr<const Operand> address);
+  IndirectOperand(
+    const std::shared_ptr<const Operand> address);
+  ~IndirectOperand();
+  const std::shared_ptr<const Operand> address;
 };
 
 struct Op {
@@ -99,11 +110,11 @@ struct BinOp final : public Op {
     Subtraction // left - right
   };
 
-  static std::unique_ptr<BinOp> Create(std::shared_ptr<VariableOperand> out, BinaryOperator binaryOperator, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
-  BinOp(std::shared_ptr<VariableOperand> out, BinaryOperator binaryOperator, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
+  static std::unique_ptr<BinOp> Create(std::shared_ptr<WritableOperand> out, BinaryOperator binaryOperator, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
+  BinOp(std::shared_ptr<WritableOperand> out, BinaryOperator binaryOperator, std::shared_ptr<Operand> in1, std::shared_ptr<Operand> in2);
   virtual ~BinOp();
 
-  std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<WritableOperand> out;
   BinaryOperator binary_operator;
   std::shared_ptr<Operand> in1;
   std::shared_ptr<Operand> in2;
@@ -119,11 +130,11 @@ struct UnaryOp final : public Op {
     UnaryMinus, // -expression
   };
 
-  static std::unique_ptr<UnaryOp> Create(std::shared_ptr<VariableOperand> out, UnaryOperator unaryOperator, std::shared_ptr<Operand> in1);
-  UnaryOp(std::shared_ptr<VariableOperand> out, UnaryOperator unaryOperator, std::shared_ptr<Operand> in1);
+  static std::unique_ptr<UnaryOp> Create(std::shared_ptr<WritableOperand> out, UnaryOperator unaryOperator, std::shared_ptr<Operand> in1);
+  UnaryOp(std::shared_ptr<WritableOperand> out, UnaryOperator unaryOperator, std::shared_ptr<Operand> in1);
   virtual ~UnaryOp();
 
-  std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<WritableOperand> out;
   UnaryOperator unary_operator;
   std::shared_ptr<Operand> in1;
 };
@@ -144,11 +155,11 @@ struct CastOp final : public Op {
  * Copy the value from `in` to `out`.
  */
 struct CopyOp final : public Op {
-  static std::unique_ptr<CopyOp> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
-  CopyOp(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
+  static std::unique_ptr<CopyOp> Create(std::shared_ptr<WritableOperand> out, std::shared_ptr<Operand> in);
+  CopyOp(std::shared_ptr<WritableOperand> out, std::shared_ptr<Operand> in);
   virtual ~CopyOp();
 
-  std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<WritableOperand> out;
   std::shared_ptr<Operand> in;
 };
 

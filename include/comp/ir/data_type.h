@@ -117,6 +117,7 @@ class PointerDataType final : public DataType {
 
   ~PointerDataType();
 
+  std::shared_ptr<const DataType> GetItemType() const;
   bool IsCastableFrom(const DataType &other) const;
   std::unique_ptr<DataType> GetCommonType(const DataType &other) const;
   bool operator==(const DataType& other) const;

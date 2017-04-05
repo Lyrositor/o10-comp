@@ -54,7 +54,7 @@ std::shared_ptr<Operand> BuildRExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block);
 
-std::shared_ptr<VariableOperand> BuildLExpressionIR(
+std::shared_ptr<WritableOperand> BuildLExpressionIR(
   const std::shared_ptr<ast::LExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
@@ -87,6 +87,13 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
 std::shared_ptr<Operand> BuildConditionalExpressionIR(
   const std::shared_ptr<ast::ConditionalExpression> node,
   ir::Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+);
+
+std::shared_ptr<IndirectOperand> BuildSubscriptExpressionIR(
+  const std::shared_ptr<ast::SubscriptExpression> node,
+  Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 );

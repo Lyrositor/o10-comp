@@ -153,7 +153,11 @@ std::shared_ptr<const DataType> ResolveDeclaratorType(const std::shared_ptr<cons
       if (arrayDeclarator.size == nullptr) {
         return PointerDataType::Create(item_type);
       } else {
-        throw std::runtime_error("Cannot specify size");
+        if (arrayDeclarator.size->node_type != ast::Node::Type::Int64Literal) {
+          throw std::runtime_error("Not-implemented: Fixed-size array declaration with non-literal size");
+        }
+        int64_t array_size = std::static_pointer_cast<ast::Int64Literal>(arrayDeclarator.size)->value;
+        return ArrayDataType::Create(item_type, size_t(array_size));
       }
     }
     case ast::Node::Type::IdentifierDeclarator: {
@@ -184,12 +188,10 @@ std::shared_ptr<const DataType> ResolveParameterType(const ast::Parameter &param
 std::string ResolveDeclaratorName(const ast::Declarator &declarator) {
   switch (declarator.node_type) {
     case ast::Node::Type::ArrayDeclarator: {
-      return ResolveDeclaratorName(declarator);
+      return ResolveDeclaratorName(*static_cast<const ast::ArrayDeclarator &>(declarator).declarator);
     }
     case ast::Node::Type::IdentifierDeclarator: {
-      const ast::IdentifierDeclarator
-        &identifierDeclarator = static_cast<const ast::IdentifierDeclarator &>(declarator);
-      return identifierDeclarator.identifier->name;
+      return static_cast<const ast::IdentifierDeclarator &>(declarator).identifier->name;
     }
     default: {
       throw std::runtime_error("Unexpected node type in `ResolveDeclaratorName`");
@@ -349,6 +351,20 @@ const std::shared_ptr<const DataType> GetOperandType(const Operand &operand) {
     case Operand::Type::Variable: {
       return static_cast<const VariableOperand &>(operand).variable->GetDataType();
     }
+    case Operand::Type::Indirect: {
+      std::shared_ptr<const DataType> base_type = GetOperandType(*static_cast<const IndirectOperand &>(operand).address);
+        switch(base_type->GetType()){
+          case DataType::Type::Array: {
+            return std::static_pointer_cast<const ArrayDataType>(base_type)->GetItemType();
+          }
+          case DataType::Type::Pointer: {
+            return std::static_pointer_cast<const PointerDataType>(base_type)->GetItemType();
+          }
+          default: {
+            throw std::domain_error("Unexpected value for `base_type->GetType()` in `GetOperandType`");
+          }
+        }
+    }
     case Operand::Type::Constant: {
       return GetInt64Type();
     }
@@ -403,6 +419,13 @@ std::shared_ptr<Operand> BuildRExpressionIR(
         std::dynamic_pointer_cast<ast::Int64Literal>(node),
         context);
     }
+    case ast::Node::Type::SubscriptExpression: {
+      return BuildSubscriptExpressionIR(
+        std::dynamic_pointer_cast<ast::SubscriptExpression>(node),
+        context,
+        cfg,
+        current_block);
+    }
     case ast::Node::Type::Uint8Literal: {
       return BuildUint8LiteralIR(
         std::dynamic_pointer_cast<ast::Uint8Literal>(node),
@@ -422,7 +445,7 @@ std::shared_ptr<Operand> BuildRExpressionIR(
   }
 }
 
-std::shared_ptr<VariableOperand> BuildLExpressionIR(
+std::shared_ptr<WritableOperand> BuildLExpressionIR(
   const std::shared_ptr<ast::LExpression> node,
   Context &context,
   std::shared_ptr<ControlFlowGraph> &cfg,
@@ -433,6 +456,13 @@ std::shared_ptr<VariableOperand> BuildLExpressionIR(
       return BuildIdentifierIR(
         std::dynamic_pointer_cast<ast::Identifier>(node),
         context);
+    }
+    case ast::Node::Type::SubscriptExpression: {
+      return BuildSubscriptExpressionIR(
+        std::dynamic_pointer_cast<ast::SubscriptExpression>(node),
+        context,
+        cfg,
+        current_block);
     }
     default: {
       throw std::domain_error(
@@ -447,7 +477,7 @@ std::shared_ptr<Operand> BuildAssignmentExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  const std::shared_ptr<VariableOperand> left = BuildLExpressionIR(node->left, context, cfg, current_block);
+  const std::shared_ptr<WritableOperand> left = BuildLExpressionIR(node->left, context, cfg, current_block);
   std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
   const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
   const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
@@ -773,6 +803,65 @@ std::shared_ptr<VariableOperand> BuildIdentifierIR(
   Context &context
 ) {
   return VariableOperand::Create(context.ResolveVariable(node->name));
+}
+
+std::shared_ptr<IndirectOperand> BuildSubscriptExpressionIR(
+  const std::shared_ptr<ast::SubscriptExpression> node,
+  Context &context,
+  std::shared_ptr<ControlFlowGraph> &cfg,
+  std::shared_ptr<BasicBlock> &current_block
+) {
+  std::shared_ptr<Operand> base_operand = BuildRExpressionIR(node->array, context, cfg, current_block);
+  std::shared_ptr<Operand> offset_operand = BuildRExpressionIR(node->index, context, cfg, current_block);
+
+  if (base_operand->operand_type == Operand::Type::Indirect) {
+    throw std::runtime_error("Not implemented: chained indirections");
+  }
+
+  std::shared_ptr<const DataType> base_type = GetOperandType(*base_operand);
+  std::shared_ptr<const DataType> offset_type = GetOperandType(*offset_operand);
+  std::shared_ptr<const DataType> item_type;
+
+  switch(base_type->GetType()) {
+    case DataType::Type::Array: {
+      item_type = std::static_pointer_cast<const ArrayDataType>(base_type)->GetItemType();
+      break;
+    }
+    case DataType::Type::Pointer: {
+      item_type = std::static_pointer_cast<const PointerDataType>(base_type)->GetItemType();
+      break;
+    }
+    default: {
+      throw std::domain_error("Unexpected value for `GetOperandType(base_operand)` in `BuildSubscriptExpressionIR`.");
+    }
+  }
+
+  // Normalize base to a pointer
+  std::shared_ptr<const DataType> pointer_type = PointerDataType::Create(item_type);
+  if (*base_type != *pointer_type) {
+    if(base_type->IsCastableTo(*pointer_type)) {
+      const std::shared_ptr<VariableOperand> casted_base = VariableOperand::Create(context.CreateVariable(pointer_type));
+      current_block->Push(CastOp::Create(casted_base, base_operand));
+      base_operand = casted_base;
+    } else {
+      throw std::runtime_error("Unable to cast to valid pointer");
+    }
+  }
+  // Normalize offset to usize
+  std::shared_ptr<const DataType> usize_type = GetInt64Type();
+  if (*offset_type != *usize_type) {
+    if(offset_type->IsCastableTo(*usize_type)) {
+      const std::shared_ptr<VariableOperand> casted_offset = VariableOperand::Create(context.CreateVariable(usize_type));
+      current_block->Push(CastOp::Create(casted_offset, offset_operand));
+      offset_operand = casted_offset;
+    } else {
+      throw std::runtime_error("Unable to cast to usize");
+    }
+  }
+
+  std::shared_ptr<VariableOperand> resolved_address = VariableOperand::Create(context.CreateVariable(pointer_type));
+  current_block->Push(BinOp::Create(resolved_address, BinOp::BinaryOperator::Addition, base_operand, offset_operand));
+  return IndirectOperand::Create(resolved_address);
 }
 
 std::shared_ptr<Operand> BuildInt64LiteralIR(

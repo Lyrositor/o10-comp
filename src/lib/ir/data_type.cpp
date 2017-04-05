@@ -245,8 +245,22 @@ PointerDataType::PointerDataType(std::shared_ptr<const DataType> pointed_type) :
 PointerDataType::~PointerDataType() {
 }
 
+std::shared_ptr<const DataType> PointerDataType::GetItemType() const {
+  return this->pointed_type_;
+}
+
 bool PointerDataType::IsCastableFrom(const DataType &other) const {
-  return *this == other;
+  switch (other.GetType()) {
+    case Type::Pointer: {
+      return *this == other; // TODO: Better casts when `void` is involved ?
+    }
+    case Type::Array: {
+      return *static_cast<const ArrayDataType &>(other).GetItemType() == *this->pointed_type_;
+    }
+    default: {
+      return false;
+    }
+  }
 }
 
 std::unique_ptr<DataType> PointerDataType::GetCommonType(const DataType &other) const {

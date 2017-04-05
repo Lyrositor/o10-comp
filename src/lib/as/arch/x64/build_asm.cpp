@@ -69,7 +69,7 @@ static const std::shared_ptr<ast::RegisterOperand>
 // Define the registers to be used to pass parameters
 static const std::vector<std::shared_ptr<ast::RegisterOperand>>
 #ifdef WIN32
-  kParameterRegisters = {RCX, RDX, R8, R9};
+kParameterRegisters = {RCX, RDX, R8, R9};
 #else
   kParameterRegisters = {RDI, RSI, RDX, RCX, R8, R9};
 #endif
@@ -111,7 +111,7 @@ void BuildFunction(
   // added to the function stack.
   // All subsequent parameters are pushed on to the stack before the return
   // address and the old RBP (in right-to-left order).
-  int64_t param_stack = kRegisterQSize*2;
+  int64_t param_stack = kRegisterQSize * 2;
   int64_t stack = 0;
   std::vector<std::shared_ptr<ast::Instruction>> param_copies;
   for (size_t idx = 0; idx < params.size(); idx++) {
@@ -128,7 +128,7 @@ void BuildFunction(
       address = ast::MemoryReference::Create(
         RBP, ast::BigIntegerLiteral::Create(-stack));
 #endif  // WIN32
-      param_copies.push_back(INSTR(MOVQ, {kParameterRegisters[idx], address}));
+      param_copies.push_back(INSTR(MOVQ, { kParameterRegisters[idx], address }));
     } else {
       address = ast::MemoryReference::Create(
         RBP, ast::BigIntegerLiteral::Create(param_stack));
@@ -160,8 +160,8 @@ void BuildFunction(
   body.insert(body.end(), {
     ast::GlobalDirective::Create(symbol),
     ast::EmptyStatement::Create({symbol}),
-    INSTR(PUSHQ, {RBP}),
-    INSTR(MOVQ, {RSP, RBP})
+    INSTR(PUSHQ, { RBP }),
+    INSTR(MOVQ, { RSP, RBP })
   });
   body.push_back(INSTR(SUBQ, stack, RSP));
 
@@ -261,79 +261,65 @@ void BuildBinOp(
   auto source1 = BuildOperand(op->in1, variables_table);
   auto source2 = BuildOperand(op->in2, variables_table);
   auto destination = BuildOperand(op->out, variables_table);
-  body.push_back(INSTR(MOVQ, {source1, RAX}));
+  body.push_back(INSTR(MOVQ, { source1, RAX }));
   switch (op->binary_operator) {
-    case ir::BinOp::BinaryOperator::Addition:
-      body.push_back(INSTR(ADDQ, {source2, RAX}));
+    case ir::BinOp::BinaryOperator::Addition:body.push_back(INSTR(ADDQ, { source2, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::BitwiseAnd:
-      body.push_back(INSTR(ANDQ, {source2, RAX}));
+    case ir::BinOp::BinaryOperator::BitwiseAnd:body.push_back(INSTR(ANDQ, { source2, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::BitwiseOr:
-      body.push_back(INSTR(ORQ, {source2, RAX}));
+    case ir::BinOp::BinaryOperator::BitwiseOr:body.push_back(INSTR(ORQ, { source2, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::BitwiseXor:
-      body.push_back(INSTR(XORQ, {source2, RAX}));
+    case ir::BinOp::BinaryOperator::BitwiseXor:body.push_back(INSTR(XORQ, { source2, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::Division:
-      body.push_back(INSTR(CQTO));
-      body.push_back(INSTR(IDIVQ, {source2}));
+    case ir::BinOp::BinaryOperator::Division:body.push_back(INSTR(CQTO));
+      body.push_back(INSTR(IDIVQ, { source2 }));
       break;
-    case ir::BinOp::BinaryOperator::Equality:
-      body.push_back(INSTR(CMPQ, {source2, RAX}));
-      body.push_back(INSTR(SETE, {AL}));
-      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+    case ir::BinOp::BinaryOperator::Equality:body.push_back(INSTR(CMPQ, { source2, RAX }));
+      body.push_back(INSTR(SETE, { AL }));
+      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::GreaterThan:
-      body.push_back(INSTR(CMPQ, {source2, RAX}));
-      body.push_back(INSTR(SETG, {AL}));
-      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+    case ir::BinOp::BinaryOperator::GreaterThan:body.push_back(INSTR(CMPQ, { source2, RAX }));
+      body.push_back(INSTR(SETG, { AL }));
+      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::GreaterThanOrEqual:
-      body.push_back(INSTR(CMPQ, {source2, RAX}));
-      body.push_back(INSTR(SETGE, {AL}));
-      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+    case ir::BinOp::BinaryOperator::GreaterThanOrEqual:body.push_back(INSTR(CMPQ, { source2, RAX }));
+      body.push_back(INSTR(SETGE, { AL }));
+      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::Inequality:
-      body.push_back(INSTR(CMPQ, {source2, RAX}));
-      body.push_back(INSTR(SETNE, {AL}));
-      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
+    case ir::BinOp::BinaryOperator::Inequality:body.push_back(INSTR(CMPQ, { source2, RAX }));
+      body.push_back(INSTR(SETNE, { AL }));
+      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::LeftShift:
-      body.push_back(INSTR(MOVQ, {source2, RCX}));
-      body.push_back(INSTR(SALQ, {CL, RAX}));
+    case ir::BinOp::BinaryOperator::LeftShift:body.push_back(INSTR(MOVQ, { source2, RCX }));
+      body.push_back(INSTR(SALQ, { CL, RAX }));
       break;
     case ir::BinOp::BinaryOperator::LessThan:
       body.insert(body.end(), {
-        INSTR(CMPQ, {source2, RAX}),
-        INSTR(SETL, {AL}),
-        INSTR(MOVZBQ, {AL, RAX})
+        INSTR(CMPQ, { source2, RAX }),
+        INSTR(SETL, { AL }),
+        INSTR(MOVZBQ, { AL, RAX })
       });
       break;
     case ir::BinOp::BinaryOperator::LessThanOrEqualTo:
       body.insert(body.end(), {
-        INSTR(CMPQ, {source2, RAX}),
-        INSTR(SETLE, {AL}),
-        INSTR(MOVZBQ, {AL, RAX})
+        INSTR(CMPQ, { source2, RAX }),
+        INSTR(SETLE, { AL }),
+        INSTR(MOVZBQ, { AL, RAX })
       });
       break;
-    case ir::BinOp::BinaryOperator::Multiplication:
-      body.push_back(INSTR(IMULQ, {source2, RAX}));
+    case ir::BinOp::BinaryOperator::Multiplication:body.push_back(INSTR(IMULQ, { source2, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::Subtraction:
-      body.push_back(INSTR(SUBQ, {source2, RAX}));
+    case ir::BinOp::BinaryOperator::Subtraction:body.push_back(INSTR(SUBQ, { source2, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::Remainder:
-      body.push_back(INSTR(CQTO));
-      body.push_back(INSTR(IDIVQ, {source2}));
-      body.push_back(INSTR(MOVQ, {RDX, RAX}));
+    case ir::BinOp::BinaryOperator::Remainder:body.push_back(INSTR(CQTO));
+      body.push_back(INSTR(IDIVQ, { source2 }));
+      body.push_back(INSTR(MOVQ, { RDX, RAX }));
       break;
-    case ir::BinOp::BinaryOperator::RightShift:
-      body.push_back(INSTR(MOVQ, {source2, RCX}));
-      body.push_back(INSTR(SARQ, {CL, RAX}));
+    case ir::BinOp::BinaryOperator::RightShift:body.push_back(INSTR(MOVQ, { source2, RCX }));
+      body.push_back(INSTR(SARQ, { CL, RAX }));
       break;
   }
-  body.push_back(INSTR(MOVQ, {RAX, destination}));
+  body.push_back(INSTR(MOVQ, { RAX, destination }));
 }
 
 void BuildCallOp(
@@ -364,15 +350,18 @@ void BuildCallOp(
         source = variables_table.Get(variable);
         break;
       }
+      default: {
+        throw std::runtime_error("Unexpected value for `op->args[idx]->operand_type` in `BuildCallOp`");
+      }
     }
 
     if (idx < kParameterRegisters.size()) {
       // Copy the parameter's value to its destination register
       std::shared_ptr<ast::Operand> destination = kParameterRegisters[idx];
-      param_setup.push_back(INSTR(MOVQ, {source, destination}));
+      param_setup.push_back(INSTR(MOVQ, { source, destination }));
     } else {
       // Push the parameter's value to a location on the stack
-      param_setup.push_back(INSTR(PUSHQ, {source}));
+      param_setup.push_back(INSTR(PUSHQ, { source }));
 //     stack_size += data_type_size; TODO(Lyrositor) Use the appropriate size
       stack_size += kRegisterQSize;
     }
@@ -394,22 +383,22 @@ void BuildCallOp(
 #endif  // WIN32
   body.push_back(
     INSTR(
-    CALLQ,
-    {
-      ast::AddressOperand::Create(
-        ast::GlobalSymbol::Create(op->function->GetName()))
-    }));
+      CALLQ,
+      {
+        ast::AddressOperand::Create(
+          ast::GlobalSymbol::Create(op->function->GetName()))
+      }));
 
   // Restore the stack to its previous state, if parameters were passed on the
   // stack
   if (stack_size > 0) {
     body.push_back(
-      INSTR(ADDQ, {ast::ImmediateOperand::Create(stack_size), RSP}));
+      INSTR(ADDQ, { ast::ImmediateOperand::Create(stack_size), RSP }));
   }
 
   // Store the return value
   auto destination = BuildOperand(op->out, variables_table);
-  body.push_back(INSTR(MOVQ, {RAX, destination}));
+  body.push_back(INSTR(MOVQ, { RAX, destination }));
 }
 
 void BuildCopyOp(
@@ -423,10 +412,10 @@ void BuildCopyOp(
   // Introduce an intermediary register if this is a copy from memory to memory
   if (source->node_type == ast::Node::Type::MemoryReference &&
     destination->node_type == ast::Node::Type::MemoryReference) {
-    body.push_back(INSTR(MOVQ, {source, RAX}));
-    body.push_back(INSTR(MOVQ, {RAX, destination}));
+    body.push_back(INSTR(MOVQ, { source, RAX }));
+    body.push_back(INSTR(MOVQ, { RAX, destination }));
   } else {
-    body.push_back(INSTR(MOVQ, {source, destination}));
+    body.push_back(INSTR(MOVQ, { source, destination }));
   }
 }
 
@@ -448,7 +437,7 @@ void BuildReturnOp(
 ) {
   // Return the value if this is a typed return
   if (op->in != nullptr) {
-    body.push_back(INSTR(MOVQ, {BuildOperand(op->in, variables_table), RAX}));
+    body.push_back(INSTR(MOVQ, { BuildOperand(op->in, variables_table), RAX }));
   }
 
   // Epilog
@@ -469,20 +458,20 @@ void BuildUnaryOp(
     case ir::UnaryOp::UnaryOperator::BitwiseComplement:
       body.insert(
         body.end(),
-        {INSTR(MOVQ, {source, RAX}), INSTR(NOTQ, {RAX})});
+        {INSTR(MOVQ, { source, RAX }), INSTR(NOTQ, { RAX })});
       break;
     case ir::UnaryOp::UnaryOperator::LogicalNegation:
       body.insert(
         body.end(),
-        {INSTR(CMPQ, 0, source), INSTR(SETE, {AL}), INSTR(MOVZBQ, {AL, RAX})});
+        {INSTR(CMPQ, 0, source), INSTR(SETE, { AL }), INSTR(MOVZBQ, { AL, RAX })});
       break;
     case ir::UnaryOp::UnaryOperator::UnaryMinus:
       body.insert(
         body.end(),
-        {INSTR(MOVQ, {source, RAX}), INSTR(NEGQ, {RAX})});
+        {INSTR(MOVQ, { source, RAX }), INSTR(NEGQ, { RAX })});
       break;
   }
-  body.push_back(INSTR(MOVQ, {RAX, destination}));
+  body.push_back(INSTR(MOVQ, { RAX, destination }));
 }
 
 std::shared_ptr<ast::Operand> BuildOperand(
@@ -490,12 +479,17 @@ std::shared_ptr<ast::Operand> BuildOperand(
   VariablesTable &variables_table
 ) {
   switch (op->operand_type) {
-    case ir::Operand::Type::Variable:
+    case ir::Operand::Type::Variable: {
       return variables_table.Get(
         std::static_pointer_cast<ir::VariableOperand>(op)->variable);
-    case ir::Operand::Type::Constant:
+    }
+    case ir::Operand::Type::Constant: {
       return ast::ImmediateOperand::Create(
         std::static_pointer_cast<ir::ConstantOperand>(op)->value);
+    }
+    default: {
+      throw std::runtime_error("Unexpected value for `op->args[idx]->operand_type` in `BuildCallOp`");
+    }
   }
 }
 }  // namespace x64

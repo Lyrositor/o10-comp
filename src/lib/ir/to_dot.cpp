@@ -38,6 +38,12 @@ void EmitVariableOperand(const VariableOperand &node, std::ostream &out, Identif
   out << "var" << it.GetVariableIdentifier(*node.variable.get());
 }
 
+void EmitIndirectOperand(const IndirectOperand &node, std::ostream &out, IdentifiersTable &it) {
+  out << "*(";
+  EmitOperand(*node.address, out, it);
+  out << ")";
+}
+
 void EmitConstantOperand(const ConstantOperand &node, std::ostream &out) {
   out << node.value;
 }
@@ -46,6 +52,10 @@ void EmitOperand(const Operand &node, std::ostream &out, IdentifiersTable &it) {
   switch (node.operand_type) {
     case Operand::Type::Variable: {
       EmitVariableOperand(static_cast<const VariableOperand &>(node), out, it);
+      break;
+    }
+    case Operand::Type::Indirect: {
+      EmitIndirectOperand(static_cast<const IndirectOperand &>(node), out, it);
       break;
     }
     case Operand::Type::Constant: {
@@ -83,7 +93,7 @@ std::string BinaryOperatorToString(const BinOp::BinaryOperator &node) {
 }
 
 void EmitBinOp(const BinOp &node, std::ostream &out, IdentifiersTable &it) {
-  EmitVariableOperand(*node.out, out, it);
+  EmitOperand(*node.out, out, it);
   out << " := " << BinaryOperatorToString(node.binary_operator) << "(";
   EmitOperand(*node.in1, out, it);
   out << ", ";
@@ -99,7 +109,7 @@ void EmitCastOp(const CastOp &node, std::ostream &out, IdentifiersTable &it) {
 }
 
 void EmitCopyOp(const CopyOp &node, std::ostream &out, IdentifiersTable &it) {
-  EmitVariableOperand(*node.out, out, it);
+  EmitOperand(*node.out, out, it);
   out << " := Copy(";
   EmitOperand(*node.in, out, it);
   out << ");";
@@ -141,7 +151,7 @@ std::string UnaryOperatorToString(const UnaryOp::UnaryOperator &node) {
 }
 
 void EmitUnaryOp(const UnaryOp &node, std::ostream &out, IdentifiersTable &it) {
-  EmitVariableOperand(*node.out, out, it);
+  EmitOperand(*node.out, out, it);
   out << " := " << UnaryOperatorToString(node.unary_operator) << "(";
   EmitOperand(*node.in1, out,it);
   out << ");";
