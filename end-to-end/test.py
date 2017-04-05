@@ -414,6 +414,8 @@ class TestCase:
         )
 
         stdout, stderr = process.communicate()
+        stdout = stdout.replace(b"\r\n", b"\n")
+        stderr = stderr.replace(b"\r\n", b"\n")
 
         if self.config.run.actual_stdout_path is not None:
             with open(self.config.run.actual_stdout_path, "w") as actual_stdout_file:
