@@ -21,6 +21,15 @@ class DataType {
 
   Type GetType() const;
 
+  /**
+   * Returns true if a value of type `this` can be casted from a value of type `other`.
+   */
+  virtual bool IsCastableFrom(const DataType &other) const = 0;
+  bool IsCastableTo(const DataType &other) const;
+  virtual std::unique_ptr<DataType> GetCommonType(const DataType &other) const = 0;
+  virtual bool operator==(const DataType &other) const = 0;
+  bool operator!=(const DataType &other) const;
+
  private:
   const Type type_;
 };
@@ -30,7 +39,11 @@ class VoidDataType final : public DataType {
   static std::unique_ptr<VoidDataType> Create();
 
   VoidDataType();
-  virtual ~VoidDataType();
+  ~VoidDataType();
+
+  bool IsCastableFrom(const DataType &other) const;
+  std::unique_ptr<DataType> GetCommonType(const DataType &other) const;
+  bool operator==(const DataType &other) const;
 };
 
 class IntegerDataType : public DataType {
@@ -45,6 +58,10 @@ class Uint8DataType final : public IntegerDataType {
 
   Uint8DataType();
   virtual ~Uint8DataType();
+
+  bool IsCastableFrom(const DataType &other) const;
+  std::unique_ptr<DataType> GetCommonType(const DataType &other) const;
+  bool operator==(const DataType &other) const;
 };
 
 class Int32DataType final : public IntegerDataType {
@@ -53,6 +70,10 @@ class Int32DataType final : public IntegerDataType {
 
   Int32DataType();
   virtual ~Int32DataType();
+
+  bool IsCastableFrom(const DataType &other) const;
+  std::unique_ptr<DataType> GetCommonType(const DataType &other) const;
+  bool operator==(const DataType &other) const;
 };
 
 class Int64DataType final : public IntegerDataType {
@@ -61,6 +82,10 @@ class Int64DataType final : public IntegerDataType {
 
   Int64DataType();
   virtual ~Int64DataType();
+
+  bool IsCastableFrom(const DataType &other) const;
+  std::unique_ptr<DataType> GetCommonType(const DataType &other) const;
+  bool operator==(const DataType &other) const;
 };
 
 
@@ -74,6 +99,10 @@ class ArrayDataType final : public DataType {
   virtual ~ArrayDataType();
   std::shared_ptr<const DataType> GetItemType() const;
   size_t GetSize() const; // Returns the number of cells in the array
+
+  bool IsCastableFrom(const DataType &other) const;
+  std::unique_ptr<DataType> GetCommonType(const DataType &other) const;
+  bool operator==(const DataType& other) const;
  private:
   const std::shared_ptr<const DataType> item_type_;
   const size_t size_; // Number of cells in the array
@@ -88,6 +117,9 @@ class PointerDataType final : public DataType {
 
   ~PointerDataType();
 
+  bool IsCastableFrom(const DataType &other) const;
+  std::unique_ptr<DataType> GetCommonType(const DataType &other) const;
+  bool operator==(const DataType& other) const;
  private:
   const std::shared_ptr<const DataType> pointed_type_;
 };

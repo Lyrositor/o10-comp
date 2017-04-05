@@ -48,6 +48,7 @@ struct Op {
   enum class Type {
     BinOp,
     CallOp,
+    CastOp,
     CopyOp,
     NoOp,
     ReturnOp,
@@ -125,6 +126,18 @@ struct UnaryOp final : public Op {
   std::shared_ptr<VariableOperand> out;
   UnaryOperator unaryOperator;
   std::shared_ptr<Operand> in1;
+};
+
+/**
+ * Copy the value from `in` to `out`, perform a cast during the copy.
+ */
+struct CastOp final : public Op {
+  static std::unique_ptr<CastOp> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
+  CastOp(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
+  virtual ~CastOp();
+
+  std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<Operand> in;
 };
 
 /**

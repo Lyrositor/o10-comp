@@ -18,7 +18,11 @@ std::unique_ptr<VariableOperand> VariableOperand::Create(const std::shared_ptr<c
   return std::unique_ptr<VariableOperand>(new VariableOperand(variable));
 }
 
-VariableOperand::VariableOperand(const std::shared_ptr<const Variable> variable) : Operand(Type::Variable), variable(variable) {
+VariableOperand::VariableOperand(
+  const std::shared_ptr<const Variable> variable
+) :
+  Operand(Type::Variable),
+  variable(variable) {
 }
 
 VariableOperand::~VariableOperand() {
@@ -34,7 +38,10 @@ ConstantOperand::ConstantOperand(int64_t value) : Operand(Type::Constant), value
 ConstantOperand::~ConstantOperand() {
 }
 
-std::unique_ptr<CallOp> CallOp::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<ir::FunctionSymbol> function, std::vector<std::shared_ptr<Operand>> args) {
+std::unique_ptr<CallOp> CallOp::Create(
+  std::shared_ptr<VariableOperand> out,
+  std::shared_ptr<ir::FunctionSymbol> function,
+  std::vector<std::shared_ptr<Operand>> args) {
   return std::unique_ptr<CallOp>(new CallOp(out, function, args));
 }
 
@@ -95,6 +102,22 @@ UnaryOp::UnaryOp(std::shared_ptr<VariableOperand> out,
 UnaryOp::~UnaryOp() {
 }
 
+std::unique_ptr<CastOp> CastOp::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
+  return std::unique_ptr<CastOp>(new CastOp(out, in));
+}
+
+CastOp::CastOp(
+  std::shared_ptr<VariableOperand> out,
+  std::shared_ptr<Operand> in
+) :
+  Op(Op::Type::CastOp),
+  out(out),
+  in(in) {
+}
+
+CastOp::~CastOp() {
+}
+
 std::unique_ptr<CopyOp> CopyOp::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
   return std::unique_ptr<CopyOp>(new CopyOp(out, in));
 }
@@ -143,7 +166,5 @@ NoOp::~NoOp() {
 std::unique_ptr<NoOp> NoOp::Create() {
   return std::unique_ptr<NoOp>(new NoOp());
 }
-
-
-}
-}
+} // ir
+} // comp

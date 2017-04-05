@@ -69,6 +69,13 @@ void EmitBinOp(const BinOp &node, std::ostream &out) {
   out << ");";
 }
 
+void EmitCastOp(const CastOp &node, std::ostream &out) {
+  EmitVariableOperand(*node.out, out);
+  out << " := Cast(";
+  EmitOperand(*node.in, out);
+  out << ");";
+}
+
 void EmitCopyOp(const CopyOp &node, std::ostream &out) {
   EmitVariableOperand(*node.out, out);
   out << " := Copy(";
@@ -122,6 +129,10 @@ void EmitOp(const Op &node, std::ostream &out) {
   switch (node.op_type) {
     case Op::Type::BinOp: {
       EmitBinOp(static_cast<const BinOp &>(node), out);
+      break;
+    }
+    case Op::Type::CastOp: {
+      EmitCastOp(static_cast<const CastOp &>(node), out);
       break;
     }
     case Op::Type::CopyOp: {

@@ -441,12 +441,18 @@ std::shared_ptr<Operand> BuildAssignmentExpressionIR(
   std::shared_ptr<BasicBlock> &current_block
 ) {
   const std::shared_ptr<VariableOperand> left = BuildLExpressionIR(node->left, context, cfg, current_block);
-  const std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
+  std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
   const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
   const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
 
-  if (left_type->GetType() != right_type->GetType()) { // TODO: Deep equality
-    throw std::runtime_error("Mismatched types for left and right operands in `BuildAssignmentExpressionIR`");
+  if (!right_type->IsCastableTo(*left_type)) {
+    throw std::runtime_error("Unable to cast type of right operand to type of left operand in `BuildAssignmentExpressionIR`");
+  } else if(*right_type != *left_type) {
+    const std::shared_ptr<const DataType> casted_right_type = left_type->GetCommonType(*right_type);
+    const std::shared_ptr<const Variable> casted_right_var = context.CreateVariable(casted_right_type);
+    const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(casted_right_var);
+    current_block->Push(CastOp::Create(casted_right, right));
+    right = casted_right;
   }
 
   switch (node->op) {
@@ -513,17 +519,33 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
     const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
-    const std::shared_ptr<Operand> left_operand = BuildRExpressionIR(node->left, context, cfg, current_block);
-    const std::shared_ptr<Operand> right_operand = BuildRExpressionIR(node->right, context, cfg, right_block);
+    std::shared_ptr<Operand> left_operand = BuildRExpressionIR(node->left, context, cfg, current_block);
+    std::shared_ptr<Operand> right_operand = BuildRExpressionIR(node->right, context, cfg, right_block);
 
     const std::shared_ptr<const DataType> left_type = GetOperandType(*left_operand);
     const std::shared_ptr<const DataType> right_type = GetOperandType(*right_operand);
-    if (right_type->GetType() != left_type->GetType()) { // TODO: Deep equality
-      throw std::domain_error("Incompatible types in logical binary expression");
-    }
 
-    const std::shared_ptr<const Variable> result_var = context.CreateVariable(left_type, node);
-    const std::shared_ptr<VariableOperand> result_operand = VariableOperand::Create(result_var);
+    std::shared_ptr<VariableOperand> result_operand;
+
+    if (*right_type == *left_type) {
+      result_operand = VariableOperand::Create(context.CreateVariable(left_type, node));
+    } else if(node->op == ast::BinaryOperator::Comma) {
+      // TODO: check if this is legal
+      result_operand = VariableOperand::Create(context.CreateVariable(right_type, node));
+    } else {
+      const std::shared_ptr<const DataType> result_type = left_type->GetCommonType(*right_type);
+      if (*left_type != *result_type) {
+        const std::shared_ptr<VariableOperand> casted_left = VariableOperand::Create(context.CreateVariable(result_type));
+        current_block->Push(CastOp::Create(casted_left, left_operand));
+        left_operand = casted_left;
+      }
+      if (*right_type != *result_type) {
+        const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(context.CreateVariable(result_type));
+        right_block->Push(CastOp::Create(casted_right, right_operand));
+        right_operand = casted_right;
+      }
+      result_operand = VariableOperand::Create(context.CreateVariable(result_type, node));
+    }
 
     current_block->Push(CopyOp::Create(result_operand, left_operand));
     right_block->Push(CopyOp::Create(result_operand, right_operand));
@@ -541,17 +563,29 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     return result_operand;
   }
 
-  const std::shared_ptr<Operand> left = BuildRExpressionIR(node->left, context, cfg, current_block);
-  const std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
+  std::shared_ptr<Operand> left = BuildRExpressionIR(node->left, context, cfg, current_block);
+  std::shared_ptr<Operand> right = BuildRExpressionIR(node->right, context, cfg, current_block);
   const std::shared_ptr<const DataType> left_type = GetOperandType(*left);
   const std::shared_ptr<const DataType> right_type = GetOperandType(*right);
 
-  if (left_type->GetType() != right_type->GetType()) { // TODO: Deep equality
-    throw std::runtime_error("Mismatched types for left and right operands");
-  }
+  std::shared_ptr<VariableOperand> result_operand;
 
-  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(left_type, node);
-  std::shared_ptr<VariableOperand> result_operand = VariableOperand::Create(tmp_var);
+  if (*right_type == *left_type) {
+    result_operand = VariableOperand::Create(context.CreateVariable(left_type, node));
+  } else {
+    const std::shared_ptr<const DataType> result_type = left_type->GetCommonType(*right_type);
+    if (*left_type != *result_type) {
+      const std::shared_ptr<VariableOperand> casted_left = VariableOperand::Create(context.CreateVariable(result_type));
+      current_block->Push(CastOp::Create(casted_left, left));
+      left = casted_left;
+    }
+    if (*right_type != *result_type) {
+      const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(context.CreateVariable(result_type));
+      current_block->Push(CastOp::Create(casted_right, right));
+      right = casted_right;
+    }
+    result_operand = VariableOperand::Create(context.CreateVariable(result_type, node));
+  }
 
   switch (node->op) {
     case ast::BinaryOperator::Addition: {
