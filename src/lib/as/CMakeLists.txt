@@ -35,4 +35,4 @@ add_library(
   arch/x64/stddef.cpp
   arch/variables_table.cpp
   emit.cpp
-)
+  ast/logical_expression.cpp)

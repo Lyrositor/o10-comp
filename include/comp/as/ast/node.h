@@ -24,6 +24,7 @@ struct Node {
     Instruction,
     IntegerLiteral,
     LocalSymbol,
+    LogicalExpression,
     MemoryReference,
     Mnemonic,
     Program,

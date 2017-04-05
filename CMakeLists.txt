@@ -42,7 +42,7 @@ set(
   src/test/ast/ast.spec.cpp
   src/test/ast/to_json.spec.cpp
   src/test/parser/parser.spec.cpp
-)
+  include/comp/as/ast/logical_expression.h)
 add_executable(comp_test ${TEST_SOURCES})
 target_link_libraries(comp_test comp gtest gtest_main)
 
