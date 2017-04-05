@@ -4,6 +4,7 @@
 #include <comp/ir/control_flow_graph.h>
 #include <comp/exceptions.h>
 #include <comp/utils.h>
+#include <iostream>
 
 namespace comp {
 namespace ir {
@@ -100,9 +101,11 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
 
   // Generate the function's control flow graph
   std::shared_ptr<ControlFlowGraph> cfg = ControlFlowGraph::Create();
-  std::shared_ptr<BasicBlock> source = cfg->GetSource();
-  std::shared_ptr<BasicBlock> current_block = source;
+  std::shared_ptr<BasicBlock> current_block = cfg->GetSource();
   BuildBlockStatementIR(*node.body, function_context, cfg, current_block);
+  if (current_block->GetType() == BasicBlock::Type::Incomplete) {
+    current_block->SetReturn(nullptr);
+  }
   function->SetBody(cfg);
   function->SetLocalVariables(function_context.GetVariables());
 
@@ -299,6 +302,10 @@ void BuildBlockStatementIR(
 ) {
   std::unique_ptr<ChildContext> childContext = context.Fork();
   for (auto statement : node.body) {
+    if (current_block->GetType() != BasicBlock::Type::Incomplete) {
+      std::cerr << "Warning: Found some dead code...\n";
+      break;
+    }
     BuildStatementIR(*statement, *childContext, cfg, current_block);
   }
   context.Join(std::move(childContext));
@@ -799,8 +806,9 @@ void BuildWhileStatementIR(
 
   current_block->SetJump(test_block);
   test_block->SetConditionalJump(test_operand, body_block, next_block);
-  body_block->SetJump(test_block);
-
+  if (body_block->GetType() == BasicBlock::Type::Incomplete) {
+    body_block->SetJump(test_block);
+  }
   current_block = next_block;
 }
 
@@ -810,9 +818,6 @@ void BuildForStatementIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
-  if (node.test == nullptr) {
-    throw std::runtime_error("Not implemented: infinite loops");
-  }
   if (node.initializer != nullptr) {
     switch (node.initializer->node_type) {
       case ast::Node::Type::DeclarationForInitializer : {
@@ -837,18 +842,24 @@ void BuildForStatementIR(
   std::shared_ptr<BasicBlock> update_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
-  std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.test, context, cfg, test_block);
   if (node.update != nullptr) {
     BuildRExpressionIR(node.update, context, cfg, update_block);
   }
   BuildStatementIR(*node.body, context, cfg, body_block);
 
   current_block->SetJump(test_block);
-  test_block->SetConditionalJump(test_operand, body_block, next_block);
-  body_block->SetJump(update_block);
-  update_block->SetJump(test_block);
+  if (body_block->GetType() == BasicBlock::Type::Incomplete) {
+    body_block->SetJump(update_block);
+    update_block->SetJump(test_block);
+  }
 
-  current_block = next_block;
+  if(node.test == nullptr) {
+    test_block->SetJump(body_block);
+  } else {
+    std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.test, context, cfg, test_block);
+    test_block->SetConditionalJump(test_operand, body_block, next_block);
+    current_block = next_block;
+  }
 }
 
 void BuildIfStatementIR(
@@ -859,21 +870,31 @@ void BuildIfStatementIR(
 ) {
   std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.test, context, cfg, current_block);
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
+  bool is_next_block_reachable = false;
 
   std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
   BuildStatementIR(*node.consequence, context, cfg, consequence);
-  consequence->SetJump(next_block);
+  if (consequence->GetType() == BasicBlock::Type::Incomplete) {
+    consequence->SetJump(next_block);
+    is_next_block_reachable = true;
+  }
 
   if (node.alternative == nullptr) {
     current_block->SetConditionalJump(test_operand, consequence, next_block);
+    is_next_block_reachable = true;
   } else {
     std::shared_ptr<BasicBlock> alternative = cfg->CreateBasicBlock();
     BuildStatementIR(*node.alternative, context, cfg, alternative);
-    alternative->SetJump(next_block);
+    if (alternative->GetType() == BasicBlock::Type::Incomplete) {
+      alternative->SetJump(next_block);
+      is_next_block_reachable = true;
+    }
     current_block->SetConditionalJump(test_operand, consequence, alternative);
   }
 
-  current_block = next_block;
+  if (is_next_block_reachable) {
+    current_block = next_block;
+  }
 }
 
 void BuildReturnStatementIR(
