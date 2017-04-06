@@ -10,10 +10,10 @@ std::unique_ptr<BasicBlock> BasicBlock::Create(
 BasicBlock::BasicBlock(
   std::vector<std::shared_ptr<Op>> ops
 ) :
-  ops_(std::move(ops)),
   type_(Type::Incomplete),
-  branch_if_false_(),
-  branch_if_true_() {
+  ops_(std::move(ops)),
+  branch_if_true_(),
+  branch_if_false_() {
 }
 
 std::vector<std::shared_ptr<Op>> BasicBlock::GetOps() const {

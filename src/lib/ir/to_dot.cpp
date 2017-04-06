@@ -129,6 +129,7 @@ void EmitCallOp(const CallOp &node, std::ostream &out, IdentifiersTable &it) {
 
 void EmitNoOp(const NoOp &node, std::ostream &out, IdentifiersTable &it) {
   UNUSED(node);
+  UNUSED(it);
   out << "NoOp;";
 }
 

@@ -33,6 +33,7 @@ add_library(
   ast/type_directive.cpp
   arch/x64/build_asm.cpp
   arch/x64/stddef.cpp
+  arch/block_table.cpp
   arch/variables_table.cpp
   emit.cpp
   ast/logical_expression.cpp)

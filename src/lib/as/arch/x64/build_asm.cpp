@@ -21,6 +21,8 @@ static const std::shared_ptr<ast::Mnemonic>
   CQTO = ast::Mnemonic::Create("cqto"),
   IDIVQ = ast::Mnemonic::Create("idivq"),
   IMULQ = ast::Mnemonic::Create("imulq"),
+  JE = ast::Mnemonic::Create("je"),
+  JMP = ast::Mnemonic::Create("jmp"),
   LEAVEQ = ast::Mnemonic::Create("leaveq"),
   MOVQ = ast::Mnemonic::Create("movq"),
   MOVZBQ = ast::Mnemonic::Create("movzbq"),
@@ -102,6 +104,7 @@ void BuildFunction(
   std::vector<std::shared_ptr<ast::Statement>> &body
 ) {
   VariablesTable variables_table;
+  BlockTable block_table;
   auto params = node->GetParameters();
 
   // Store the memory references of the parameters
@@ -128,7 +131,7 @@ void BuildFunction(
       address = ast::MemoryReference::Create(
         RBP, ast::BigIntegerLiteral::Create(-stack));
 #endif  // WIN32
-      param_copies.push_back(INSTR(MOVQ, { kParameterRegisters[idx], address }));
+      param_copies.push_back(INSTR(MOVQ, {kParameterRegisters[idx], address}));
     } else {
       address = ast::MemoryReference::Create(
         RBP, ast::BigIntegerLiteral::Create(param_stack));
@@ -160,8 +163,8 @@ void BuildFunction(
   body.insert(body.end(), {
     ast::GlobalDirective::Create(symbol),
     ast::EmptyStatement::Create({symbol}),
-    INSTR(PUSHQ, { RBP }),
-    INSTR(MOVQ, { RSP, RBP })
+    INSTR(PUSHQ, {RBP}),
+    INSTR(MOVQ, {RSP, RBP})
   });
   body.push_back(INSTR(SUBQ, stack, RSP));
 
@@ -177,35 +180,53 @@ void BuildFunction(
     body.push_back(*it);
   }
 
+  // Generate the labels for every block
+  std::set<std::shared_ptr<ir::BasicBlock>>
+    blocks = node->GetBody()->GetBasicBlocks();
+  size_t label = 0;
+  for (auto block : blocks) {
+    block_table.Register(
+      block,
+      ast::GlobalSymbol::Create(".L"+std::to_string(label++)));
+  }
+
   // Generate the function body
   // The epilog will be generated when a return statement is encountered; this
   // is a guarantee by the IR
-  BuildBasicBlock(node->GetBody()->GetSource(), body, variables_table);
+  BuildBasicBlock(
+    node->GetBody()->GetSource(), body, block_table, variables_table);
 
   // Generate every subsequent block
-  std::set<std::shared_ptr<ir::BasicBlock>>
-    remaining_blocks = node->GetBody()->GetBasicBlocks();
-  remaining_blocks.erase(node->GetBody()->GetSource());
-  for (auto block : node->GetBody()->GetBasicBlocks()) {
-    // TODO(Lyrositor) Generate eve
-    remaining_blocks.erase(block);
+  blocks.erase(node->GetBody()->GetSource());
+  for (auto block : blocks) {
+    body.push_back(ast::EmptyStatement::Create({block_table.Get(block)}));
+    BuildBasicBlock(block, body, block_table, variables_table);
   }
 }
 
 void BuildBasicBlock(
   std::shared_ptr<ir::BasicBlock> block,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const BlockTable &block_table,
+  const VariablesTable &variables_table
 ) {
   for (auto op : block->GetOps()) {
-    BuildOp(op, body, variables_table);
+    BuildOp(op, block, body, block_table, variables_table);
+  }
+  if (block->GetType() == ir::BasicBlock::Type::Jump) {
+    body.push_back(
+      INSTR(
+        JMP,
+        {ast::AddressOperand::Create(block_table.Get(block->GetBranch()))}));
   }
 }
 
 void BuildOp(
   std::shared_ptr<ir::Op> op,
+  std::shared_ptr<ir::BasicBlock> block,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const BlockTable &block_table,
+  const VariablesTable &variables_table
 ) {
   switch (op->op_type) {
     case ir::Op::Type::BinOp:
@@ -221,7 +242,10 @@ void BuildOp(
         variables_table);
       break;
     case ir::Op::Type::CastOp:
-      // TODO(Lyrositor) Implement cast op
+      BuildCastOp(
+        std::static_pointer_cast<ir::CastOp>(op),
+        body,
+        variables_table);
       break;
     case ir::Op::Type::CopyOp:
       BuildCopyOp(
@@ -242,7 +266,12 @@ void BuildOp(
         variables_table);
       break;
     case ir::Op::Type::TestOp:
-      // TODO(Lyrositor) Implement test op
+      BuildTestOp(
+        std::static_pointer_cast<ir::TestOp>(op),
+        block,
+        body,
+        block_table,
+        variables_table);
       break;
     case ir::Op::Type::UnaryOp:
       BuildUnaryOp(
@@ -256,76 +285,90 @@ void BuildOp(
 void BuildBinOp(
   std::shared_ptr<ir::BinOp> op,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const VariablesTable &variables_table
 ) {
   auto source1 = BuildOperand(op->in1, variables_table);
   auto source2 = BuildOperand(op->in2, variables_table);
   auto destination = BuildOperand(op->out, variables_table);
-  body.push_back(INSTR(MOVQ, { source1, RAX }));
+  body.push_back(INSTR(MOVQ, {source1, RAX}));
   switch (op->binary_operator) {
-    case ir::BinOp::BinaryOperator::Addition:body.push_back(INSTR(ADDQ, { source2, RAX }));
+    case ir::BinOp::BinaryOperator::Addition:
+      body.push_back(INSTR(ADDQ, {source2, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::BitwiseAnd:body.push_back(INSTR(ANDQ, { source2, RAX }));
+    case ir::BinOp::BinaryOperator::BitwiseAnd:
+      body.push_back(INSTR(ANDQ, {source2, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::BitwiseOr:body.push_back(INSTR(ORQ, { source2, RAX }));
+    case ir::BinOp::BinaryOperator::BitwiseOr:
+      body.push_back(INSTR(ORQ, {source2, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::BitwiseXor:body.push_back(INSTR(XORQ, { source2, RAX }));
+    case ir::BinOp::BinaryOperator::BitwiseXor:
+      body.push_back(INSTR(XORQ, {source2, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::Division:body.push_back(INSTR(CQTO));
-      body.push_back(INSTR(IDIVQ, { source2 }));
+    case ir::BinOp::BinaryOperator::Division:
+      body.push_back(INSTR(CQTO));
+      body.push_back(INSTR(IDIVQ, {source2}));
       break;
-    case ir::BinOp::BinaryOperator::Equality:body.push_back(INSTR(CMPQ, { source2, RAX }));
-      body.push_back(INSTR(SETE, { AL }));
-      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
+    case ir::BinOp::BinaryOperator::Equality:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETE, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::GreaterThan:body.push_back(INSTR(CMPQ, { source2, RAX }));
-      body.push_back(INSTR(SETG, { AL }));
-      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
+    case ir::BinOp::BinaryOperator::GreaterThan:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETG, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::GreaterThanOrEqual:body.push_back(INSTR(CMPQ, { source2, RAX }));
-      body.push_back(INSTR(SETGE, { AL }));
-      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
+    case ir::BinOp::BinaryOperator::GreaterThanOrEqual:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETGE, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::Inequality:body.push_back(INSTR(CMPQ, { source2, RAX }));
-      body.push_back(INSTR(SETNE, { AL }));
-      body.push_back(INSTR(MOVZBQ, { AL, RAX }));
+    case ir::BinOp::BinaryOperator::Inequality:
+      body.push_back(INSTR(CMPQ, {source2, RAX}));
+      body.push_back(INSTR(SETNE, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::LeftShift:body.push_back(INSTR(MOVQ, { source2, RCX }));
-      body.push_back(INSTR(SALQ, { CL, RAX }));
+    case ir::BinOp::BinaryOperator::LeftShift:
+      body.push_back(INSTR(MOVQ, {source2, RCX}));
+      body.push_back(INSTR(SALQ, {CL, RAX}));
       break;
     case ir::BinOp::BinaryOperator::LessThan:
       body.insert(body.end(), {
-        INSTR(CMPQ, { source2, RAX }),
-        INSTR(SETL, { AL }),
-        INSTR(MOVZBQ, { AL, RAX })
+        INSTR(CMPQ, {source2, RAX}),
+        INSTR(SETL, {AL}),
+        INSTR(MOVZBQ, {AL, RAX})
       });
       break;
     case ir::BinOp::BinaryOperator::LessThanOrEqualTo:
       body.insert(body.end(), {
-        INSTR(CMPQ, { source2, RAX }),
-        INSTR(SETLE, { AL }),
-        INSTR(MOVZBQ, { AL, RAX })
+        INSTR(CMPQ, {source2, RAX}),
+        INSTR(SETLE, {AL}),
+        INSTR(MOVZBQ, {AL, RAX})
       });
       break;
-    case ir::BinOp::BinaryOperator::Multiplication:body.push_back(INSTR(IMULQ, { source2, RAX }));
+    case ir::BinOp::BinaryOperator::Multiplication:
+      body.push_back(INSTR(IMULQ, {source2, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::Subtraction:body.push_back(INSTR(SUBQ, { source2, RAX }));
+    case ir::BinOp::BinaryOperator::Subtraction:
+      body.push_back(INSTR(SUBQ, {source2, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::Remainder:body.push_back(INSTR(CQTO));
-      body.push_back(INSTR(IDIVQ, { source2 }));
-      body.push_back(INSTR(MOVQ, { RDX, RAX }));
+    case ir::BinOp::BinaryOperator::Remainder:
+      body.push_back(INSTR(CQTO));
+      body.push_back(INSTR(IDIVQ, {source2}));
+      body.push_back(INSTR(MOVQ, {RDX, RAX}));
       break;
-    case ir::BinOp::BinaryOperator::RightShift:body.push_back(INSTR(MOVQ, { source2, RCX }));
-      body.push_back(INSTR(SARQ, { CL, RAX }));
+    case ir::BinOp::BinaryOperator::RightShift:
+      body.push_back(INSTR(MOVQ, {source2, RCX}));
+      body.push_back(INSTR(SARQ, {CL, RAX}));
       break;
   }
-  body.push_back(INSTR(MOVQ, { RAX, destination }));
+  body.push_back(INSTR(MOVQ, {RAX, destination}));
 }
 
 void BuildCallOp(
   std::shared_ptr<ir::CallOp> op,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const VariablesTable &variables_table
 ) {
   // Copy, in left-to-right order, the parameters to the registers first and
   // then to the stack before the call
@@ -358,10 +401,10 @@ void BuildCallOp(
     if (idx < kParameterRegisters.size()) {
       // Copy the parameter's value to its destination register
       std::shared_ptr<ast::Operand> destination = kParameterRegisters[idx];
-      param_setup.push_back(INSTR(MOVQ, { source, destination }));
+      param_setup.push_back(INSTR(MOVQ, {source, destination}));
     } else {
       // Push the parameter's value to a location on the stack
-      param_setup.push_back(INSTR(PUSHQ, { source }));
+      param_setup.push_back(INSTR(PUSHQ, {source}));
 //     stack_size += data_type_size; TODO(Lyrositor) Use the appropriate size
       stack_size += kRegisterQSize;
     }
@@ -393,18 +436,38 @@ void BuildCallOp(
   // stack
   if (stack_size > 0) {
     body.push_back(
-      INSTR(ADDQ, { ast::ImmediateOperand::Create(stack_size), RSP }));
+      INSTR(ADDQ, {ast::ImmediateOperand::Create(stack_size), RSP}));
   }
 
   // Store the return value
   auto destination = BuildOperand(op->out, variables_table);
-  body.push_back(INSTR(MOVQ, { RAX, destination }));
+  body.push_back(INSTR(MOVQ, {RAX, destination}));
+}
+
+void BuildCastOp(
+  std::shared_ptr<ir::CastOp> op,
+  std::vector<std::shared_ptr<ast::Statement>> &body,
+  const VariablesTable &variables_table
+) {
+  // TODO(Lyrositor) This is a simple CopyOp for now; change this once different
+  // types are properly handled
+  auto source = BuildOperand(op->in, variables_table);
+  auto destination = BuildOperand(op->out, variables_table);
+
+  // Introduce an intermediary register if this is a copy from memory to memory
+  if (source->node_type == ast::Node::Type::MemoryReference &&
+    destination->node_type == ast::Node::Type::MemoryReference) {
+    body.push_back(INSTR(MOVQ, {source, RAX}));
+    body.push_back(INSTR(MOVQ, {RAX, destination}));
+  } else {
+    body.push_back(INSTR(MOVQ, {source, destination}));
+  }
 }
 
 void BuildCopyOp(
   std::shared_ptr<ir::CopyOp> op,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const VariablesTable &variables_table
 ) {
   auto source = BuildOperand(op->in, variables_table);
   auto destination = BuildOperand(op->out, variables_table);
@@ -412,17 +475,17 @@ void BuildCopyOp(
   // Introduce an intermediary register if this is a copy from memory to memory
   if (source->node_type == ast::Node::Type::MemoryReference &&
     destination->node_type == ast::Node::Type::MemoryReference) {
-    body.push_back(INSTR(MOVQ, { source, RAX }));
-    body.push_back(INSTR(MOVQ, { RAX, destination }));
+    body.push_back(INSTR(MOVQ, {source, RAX}));
+    body.push_back(INSTR(MOVQ, {RAX, destination}));
   } else {
-    body.push_back(INSTR(MOVQ, { source, destination }));
+    body.push_back(INSTR(MOVQ, {source, destination}));
   }
 }
 
 void BuildNoOp(
   std::shared_ptr<ir::NoOp> op,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const VariablesTable &variables_table
 ) {
   UNUSED(op);
   UNUSED(body);
@@ -433,11 +496,11 @@ void BuildNoOp(
 void BuildReturnOp(
   std::shared_ptr<ir::ReturnOp> op,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const VariablesTable &variables_table
 ) {
   // Return the value if this is a typed return
   if (op->in != nullptr) {
-    body.push_back(INSTR(MOVQ, { BuildOperand(op->in, variables_table), RAX }));
+    body.push_back(INSTR(MOVQ, {BuildOperand(op->in, variables_table), RAX}));
   }
 
   // Epilog
@@ -447,10 +510,34 @@ void BuildReturnOp(
   });
 }
 
+void BuildTestOp(
+  std::shared_ptr<ir::TestOp> op,
+  std::shared_ptr<ir::BasicBlock> block,
+  std::vector<std::shared_ptr<ast::Statement>> &body,
+  const BlockTable &block_table,
+  const VariablesTable &variables_table
+) {
+  // Jump to the `true` branch if the test is not equal to zero; otherwise,
+  // jump to the `false` branch
+  auto test = BuildOperand(op->test, variables_table);
+  body.push_back(INSTR(MOVQ, {test, RAX}));
+  body.push_back(INSTR(CMPQ, 0, RAX));
+  body.push_back(
+    INSTR(
+      JE,
+      {ast::AddressOperand::Create(
+          block_table.Get(block->GetBranchIfFalse()))}));
+  body.push_back(
+    INSTR(
+      JMP,
+      {ast::AddressOperand::Create(
+          block_table.Get(block->GetBranchIfTrue()))}));
+}
+
 void BuildUnaryOp(
   std::shared_ptr<ir::UnaryOp> op,
   std::vector<std::shared_ptr<ast::Statement>> &body,
-  VariablesTable &variables_table
+  const VariablesTable &variables_table
 ) {
   auto source = BuildOperand(op->in1, variables_table);
   auto destination = BuildOperand(op->out, variables_table);
@@ -458,25 +545,25 @@ void BuildUnaryOp(
     case ir::UnaryOp::UnaryOperator::BitwiseComplement:
       body.insert(
         body.end(),
-        {INSTR(MOVQ, { source, RAX }), INSTR(NOTQ, { RAX })});
+        {INSTR(MOVQ, {source, RAX}), INSTR(NOTQ, {RAX})});
       break;
     case ir::UnaryOp::UnaryOperator::LogicalNegation:
       body.insert(
         body.end(),
-        {INSTR(CMPQ, 0, source), INSTR(SETE, { AL }), INSTR(MOVZBQ, { AL, RAX })});
+        {INSTR(CMPQ, 0, source), INSTR(SETE, {AL}), INSTR(MOVZBQ, {AL, RAX})});
       break;
     case ir::UnaryOp::UnaryOperator::UnaryMinus:
       body.insert(
         body.end(),
-        {INSTR(MOVQ, { source, RAX }), INSTR(NEGQ, { RAX })});
+        {INSTR(MOVQ, {source, RAX}), INSTR(NEGQ, {RAX})});
       break;
   }
-  body.push_back(INSTR(MOVQ, { RAX, destination }));
+  body.push_back(INSTR(MOVQ, {RAX, destination}));
 }
 
 std::shared_ptr<ast::Operand> BuildOperand(
   std::shared_ptr<ir::Operand> op,
-  VariablesTable &variables_table
+  const VariablesTable &variables_table
 ) {
   switch (op->operand_type) {
     case ir::Operand::Type::Variable: {

@@ -8,7 +8,6 @@
 namespace comp {
 namespace as {
 namespace arch {
-namespace x64 {
 class VariablesTable {
  public:
   void Register(
@@ -16,16 +15,15 @@ class VariablesTable {
     std::shared_ptr<ast::MemoryReference> memory_reference);
 
   std::shared_ptr<ast::MemoryReference> Get(
-    std::shared_ptr<const ir::Variable> variable);
+    std::shared_ptr<const ir::Variable> variable) const;
 
-  bool Contains(std::shared_ptr<const ir::Variable> variable);
+  bool Contains(std::shared_ptr<const ir::Variable> variable) const;
 
  private:
   std::unordered_map<
   std::shared_ptr<const ir::Variable>,
   std::shared_ptr<ast::MemoryReference>> variables_;
 };
-}  // namespace x64
 }  // namespace arch
 }  // namespace as
 }  // namespace comp
