@@ -9,7 +9,6 @@
     "actual-png": "ir.actual.png"
   },
   "run": {
-    "skip": true,
     "actual-assembly": "main.actual.asm",
     "expected-assembly": "main.expected.asm",
     "executable": "main.o10c",
