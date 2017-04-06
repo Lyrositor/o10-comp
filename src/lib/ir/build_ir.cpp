@@ -5,7 +5,7 @@
 #include <comp/ir/builtins.h>
 #include <comp/ir/control_flow_graph.h>
 #include <comp/ir/op.h>
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 #include <comp/utils.h>
 
 namespace comp {

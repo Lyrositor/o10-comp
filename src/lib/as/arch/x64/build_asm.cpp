@@ -3,7 +3,7 @@
 #include <comp/as/arch/x64/stddef.h>
 #include <comp/ir/builtins.h>
 #include <comp/ast.h>
-#include <comp/exceptions.h>
+#include <comp/utils/exceptions.h>
 #include <comp/utils.h>
 
 namespace comp {
