@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 
-#include "comp/ir/op_grah.h"
+#include "comp/ir/basic_block.h"
 #include "comp/ir/control_flow_graph.h"
 #include "comp/ir/variable.h"
 

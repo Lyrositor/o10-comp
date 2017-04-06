@@ -1,7 +1,7 @@
 #pragma once
 
 #include "comp/ast.h"
-#include "comp/ir/op_grah.h"
+#include "comp/ir/basic_block.h"
 #include "comp/ir/context.h"
 #include "comp/ir/op.h"
 #include "comp/ir/program.h"

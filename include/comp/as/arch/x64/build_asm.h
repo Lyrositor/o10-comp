@@ -4,7 +4,7 @@
 
 #include <comp/as/arch/variables_table.h>
 #include <comp/as/ast.h>
-#include <comp/ir/op_grah.h>
+#include <comp/ir/basic_block.h>
 #include <comp/ir/program.h>
 
 namespace comp {
