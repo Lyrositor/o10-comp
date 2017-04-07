@@ -579,6 +579,7 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
     }
     if (*right_type != *result_type) {
       const std::shared_ptr<VariableOperand> casted_right = VariableOperand::Create(context.CreateVariable(result_type));
+      current_block->Push(CastOp::Create(casted_right, right_operand));
       right_operand = casted_right;
     }
     result_operand = VariableOperand::Create(context.CreateVariable(result_type, node));
