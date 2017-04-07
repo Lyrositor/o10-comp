@@ -4,5 +4,4 @@ void main() {
     int32_t a;
     a = 1;
     a = -a;
-    return a;
 }
