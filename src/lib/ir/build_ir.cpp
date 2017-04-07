@@ -806,7 +806,7 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
       break;
     }
     case ast::UnaryOperator::UnaryPlus: {
-      const std::shared_ptr<const DataType> int_type = std::shared_ptr<const Int32DataType>(Int32DataType());
+      const std::shared_ptr<const DataType> int_type = std::shared_ptr<const Int64DataType>(new Int64DataType());
       const std::shared_ptr<const Variable> int_type_var = context.CreateVariable(int_type);
       const std::shared_ptr<VariableOperand> int_op = VariableOperand::Create(int_type_var);
       current_block->Push(CastOp::Create(int_op, expr));
