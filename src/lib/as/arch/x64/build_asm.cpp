@@ -29,6 +29,7 @@ static const std::shared_ptr<ast::Mnemonic>
   NEGQ = ast::Mnemonic::Create("negq"),
   NOP = ast::Mnemonic::Create("nop"),
   NOTQ = ast::Mnemonic::Create("notq"),
+  INCQ = ast::Mnemonic::Create("incq"),
   ORQ = ast::Mnemonic::Create("orq"),
   PUSHQ = ast::Mnemonic::Create("pushq"),
   RETQ = ast::Mnemonic::Create("retq"),
@@ -555,6 +556,45 @@ void BuildUnaryOp(
       body.insert(
         body.end(),
         {INSTR(MOVQ, {source, RAX}), INSTR(NEGQ, {RAX})});
+      break;
+    case ir::UnaryOp::UnaryOperator::UnaryPlus:
+      body.insert(
+        body.end(),
+        {INSTR(MOVQ, { source, RAX })});
+      break;
+    case ir::UnaryOp::UnaryOperator::PostfixIncrement:
+      body.insert(
+        body.end(),
+        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(1), RAX})});
+      break;
+    case ir::UnaryOp::UnaryOperator::PrefixIncrement:
+      body.insert(
+        body.end(),
+        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(1), RAX})});
+      break;
+    case ir::UnaryOp::UnaryOperator::PostfixDecrement:
+      body.insert(
+        body.end(),
+        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(-1), RAX})});
+      break;
+    case ir::UnaryOp::UnaryOperator::PrefixDecrement:
+      body.insert(
+        body.end(),
+        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(-1), RAX})});
+      break;
+    case ir::UnaryOp::UnaryOperator::Address:
+      body.insert(
+        body.end(),
+        {
+         INSTR(MOVQ, { source, RAX })//,INSTR(ADDQ, {RAX, ast::ImmediateOperand::Create(1)})
+        });
+      break;
+    case ir::UnaryOp::UnaryOperator::Indirection:
+      body.insert(
+        body.end(),
+        {
+         INSTR(MOVQ, { source, RAX })//,INSTR(ADDQ, {RAX, ast::ImmediateOperand::Create(1)})
+        });
       break;
   }
   body.push_back(INSTR(MOVQ, {RAX, destination}));
