@@ -6,5 +6,9 @@
   },
   "ir": {
     "skip": true
+  },
+  "run": {
+    "executable": "main.o10c",
+    "return-code": -1
   }
 }

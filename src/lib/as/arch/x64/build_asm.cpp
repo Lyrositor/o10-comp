@@ -557,43 +557,34 @@ void BuildUnaryOp(
         body.end(),
         {INSTR(MOVQ, {source, RAX}), INSTR(NEGQ, {RAX})});
       break;
-    case ir::UnaryOp::UnaryOperator::UnaryPlus:
-      body.insert(
-        body.end(),
-        {INSTR(MOVQ, { source, RAX })});
-      break;
-    case ir::UnaryOp::UnaryOperator::PostfixIncrement:
-      body.insert(
-        body.end(),
-        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(1), RAX})});
-      break;
     case ir::UnaryOp::UnaryOperator::PrefixIncrement:
       body.insert(
         body.end(),
-        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(1), RAX})});
-      break;
-    case ir::UnaryOp::UnaryOperator::PostfixDecrement:
-      body.insert(
-        body.end(),
-        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(-1), RAX})});
+        {
+            INSTR(MOVQ, { source, RAX }),
+            INSTR(ADDQ, {ast::ImmediateOperand::Create(1), RAX})
+        });
       break;
     case ir::UnaryOp::UnaryOperator::PrefixDecrement:
       body.insert(
         body.end(),
-        {INSTR(MOVQ, { source, RAX }), INSTR(ADDQ, {ast::ImmediateOperand::Create(-1), RAX})});
+        {
+            INSTR(MOVQ, { source, RAX }),
+            INSTR(ADDQ, {ast::ImmediateOperand::Create(-1), RAX})
+        });
       break;
     case ir::UnaryOp::UnaryOperator::Address:
       body.insert(
         body.end(),
         {
-         INSTR(MOVQ, { source, RAX })//,INSTR(ADDQ, {RAX, ast::ImmediateOperand::Create(1)})
+         INSTR(MOVQ, { source, RAX })
         });
       break;
     case ir::UnaryOp::UnaryOperator::Indirection:
       body.insert(
         body.end(),
         {
-         INSTR(MOVQ, { source, RAX })//,INSTR(ADDQ, {RAX, ast::ImmediateOperand::Create(1)})
+         INSTR(MOVQ, { source, RAX })
         });
       break;
   }
