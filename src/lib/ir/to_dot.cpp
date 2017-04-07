@@ -143,6 +143,13 @@ std::string UnaryOperatorToString(const UnaryOp::UnaryOperator &node) {
     case UnaryOp::UnaryOperator::BitwiseComplement: return "BitwiseComplement";
     case UnaryOp::UnaryOperator::LogicalNegation: return "LogicalNegation";
     case UnaryOp::UnaryOperator::UnaryMinus: return "UnaryMinus";
+    case UnaryOp::UnaryOperator::UnaryPlus: return "UnaryPlus";
+    case UnaryOp::UnaryOperator::PostfixDecrement: return "PostfixDecrement";
+    case UnaryOp::UnaryOperator::PrefixDecrement: return "PrefixDecrement";
+    case UnaryOp::UnaryOperator::PrefixIncrement: return "PrefixIncrement";
+    case UnaryOp::UnaryOperator::PostfixIncrement: return "PostfixIncrement";
+    case UnaryOp::UnaryOperator::Indirection: return "Indirection";
+    case UnaryOp::UnaryOperator::Address: return "Address";
   }
   throw Exception("unexpected ir unary operator type");
 }
