@@ -1,5 +1,7 @@
 #include <comp/ast/binary_expression.h>
 
+#include <comp/utils/exceptions.h>
+
 namespace comp {
 namespace ast {
 std::string BinaryOperatorToString(BinaryOperator op) {
@@ -17,14 +19,13 @@ std::string BinaryOperatorToString(BinaryOperator op) {
     case BinaryOperator::LeftShift: return "LeftShift";
     case BinaryOperator::LessThan: return "LessThan";
     case BinaryOperator::LessThanOrEqualTo: return "LessThanOrEqualTo";
-    case BinaryOperator::LogicalAnd: return "LogicalAnd";
-    case BinaryOperator::LogicalOr: return "LogicalOr";
     case BinaryOperator::Multiplication: return "Multiplication";
     case BinaryOperator::Remainder: return "Remainder";
     case BinaryOperator::RightShift: return "RightShift";
     case BinaryOperator::Subtraction: return "Subtraction";
   }
-  return "[Unknown]";
+
+  throw Exception("unexpected BinaryOperator type");
 }
 
 std::unique_ptr<BinaryExpression> BinaryExpression::Create(

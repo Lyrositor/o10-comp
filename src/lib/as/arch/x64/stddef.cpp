@@ -25,13 +25,18 @@ int64_t GetDataTypeSize(std::shared_ptr<const ir::DataType> data_type) {
         data_type);
       return GetDataTypeSize(array->GetItemType()) * array->GetSize();
     }
-    default:
+    case ir::DataType::Type::Int32:
+    case ir::DataType::Type::Int64:
+    case ir::DataType::Type::Pointer:
+    case ir::DataType::Type::Uint8:
+    case ir::DataType::Type::Void:
       try {
         return kDataTypeSizes.at(data_type->GetType());
       } catch (std::out_of_range &e) {
-        throw Exception("Invalid IR data type");
+        throw Exception("invalid IR data type");
       }
   }
+  throw Exception("unexpected IR data type");
 }
 }  // namespace x64
 }  // namespace arch

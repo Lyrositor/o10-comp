@@ -386,15 +386,14 @@ void BuildCallOp(
         // data_type_size = GetDataTypeSize(ir::GetInt64Type());
         break;
       }
+      case ir::Operand::Type::Indirect:
+        throw Exception("indirect operand not supported yet");
       case ir::Operand::Type::Variable: {
         auto variable = std::static_pointer_cast<ir::VariableOperand>(
           op->args[idx])->variable;
         // data_type_size = GetDataTypeSize(variable->GetDataType());
         source = variables_table.Get(variable);
         break;
-      }
-      default: {
-        throw std::runtime_error("Unexpected value for `op->args[idx]->operand_type` in `BuildCallOp`");
       }
     }
 
@@ -570,14 +569,14 @@ std::shared_ptr<ast::Operand> BuildOperand(
       return variables_table.Get(
         std::static_pointer_cast<ir::VariableOperand>(op)->variable);
     }
+    case ir::Operand::Type::Indirect:
+      throw Exception("indirect operand not supported yet");
     case ir::Operand::Type::Constant: {
       return ast::ImmediateOperand::Create(
         std::static_pointer_cast<ir::ConstantOperand>(op)->value);
     }
-    default: {
-      throw std::runtime_error("Unexpected value for `op->args[idx]->operand_type` in `BuildCallOp`");
-    }
   }
+  throw Exception("unexpected as operand type");
 }
 }  // namespace x64
 }  // namespace arch

@@ -1,13 +1,17 @@
 #pragma once
 
+#include <string>
+
 #include "comp/ast/expression.h"
 
 namespace comp {
 namespace ast {
 enum class LogicalOperator {
-  LogicalAnd, // left && right
-  LogicalOr, // left || right
+  LogicalAnd,  // left && right
+  LogicalOr,  // left || right
 };
+
+std::string LogicalOperatorToString(LogicalOperator op);
 
 struct LogicalExpression final : public RExpression {
   static std::unique_ptr<LogicalExpression> Create(

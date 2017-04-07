@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "comp/ast/expression.h"
 
 namespace comp {

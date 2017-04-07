@@ -544,9 +544,6 @@ std::shared_ptr<Operand> BuildAssignmentExpressionIR(
       current_block->Push(BinOp::Create(left, BinOp::BinaryOperator::Subtraction, left, right));
       break;
     };
-    default: {
-      throw std::domain_error("Unexpected value for node.op in `BuildAssignmentExpressionIR`");
-    }
   }
 
   return left;

@@ -1,17 +1,13 @@
 #include <iomanip>
 #include <sstream>
+#include <vector>
 
 #include <comp/ir/to_dot.h>
 #include <comp/utils.h>
-#include <map>
-#include <vector>
-#include <sstream>
 
 namespace comp {
 namespace ir {
-
-IdentifiersTable::IdentifiersTable(
-) :
+IdentifiersTable::IdentifiersTable() :
   basic_blocks_counter(0), basic_blocks_map(),
   variables_counter(0),  variables_map(),
   functions_counter(0), functions_map() {
@@ -69,9 +65,6 @@ void EmitOperand(const Operand &node, std::ostream &out, IdentifiersTable &it) {
       EmitConstantOperand(static_cast<const ConstantOperand &>(node), out);
       break;
     }
-    default: {
-      throw std::domain_error("Unexpected value for `node.operand_type` in `EmitOperand`");
-    }
   }
 }
 
@@ -93,10 +86,8 @@ std::string BinaryOperatorToString(const BinOp::BinaryOperator &node) {
     case BinOp::BinaryOperator::Remainder: return "Remainder";
     case BinOp::BinaryOperator::RightShift: return "RightShift";
     case BinOp::BinaryOperator::Subtraction: return "Subtraction";
-    default: {
-      throw std::domain_error("Unexpected value for `node` in `BinaryOperatorToString`");
-    }
   }
+  throw Exception("unexpected ir binary operator");
 }
 
 void EmitBinOp(const BinOp &node, std::ostream &out, IdentifiersTable &it) {
@@ -152,10 +143,8 @@ std::string UnaryOperatorToString(const UnaryOp::UnaryOperator &node) {
     case UnaryOp::UnaryOperator::BitwiseComplement: return "BitwiseComplement";
     case UnaryOp::UnaryOperator::LogicalNegation: return "LogicalNegation";
     case UnaryOp::UnaryOperator::UnaryMinus: return "UnaryMinus";
-    default: {
-      throw std::domain_error("Unexpected value for `node` in `UnaryOperatorToString`");
-    }
   }
+  throw Exception("unexpected ir unary operator type");
 }
 
 void EmitUnaryOp(const UnaryOp &node, std::ostream &out, IdentifiersTable &it) {
@@ -198,9 +187,6 @@ void EmitOp(const Op &node, std::ostream &out, IdentifiersTable &it) {
     case Op::Type::UnaryOp: {
       EmitUnaryOp(static_cast<const UnaryOp &>(node), out, it);
       break;
-    }
-    default: {
-      throw std::domain_error("Unexpected value for `node.op_type` in `EmitOp`");
     }
   }
 }
@@ -272,9 +258,6 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
       attributes.push_back(dot::ast::Assignment::Create("style", "bold"));
       result.push_back(dot::ast::NodeStatement::Create(id, attributes));
       break;
-    }
-    default: {
-      throw std::domain_error("Unexpected value for `node.GetType()` in `BasicBlockToDot`");
     }
   }
 

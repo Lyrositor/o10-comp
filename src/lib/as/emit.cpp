@@ -53,9 +53,8 @@ void EmitStatement(const ast::Statement &node, std::ostream &out) {
       EmitTypeDirective(static_cast<const ast::TypeDirective &>(node), out);
       break;
     }
-    default: {
-      throw std::domain_error("Unexpected value for `node.node_type`");
-    }
+    default:
+      throw Exception("invalid as statement type");
   }
 }
 
@@ -195,9 +194,8 @@ void EmitExpression(const ast::AddressExpression &node, std::ostream &out) {
       EmitLogicalExpression(static_cast<const ast::LogicalExpression &>(node), out);
       break;
     }
-    default: {
-      throw std::domain_error("Unexpected value for `node.node_type`");
-    }
+    default:
+      throw Exception("unexpected as expression type");
   }
 }
 
@@ -211,9 +209,8 @@ void EmitSymbol(const ast::Symbol &node, std::ostream &out) {
       EmitLocalSymbol(static_cast<const ast::LocalSymbol &>(node), out);
       break;
     }
-    default: {
-      throw std::domain_error("Unexpected value for `node.node_type`");
-    }
+    default:
+      throw Exception("invalid as symbol type");
   }
 }
 
@@ -252,20 +249,16 @@ std::string serializeBinaryOperator(const ast::BinaryOperator op) {
     case ast::BinaryOperator::ShiftLeft: return "<<";
     case ast::BinaryOperator::ShiftRight: return ">>";
     case ast::BinaryOperator::Subtraction: return "-";
-    default: {
-      throw std::domain_error("Unexpected value for `op`");
-    }
   }
+  throw Exception("unexpected as binary operator");
 }
 
 std::string serializeLogicalOperator(const ast::LogicalOperator op) {
   switch (op) {
     case ast::LogicalOperator::LogicalAnd: return "&&";
     case ast::LogicalOperator::LogicalOr: return "||";
-    default: {
-      throw std::domain_error("Unexpected value for `for`");
-    }
   }
+  throw Exception("unexpected as logical operator");
 }
 
 void EmitBinaryExpression(const ast::BinaryExpression &node, std::ostream &out) {
@@ -330,9 +323,8 @@ void EmitOperand(const ast::Operand &node, std::ostream &out) {
         out);
       break;
     }
-    default: {
-      throw std::domain_error("Unexpected value for `node.node_type`");
-    }
+    default:
+      throw Exception("invalid as operand type");
   }
 }
 
@@ -374,10 +366,10 @@ void EmitAddressOperand(const ast::AddressOperand &node, std::ostream &out) {
     case ast::Node::Type::IntegerLiteral:
       out << std::static_pointer_cast<ast::IntegerLiteral>(node.address)->value;
       break;
-    // TODO(Lyrositor) Handle all other cases
+    case ast::Node::Type::AddressOperand:
+      // TODO(Lyrositor) Handle this operand too?
     default:
-//      throw Exception("Unexpected address operand node type"); TODO(Lyrositor) Uncomment once exceptions fixed
-      throw std::domain_error("Unexpected address operand node type");
+      throw Exception("invalid as address operand type");
   }
 }
 }  // namespace as

@@ -1,7 +1,17 @@
 #include <comp/ast/logical_expression.h>
 
+#include <comp/utils/exceptions.h>
+
 namespace comp {
 namespace ast {
+std::string LogicalOperatorToString(LogicalOperator op) {
+  switch (op) {
+    case LogicalOperator::LogicalAnd: return "LogicalAnd";
+    case LogicalOperator::LogicalOr: return "LogicalOr";
+  }
+  throw Exception("unexpected LogicalOperator type");
+}
+
 std::unique_ptr<LogicalExpression> LogicalExpression::Create(
   LogicalOperator op,
   std::shared_ptr<RExpression> left,
