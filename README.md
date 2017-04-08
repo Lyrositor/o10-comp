@@ -44,6 +44,8 @@ make prepare
 make
 ```
 
+Note: on INSA machines, replace all uses of `make` with `make-insa` (the parameters are unchanged).
+
 You will get the following artifacts:
 
 - **build/o10c**: The compiler executable
@@ -74,6 +76,8 @@ Finally, you can also run the unit tests with test coverage analysis with:
 ```shell
 make coverage
 ```
+
+Note: on INSA machines, replace all uses of `make` with `make-insa` (the parameters are unchanged).
 
 ## License
 
