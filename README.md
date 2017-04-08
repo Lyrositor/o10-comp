@@ -5,7 +5,7 @@
 If you just want to build the project, you will only need the _build dependencies_.
 The test dependencies are required for unit tests, coverage analysis and memory leak checks (`make test`).
 
-The project is continuously tested with [this docker image](https://raw.githubusercontent.com/demurgos/docker-cpp/master/insa/Dockerfile).
+The project is continuously tested with [this docker image](https://raw.githubusercontent.com/demurgos/docker-cpp/master/insa-gcc-5/Dockerfile).
 
 You can start a session with the environment of the Docker image above by running
 the following command in an empty directory:
