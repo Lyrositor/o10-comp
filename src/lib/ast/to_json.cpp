@@ -495,7 +495,7 @@ std::unique_ptr<rapidjson::Value> Uint8LiteralToJson(const Uint8Literal &node, r
 
 std::string serialializeUnaryOperator(const UnaryOperator op) {
   switch (op) {
-    case UnaryOperator::Address: return "Address";
+    case UnaryOperator::AddressOf: return "Address";
     case UnaryOperator::BitwiseComplement: return "BitwiseComplement";
     case UnaryOperator::Indirection: return "Indirection";
     case UnaryOperator::LogicalNegation: return "LogicalNegation";

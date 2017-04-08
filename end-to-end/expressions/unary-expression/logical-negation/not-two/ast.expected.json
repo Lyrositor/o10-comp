@@ -1,0 +1,32 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "int64_t"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "ReturnStatement",
+            "expression": {
+              "node_type": "UnaryExpression",
+              "op": "LogicalNegation",
+              "expression": {
+                "node_type": "Int64Literal",
+                "value": 2
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

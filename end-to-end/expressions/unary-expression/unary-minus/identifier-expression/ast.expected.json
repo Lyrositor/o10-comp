@@ -1,0 +1,117 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "char"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "a"
+                  }
+                },
+                "initial_value": {
+                  "node_type": "Uint8Literal",
+                  "value": 53
+                }
+              }
+            ]
+          },
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "char"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "IdentifierDeclarator",
+                  "identifier": {
+                    "node_type": "Identifier",
+                    "name": "b"
+                  }
+                },
+                "initial_value": {
+                  "node_type": "Int64Literal",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "BinaryExpression",
+                  "op": "+",
+                  "left": {
+                    "node_type": "Identifier",
+                    "name": "a"
+                  },
+                  "right": {
+                    "node_type": "UnaryExpression",
+                    "op": "UnaryMinus",
+                    "expression": {
+                      "node_type": "Identifier",
+                      "name": "b"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "Uint8Literal",
+                  "value": 10
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

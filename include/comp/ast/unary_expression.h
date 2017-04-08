@@ -7,7 +7,7 @@
 namespace comp {
 namespace ast {
 enum class UnaryOperator {
-  Address, // &expression
+  AddressOf, // &expression
   BitwiseComplement, // ~expression
   Indirection, // *expression
   LogicalNegation, // !expression

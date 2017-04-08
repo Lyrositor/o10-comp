@@ -63,6 +63,10 @@ const std::shared_ptr<const Int64DataType> GetInt64Type() {
   return kInt64Type;
 }
 
+const std::shared_ptr<const Int64DataType> GetUsizeType() {
+  return kInt64Type;
+}
+
 RootContext CreateRootContextWithBuiltIns() {
   return RootContext(kBuiltInSymbols, {});
 }

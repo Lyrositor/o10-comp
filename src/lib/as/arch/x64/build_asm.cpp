@@ -19,6 +19,7 @@ static const std::shared_ptr<ast::Mnemonic>
   CALLQ = ast::Mnemonic::Create("callq"),
   CMPQ = ast::Mnemonic::Create("cmpq"),
   CQTO = ast::Mnemonic::Create("cqto"),
+  DECQ = ast::Mnemonic::Create("decq"),
   IDIVQ = ast::Mnemonic::Create("idivq"),
   IMULQ = ast::Mnemonic::Create("imulq"),
   JE = ast::Mnemonic::Create("je"),
@@ -542,50 +543,29 @@ void BuildUnaryOp(
   auto source = BuildOperand(op->in1, variables_table);
   auto destination = BuildOperand(op->out, variables_table);
   switch (op->unary_operator) {
+    case ir::UnaryOp::UnaryOperator::AddressOf:
+      throw std::runtime_error("Not implemented: `AddressOf` operation");
     case ir::UnaryOp::UnaryOperator::BitwiseComplement:
-      body.insert(
-        body.end(),
-        {INSTR(MOVQ, {source, RAX}), INSTR(NOTQ, {RAX})});
+      body.push_back(INSTR(MOVQ, {source, RAX}));
+      body.push_back(INSTR(NOTQ, {RAX}));
+      break;
+    case ir::UnaryOp::UnaryOperator::Decrement:
+      body.push_back(INSTR(MOVQ, {source, RAX}));
+      body.push_back(INSTR(DECQ, {RAX}));
+      break;
+    case ir::UnaryOp::UnaryOperator::Increment:
+      body.push_back(INSTR(MOVQ, {source, RAX}));
+      body.push_back(INSTR(INCQ, {RAX}));
       break;
     case ir::UnaryOp::UnaryOperator::LogicalNegation:
-      body.insert(
-        body.end(),
-        {INSTR(CMPQ, 0, source), INSTR(SETE, {AL}), INSTR(MOVZBQ, {AL, RAX})});
+      body.push_back(INSTR(MOVQ, {source, RAX}));
+      body.push_back(INSTR(CMPQ, {ast::ImmediateOperand::Create(0), RAX}));
+      body.push_back(INSTR(SETE, {AL}));
+      body.push_back(INSTR(MOVZBQ, {AL, RAX}));
       break;
     case ir::UnaryOp::UnaryOperator::UnaryMinus:
-      body.insert(
-        body.end(),
-        {INSTR(MOVQ, {source, RAX}), INSTR(NEGQ, {RAX})});
-      break;
-    case ir::UnaryOp::UnaryOperator::PrefixIncrement:
-      body.insert(
-        body.end(),
-        {
-            INSTR(MOVQ, { source, RAX }),
-            INSTR(ADDQ, {ast::ImmediateOperand::Create(1), RAX})
-        });
-      break;
-    case ir::UnaryOp::UnaryOperator::PrefixDecrement:
-      body.insert(
-        body.end(),
-        {
-            INSTR(MOVQ, { source, RAX }),
-            INSTR(ADDQ, {ast::ImmediateOperand::Create(-1), RAX})
-        });
-      break;
-    case ir::UnaryOp::UnaryOperator::Address:
-      body.insert(
-        body.end(),
-        {
-         INSTR(MOVQ, { source, RAX })
-        });
-      break;
-    case ir::UnaryOp::UnaryOperator::Indirection:
-      body.insert(
-        body.end(),
-        {
-         INSTR(MOVQ, { source, RAX })
-        });
+      body.push_back(INSTR(MOVQ, {source, RAX}));
+      body.push_back(INSTR(NEGQ, {RAX}));
       break;
   }
   body.push_back(INSTR(MOVQ, {RAX, destination}));

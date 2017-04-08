@@ -5,6 +5,7 @@
     "expected-json": "ast.expected.json"
   },
   "ir": {
-    "skip": true
+    "actual-dot": "ir.actual.dot",
+    "actual-png": "ir.actual.png"
   }
 }

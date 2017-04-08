@@ -762,62 +762,100 @@ std::shared_ptr<Operand> BuildUnaryExpressionIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block
 ) {
+  if (node->op == ast::UnaryOperator::PostfixDecrement
+    || node->op == ast::UnaryOperator::PostfixIncrement
+    || node->op == ast::UnaryOperator::PrefixDecrement
+    || node->op == ast::UnaryOperator::PrefixIncrement) {
+
+    if (node->expression->node_type != ast::Node::Type::Identifier
+      && node->expression->node_type != ast::Node::Type::SubscriptExpression) {
+      throw std::runtime_error("Address operation can only be applied on L-Value");
+    }
+
+    std::shared_ptr<WritableOperand> expr = BuildLExpressionIR(
+      std::static_pointer_cast<ast::LExpression>(node->expression),
+      context,
+      cfg,
+      current_block);
+    const std::shared_ptr<const DataType> expr_type = GetOperandType(*expr);
+
+    std::shared_ptr<WritableOperand> result_operand;
+
+    switch (node->op) {
+      case ast::UnaryOperator::PostfixDecrement: {
+        result_operand = VariableOperand::Create(context.CreateVariable(expr_type, node));
+        current_block->Push(CopyOp::Create(result_operand, expr));
+        current_block->Push(UnaryOp::Create(expr, UnaryOp::UnaryOperator::Decrement, expr));
+        break;
+      }
+      case ast::UnaryOperator::PostfixIncrement: {
+        result_operand = VariableOperand::Create(context.CreateVariable(expr_type, node));
+        current_block->Push(CopyOp::Create(result_operand, expr));
+        current_block->Push(UnaryOp::Create(expr, UnaryOp::UnaryOperator::Increment, expr));
+        break;
+      }
+      case ast::UnaryOperator::PrefixDecrement: {
+        result_operand = expr;
+        current_block->Push(UnaryOp::Create(expr, UnaryOp::UnaryOperator::Decrement, expr));
+        break;
+      }
+      case ast::UnaryOperator::PrefixIncrement: {
+        result_operand = expr;
+        current_block->Push(UnaryOp::Create(expr, UnaryOp::UnaryOperator::Increment, expr));
+        break;
+      }
+      default: {
+        throw std::domain_error("Unexpected value for `node->op` in `BuildUnaryExpressionIR`");
+      }
+    }
+    return result_operand;
+  }
+
   const std::shared_ptr<Operand> expr = BuildRExpressionIR(node->expression, context, cfg, current_block);
   const std::shared_ptr<const DataType> expr_type = GetOperandType(*expr);
 
-  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(expr_type, node);
-  std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
+  std::shared_ptr<VariableOperand> result_operand;
 
   switch (node->op) {
     case ast::UnaryOperator::UnaryMinus: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::UnaryMinus, expr));
+      result_operand = VariableOperand::Create(context.CreateVariable(expr_type, node));
+      current_block->Push(UnaryOp::Create(result_operand, UnaryOp::UnaryOperator::UnaryMinus, expr));
       break;
     }
-    case ast::UnaryOperator::Address: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::Address, expr));
+    case ast::UnaryOperator::AddressOf: {
+      if (node->expression->node_type != ast::Node::Type::Identifier
+        && node->expression->node_type != ast::Node::Type::SubscriptExpression) {
+        throw std::runtime_error("Address operation can only be applied on L-Value");
+      }
+      result_operand = VariableOperand::Create(context.CreateVariable(GetUsizeType(), node));
+      current_block->Push(UnaryOp::Create(result_operand, UnaryOp::UnaryOperator::AddressOf, expr));
       break;
     }
     case ast::UnaryOperator::BitwiseComplement: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::BitwiseComplement, expr));
+      result_operand = VariableOperand::Create(context.CreateVariable(expr_type, node));
+      current_block->Push(UnaryOp::Create(result_operand, UnaryOp::UnaryOperator::BitwiseComplement, expr));
       break;
     }
     case ast::UnaryOperator::Indirection: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::Indirection, expr));
-      break;
+      // Implement it to achieve an effect similar to `expr[0]`.
+      throw std::runtime_error("Not implemented: BuildUnaryExpressionIR for Indirection");
     }
     case ast::UnaryOperator::LogicalNegation: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::LogicalNegation, expr));
-      break;
-    }
-    case ast::UnaryOperator::PostfixDecrement: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PostfixDecrement, expr));
-      break;
-    }
-    case ast::UnaryOperator::PostfixIncrement: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PostfixIncrement, expr));
-      break;
-    }
-    case ast::UnaryOperator::PrefixDecrement: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PrefixDecrement, expr));
-      break;
-    }
-    case ast::UnaryOperator::PrefixIncrement: {
-      current_block->Push(UnaryOp::Create(tmp_operand, UnaryOp::UnaryOperator::PrefixIncrement, expr));
+      result_operand = VariableOperand::Create(context.CreateVariable(expr_type, node));
+      current_block->Push(UnaryOp::Create(result_operand, UnaryOp::UnaryOperator::LogicalNegation, expr));
       break;
     }
     case ast::UnaryOperator::UnaryPlus: {
-      const std::shared_ptr<const DataType> int_type = std::shared_ptr<const Int64DataType>(new Int64DataType());
-      const std::shared_ptr<const Variable> int_type_var = context.CreateVariable(int_type);
-      const std::shared_ptr<VariableOperand> int_op = VariableOperand::Create(int_type_var);
-      current_block->Push(CastOp::Create(int_op, expr));
+      result_operand = VariableOperand::Create(context.CreateVariable(GetInt64Type(), node));
+      current_block->Push(CastOp::Create(result_operand, expr));
       break;
     }
     default: {
-      throw std::domain_error("Unexpected value for node.op");
+      throw std::domain_error("Unexpected value for node.op in `BuildUnaryExpressionIR`");
     }
   }
 
-  return tmp_operand;
+  return result_operand;
 }
 
 std::shared_ptr<Operand> BuildConditionalExpressionIR(
