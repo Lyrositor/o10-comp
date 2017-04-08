@@ -9,7 +9,7 @@
 
 namespace comp {
 namespace ir {
-std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node);
+std::unique_ptr<Program> BuildProgramIR(const ast::Program &program_node);
 
 std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   const ast::Function &node,

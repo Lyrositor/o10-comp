@@ -9,6 +9,8 @@ namespace comp {
 namespace ir {
 class Program {
  public:
+  static std::unique_ptr<Program> Create();
+
   Program();
 
   ~Program();

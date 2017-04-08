@@ -21,6 +21,8 @@
 #include <comp/dot/ast.h>
 #include <comp/ir/to_dot.h>
 #include <comp/dot/emit.h>
+#include <comp/ir/optimizer/op_graph.h>
+#include <comp/ir/optimizer/optimize.h>
 
 #include "error_handling.h"
 
@@ -193,8 +195,16 @@ int main(int argc, char **argv) {
       return main_exit(EXIT_SUCCESS, buffer, options);
     }
 
-    std::shared_ptr<comp::ir::Program> program_ir = comp::ir::BuildProgramIR(
-      *program_ast);
+    std::unique_ptr<comp::ir::Program> program_ir = comp::ir::BuildProgramIR(*program_ast);
+
+    if (options[Optimise]) {
+      std::unordered_set<comp::ir::optimizer::Optimization> optimizations;
+//      optimizations.insert(comp::ir::optimizer::Optimization::NoOpElimination);
+//      optimizations.insert(comp::ir::optimizer::Optimization::ConstantsPropagation);
+//      optimizations.insert(comp::ir::optimizer::Optimization::ReturnFactorization);
+      program_ir = comp::ir::optimizer::OptimizeProgram(*program_ir, optimizations);
+    }
+
     if (options[Ir]) {
       std::unique_ptr<comp::dot::ast::Graph> program_graph = comp::ir::ProgramToDot(
         *program_ir);
@@ -222,11 +232,6 @@ int main(int argc, char **argv) {
         std::cerr << std::endl;
         std::cerr << "compilation terminated." << std::endl;
         return main_exit(EXIT_FAILURE, buffer, options);
-      }
-
-      // Optimise the generated code
-      if (options[Optimise]) {
-        // TODO(Lyrositor) Optimise the generated code
       }
 
       std::shared_ptr<comp::as::ast::Program>

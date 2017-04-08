@@ -1,6 +1,7 @@
 add_library(
   ir STATIC
   optimizer/op_graph.cpp
+  optimizer/optimize.cpp
   basic_block.cpp
   build_ir.cpp
   builtins.cpp

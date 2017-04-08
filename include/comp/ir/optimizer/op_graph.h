@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <set>
@@ -22,7 +23,7 @@ class OpGraph final {
    */
   static std::unique_ptr<OpGraph> Create();
 
-  static std::unique_ptr<OpGraph> FromControlFlowGraph(std::shared_ptr<ControlFlowGraph> cfg);
+  static std::unique_ptr<OpGraph> FromControlFlowGraph(const ControlFlowGraph &cfg);
 
   /**
    * Create a new empty operations graph
@@ -44,9 +45,19 @@ class OpGraph final {
 
   bool HasEdge(Edge edge) const;
 
+  std::set<Vertex> GetInEdges(const Vertex vertex) const;
+
+  std::pair<Vertex, Vertex> GetOutEdges(const Vertex vertex) const;
+
+  Vertex GetSource() const;
+
+  void Dfs(std::function<void(const Vertex &)> visitor) const;
+
   std::unique_ptr<ControlFlowGraph> ToControlFlowGraph() const;
 
  private:
+  Vertex source_;
+
   /**
    * The set of vertices
    */

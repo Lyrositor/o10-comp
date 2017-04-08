@@ -10,8 +10,8 @@
 
 namespace comp {
 namespace ir {
-std::shared_ptr<Program> BuildProgramIR(const ast::Program &program_node) {
-  std::shared_ptr<Program> program(new Program());
+std::unique_ptr<Program> BuildProgramIR(const ast::Program &program_node) {
+  std::unique_ptr<Program> program = Program::Create();
   RootContext context = CreateRootContextWithBuiltIns();
   for (auto declaration : program_node.body) {
     switch (declaration->node_type) {
