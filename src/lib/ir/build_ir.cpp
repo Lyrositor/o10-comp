@@ -675,6 +675,7 @@ std::shared_ptr<Operand> BuildLogicalExpressionIR(
     std::shared_ptr<BasicBlock> &current_block
 ) {
   std::shared_ptr<BasicBlock> right_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> right_block_head = right_block;
   const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
   std::shared_ptr<Operand> left_operand = BuildRExpressionIR(node->left, context, cfg, current_block);
@@ -708,11 +709,11 @@ std::shared_ptr<Operand> BuildLogicalExpressionIR(
   // Branching
   switch (node->op) {
     case ast::LogicalOperator ::LogicalOr: {
-      current_block->SetConditionalJump(result_operand, next_block, right_block);
+      current_block->SetConditionalJump(result_operand, next_block, right_block_head);
       break;
     }
     case ast::LogicalOperator ::LogicalAnd: {
-      current_block->SetConditionalJump(result_operand, right_block, next_block);
+      current_block->SetConditionalJump(result_operand, right_block_head, next_block);
       break;
     }
     default: {
@@ -837,7 +838,9 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
   std::shared_ptr<BasicBlock> &current_block
 ) {
   std::shared_ptr<BasicBlock> consequence_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> consequence_block_head = consequence_block;
   std::shared_ptr<BasicBlock> alternative_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> alternative_block_head = alternative_block;
   const std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
   const std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node->test, context, cfg, current_block);
@@ -857,7 +860,7 @@ std::shared_ptr<Operand> BuildConditionalExpressionIR(
   consequence_block->Push(CopyOp::Create(result_operand, consequence_operand));
   alternative_block->Push(CopyOp::Create(result_operand, alternative_operand));
 
-  current_block->SetConditionalJump(test_operand, consequence_block, alternative_block);
+  current_block->SetConditionalJump(test_operand, consequence_block_head, alternative_block_head);
   consequence_block->SetJump(next_block);
   alternative_block->SetJump(next_block);
 
@@ -955,17 +958,18 @@ void BuildWhileStatementIR(
   std::shared_ptr<BasicBlock> &current_block
 ) {
   std::shared_ptr<BasicBlock> test_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> test_block_head = test_block;
   std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> body_block_head = body_block;
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
   std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.condition, context, cfg, test_block);
-  std::shared_ptr<BasicBlock> body_block_head = body_block;
   BuildStatementIR(*node.body, context, cfg, body_block);
 
-  current_block->SetJump(test_block);
+  current_block->SetJump(test_block_head);
   test_block->SetConditionalJump(test_operand, body_block_head, next_block);
   if (body_block->GetType() == BasicBlock::Type::Incomplete) {
-    body_block->SetJump(test_block);
+    body_block->SetJump(test_block_head);
   }
   current_block = next_block;
 }
@@ -997,19 +1001,21 @@ void BuildForStatementIR(
   }
 
   std::shared_ptr<BasicBlock> test_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> test_block_head = test_block;
   std::shared_ptr<BasicBlock> update_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> update_block_head = update_block;
   std::shared_ptr<BasicBlock> body_block = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> body_block_head = body_block;
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
   if (node.update != nullptr) {
     BuildRExpressionIR(node.update, context, cfg, update_block);
   }
-  std::shared_ptr<BasicBlock> body_block_head = body_block;
   BuildStatementIR(*node.body, context, cfg, body_block);
 
-  current_block->SetJump(test_block);
+  current_block->SetJump(test_block_head);
   if (body_block->GetType() == BasicBlock::Type::Incomplete) {
-    body_block->SetJump(update_block);
-    update_block->SetJump(test_block);
+    body_block->SetJump(update_block_head);
+    update_block->SetJump(test_block_head);
   }
 
   if(node.test == nullptr) {
