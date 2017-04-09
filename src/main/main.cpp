@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
     std::unique_ptr<comp::ir::Program> program_ir = comp::ir::BuildProgramIR(*program_ast);
 
     if (options[Optimise]) {
-      std::unordered_set<comp::ir::optimizer::Optimization> optimizations;
+      std::set<comp::ir::optimizer::Optimization> optimizations;
       optimizations.insert(comp::ir::optimizer::Optimization::NoOpElimination);
       optimizations.insert(comp::ir::optimizer::Optimization::ConstantsPropagation);
       optimizations.insert(comp::ir::optimizer::Optimization::ReturnFactorization);

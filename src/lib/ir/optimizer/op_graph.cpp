@@ -210,7 +210,7 @@ std::unique_ptr<ControlFlowGraph> OpGraph::ToControlFlowGraph() const {
   std::map<Vertex, std::shared_ptr<BasicBlock>> block_heads;
   block_heads[source] = result->GetSource();
 
-  this->Dfs([&, &block_heads, &result](const Vertex &v) -> void {
+  this->Dfs([&](const Vertex &v) -> void {
     std::set<Vertex> in_edges = this->GetInEdges(v);
     bool is_block_head = in_edges.size() > 1;
     if (in_edges.size() == 1) {
@@ -228,7 +228,7 @@ std::unique_ptr<ControlFlowGraph> OpGraph::ToControlFlowGraph() const {
 
   // The block corresponding to the current branch
   std::shared_ptr<BasicBlock> current_block = nullptr;
-  this->Dfs([&, &block_heads, &current_block](const Vertex &v) -> void {
+  this->Dfs([&](const Vertex &v) -> void {
     if (current_block == nullptr) {
       current_block = block_heads[v];
     }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <comp/ir/program.h>
-#include <unordered_set>
+#include <set>
 
 namespace comp {
 namespace ir {
@@ -30,21 +30,21 @@ enum class Optimization {
  */
 std::unique_ptr<ir::Program> OptimizeProgram(
   const ir::Program &program,
-  const std::unordered_set<Optimization> &optimizations);
+  const std::set<Optimization> &optimizations);
 
 /**
  * Optimize a function symbol
  */
 std::unique_ptr<ir::FunctionSymbol> OptimizeFunctionSymbol(
   const ir::FunctionSymbol &function,
-  const std::unordered_set<Optimization> &optimizations);
+  const std::set<Optimization> &optimizations);
 
 /**
  * Optimize a single control flow graph
  */
 std::unique_ptr<ir::ControlFlowGraph> OptimizeControlFlowGraph(
   const ir::ControlFlowGraph &cfg,
-  const std::unordered_set<Optimization> &optimizations);
+  const std::set<Optimization> &optimizations);
 
 } // namespace optimizer
 } // namespace ir

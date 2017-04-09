@@ -1,13 +1,13 @@
 #include <comp/ir/optimizer/optimize.h>
-#include <comp/utils.h>
 #include <comp/ir/optimizer/op_graph.h>
+#include <comp/utils.h>
 
 namespace comp {
 namespace ir {
 namespace optimizer {
 std::unique_ptr<ir::Program> OptimizeProgram(
   const ir::Program &program,
-  const std::unordered_set<Optimization> &optimizations
+  const std::set<Optimization> &optimizations
 ) {
   std::unique_ptr<ir::Program> result = ir::Program::Create();
 
@@ -28,7 +28,7 @@ std::unique_ptr<ir::Program> OptimizeProgram(
 
 std::unique_ptr<ir::FunctionSymbol> OptimizeFunctionSymbol(
   const ir::FunctionSymbol &function,
-  const std::unordered_set<Optimization> &optimizations
+  const std::set<Optimization> &optimizations
 ) {
   std::shared_ptr<ControlFlowGraph> body = OptimizeControlFlowGraph(*function.GetBody(), optimizations);
   std::unique_ptr<ir::FunctionSymbol> result = FunctionSymbol::Create(function.GetName(), function.GetParameters(), function.GetReturnType(), body);
@@ -38,7 +38,7 @@ std::unique_ptr<ir::FunctionSymbol> OptimizeFunctionSymbol(
 
 std::unique_ptr<ir::ControlFlowGraph> OptimizeControlFlowGraph(
   const ir::ControlFlowGraph &cfg,
-  const std::unordered_set<Optimization> &optimizations
+  const std::set<Optimization> &optimizations
 ) {
   UNUSED(optimizations);
   return OpGraph::FromControlFlowGraph(cfg)->ToControlFlowGraph();
