@@ -25,6 +25,16 @@ TEST(comp__ir__optimizer__op_graph, AddEdge) {
   ASSERT_TRUE(graph->HasVertex(v1));
   ASSERT_TRUE(graph->HasVertex(v2));
   ASSERT_TRUE(graph->HasEdge(e));
+  std::set<Vertex> v1_in_edges = graph->GetInEdges(v1);
+  std::set<Vertex> v2_in_edges = graph->GetInEdges(v2);
+  ASSERT_TRUE(v1_in_edges.size() == 0);
+  ASSERT_TRUE(v2_in_edges.size() == 1);
+  std::pair<Vertex, Vertex> actual_v1_out_edges = graph->GetOutEdges(v1);
+  std::pair<Vertex, Vertex> actual_v2_out_edges = graph->GetOutEdges(v2);
+  std::pair<Vertex, Vertex> expected_v1_out_edges(v2, nullptr);
+  std::pair<Vertex, Vertex> expected_v2_out_edges(nullptr, nullptr);
+  ASSERT_EQ(actual_v1_out_edges, expected_v1_out_edges);
+  ASSERT_EQ(actual_v2_out_edges, expected_v2_out_edges);
 }
 
 TEST(comp__ir__build_ir, AddEdgeNoVertices) {

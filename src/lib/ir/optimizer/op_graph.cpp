@@ -83,13 +83,13 @@ void OpGraph::AddEdge(Vertex source, Vertex target) {
     throw std::runtime_error("The source node already has an out edge");
   }
   if (this->in_edges_.find(target) == this->in_edges_.end()) {
-    this->in_edges_[target] = std::unique_ptr<std::set<Vertex>>(new std::set<Vertex>());
+    this->in_edges_[target] = std::shared_ptr<std::set<Vertex>>(new std::set<Vertex>());
   }
 
   Edge edge(source, target);
   this->edges_.insert(edge);
   // Use a virtual edge
-  this->out_edges_[source] = std::unique_ptr<Edge>(new Edge(target, nullptr));
+  this->out_edges_[source] = std::shared_ptr<Edge>(new Edge(target, nullptr));
   this->in_edges_[target]->insert(source);
 }
 
@@ -110,10 +110,10 @@ void OpGraph::AddConditionalEdges(Vertex source, Vertex target_if_true, Vertex t
     throw std::runtime_error("The source node already has an out edge");
   }
   if (this->in_edges_.find(target_if_true) == this->in_edges_.end()) {
-    this->in_edges_[target_if_true] = std::unique_ptr<std::set<Vertex>>(new std::set<Vertex>());
+    this->in_edges_[target_if_true] = std::shared_ptr<std::set<Vertex>>(new std::set<Vertex>());
   }
   if (this->in_edges_.find(target_if_false) == this->in_edges_.end()) {
-    this->in_edges_[target_if_false] = std::unique_ptr<std::set<Vertex>>(new std::set<Vertex>());
+    this->in_edges_[target_if_false] = std::shared_ptr<std::set<Vertex>>(new std::set<Vertex>());
   }
 
   Edge edge_if_true(source, target_if_true);
@@ -121,7 +121,7 @@ void OpGraph::AddConditionalEdges(Vertex source, Vertex target_if_true, Vertex t
   this->edges_.insert(edge_if_true);
   this->edges_.insert(edge_if_false);
   // Use a virtual edge
-  this->out_edges_[source] = std::unique_ptr<Edge>(new Edge(target_if_true, target_if_false));
+  this->out_edges_[source] = std::shared_ptr<Edge>(new Edge(target_if_true, target_if_false));
   this->in_edges_[target_if_true]->insert(source);
   this->in_edges_[target_if_false]->insert(source);
 }
@@ -136,11 +136,19 @@ bool OpGraph::HasEdge(Edge edge) const {
 
 std::set<Vertex> OpGraph::GetInEdges(const Vertex vertex) const {
   assert(this->HasVertex(vertex));
-  return *this->in_edges_.find(vertex)->second;
+  auto it = this->in_edges_.find(vertex);
+  if (it == this->in_edges_.end()) {
+    return std::set<Vertex>();
+  }
+  return std::set<Vertex>(it->second->begin(), it->second->end());
 }
 
 std::pair<Vertex, Vertex> OpGraph::GetOutEdges(const Vertex vertex) const {
   assert(this->HasVertex(vertex));
+  auto it = this->out_edges_.find(vertex);
+  if (it == this->out_edges_.end()) {
+    return Edge(nullptr, nullptr);
+  }
   return *this->out_edges_.find(vertex)->second;
 }
 
@@ -195,14 +203,23 @@ std::unique_ptr<ControlFlowGraph> OpGraph::ToControlFlowGraph() const {
     return result;
   }
 
-  // A basic starts either with the source operation or is an operation
-  // with more than one in-edge. This map stores the operation that
-  // start a basic block.
+  // A basic starts either with the source operation, is an operation
+  // with more than one in-edge or the target of a conditional
+  // jump. This map stores the operation that starts a basic
+  // block.
   std::map<Vertex, std::shared_ptr<BasicBlock>> block_heads;
   block_heads[source] = result->GetSource();
 
   this->Dfs([&, &block_heads, &result](const Vertex &v) -> void {
-    if (this->GetInEdges(v).size() > 1) {
+    std::set<Vertex> in_edges = this->GetInEdges(v);
+    bool is_block_head = in_edges.size() > 1;
+    if (in_edges.size() == 1) {
+      Vertex parent = *in_edges.begin();
+      if (parent->op_type == Op::Type::TestOp) {
+        is_block_head = true;
+      }
+    }
+    if (is_block_head) {
       if (block_heads.find(v) == block_heads.end()) {
         block_heads[v] = result->CreateBasicBlock();
       }

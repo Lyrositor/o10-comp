@@ -625,7 +625,6 @@ std::shared_ptr<ast::Operand> BuildOperand(
         std::static_pointer_cast<ir::ConstantOperand>(op)->value);
     }
   }
-  throw Exception("unexpected as operand type");
 }
 }  // namespace x64
 }  // namespace arch

@@ -73,12 +73,12 @@ class OpGraph final {
    * edge or a pair <target_vertex_if_true, target_vertex_if_false> if there are two
    * out edges.
    */
-  std::map<Vertex, std::unique_ptr<std::pair<Vertex, Vertex>>> out_edges_;
+  std::map<Vertex, std::shared_ptr<std::pair<Vertex, Vertex>>> out_edges_;
 
   /**
    * A map from the target vertex of the edge to the source vertex of the edge
    */
-  std::map<Vertex, std::unique_ptr<std::set<Vertex>>> in_edges_;
+  std::map<Vertex, std::shared_ptr<std::set<Vertex>>> in_edges_;
 };
 } // namespace optimizer
 } // namespace ir

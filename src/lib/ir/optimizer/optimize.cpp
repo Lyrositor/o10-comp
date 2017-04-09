@@ -15,6 +15,7 @@ std::unique_ptr<ir::Program> OptimizeProgram(
     switch (symbol->GetType()) {
       case ir::ProgramSymbol::Type::Function: {
         result->AddSymbol(OptimizeFunctionSymbol(*std::static_pointer_cast<const FunctionSymbol>(symbol), optimizations));
+        break;
       }
       default: {
         result->AddSymbol(symbol);
