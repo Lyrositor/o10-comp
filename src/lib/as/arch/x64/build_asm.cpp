@@ -481,8 +481,8 @@ void BuildCastOp(
   if (in_data_type->GetType() == ir::DataType::Type::Array &&
     out_data_type->GetType() == ir::DataType::Type::Pointer) {
     body.insert(body.end(), {
-      INSTR(LEA, {source, R10}),
-      INSTR(MOVQ, {R10, destination})
+      INSTR(LEA, {source, RAX}),
+      INSTR(MOVQ, {RAX, destination})
     });
   }
 
