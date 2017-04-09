@@ -44,13 +44,23 @@ make prepare
 make
 ```
 
-Note: on INSA machines, replace all uses of `make` with `make-insa` (the parameters are unchanged).
+Note: on INSA machines, replace all uses of `make` with `./make-insa` (the parameters are unchanged).
 
 You will get the following artifacts:
 
 - **build/o10c**: The compiler executable
 - **build/comp_test**: The executable that runs the unit-tests
 - **build/src/lib/libcomp.a**: The compiler library, the headers are in **include/**
+
+## Run
+
+To run the compiler, run the `build/o10c` executable from the command-line. You can use the `-h` flag for information about its usage.
+
+If you only want to compile an executable and have GCC installed, run the `o10c.sh` script instead. It takes two parameters:
+- a C source file to compile
+- the name of the executable file to produce
+
+Example: `./o10c.sh my_program.c my_program`
 
 ## Test
 
@@ -77,7 +87,7 @@ Finally, you can also run the unit tests with test coverage analysis with:
 make coverage
 ```
 
-Note: on INSA machines, replace all uses of `make` with `make-insa` (the parameters are unchanged).
+Note: on INSA machines, replace all uses of `make` with `./make-insa` (the parameters are unchanged).
 
 ## License
 
