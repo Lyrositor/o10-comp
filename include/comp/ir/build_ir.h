@@ -46,8 +46,6 @@ void BuildVariableDeclarationIR(
   std::shared_ptr<ControlFlowGraph> &cfg,
   std::shared_ptr<BasicBlock> &current_block);
 
-const std::shared_ptr<const DataType> GetOperandType(const Operand &operand);
-
 std::shared_ptr<Operand> BuildRExpressionIR(
   const std::shared_ptr<ast::RExpression> node,
   Context &context,

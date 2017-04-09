@@ -239,7 +239,7 @@ std::unique_ptr<PointerDataType> PointerDataType::Create(
 }
 
 PointerDataType::PointerDataType(std::shared_ptr<const DataType> pointed_type) :
-  DataType(Type::Array), pointed_type_(pointed_type) {
+  DataType(Type::Pointer), pointed_type_(pointed_type) {
 }
 
 PointerDataType::~PointerDataType() {

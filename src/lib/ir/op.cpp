@@ -1,5 +1,7 @@
 #include <comp/ir/op.h>
 
+#include <comp/ir/builtins.h>
+
 namespace comp {
 namespace ir {
 Op::Op(Type op_type) : op_type(op_type) {
@@ -45,12 +47,12 @@ ConstantOperand::~ConstantOperand() {
 }
 
 std::unique_ptr<IndirectOperand> IndirectOperand::Create(
-  const std::shared_ptr<const Operand> address) {
+  const std::shared_ptr<Operand> address) {
   return std::unique_ptr<IndirectOperand>(new IndirectOperand(address));
 }
 
 IndirectOperand::IndirectOperand(
-  const std::shared_ptr<const Operand> address
+  const std::shared_ptr<Operand> address
 ) :
   WritableOperand(Type::Indirect), address(address) {
 }
@@ -183,8 +185,37 @@ NoOp::NoOp() : Op(Op::Type::NoOp) {
 
 NoOp::~NoOp() {
 }
+
 std::unique_ptr<NoOp> NoOp::Create() {
   return std::unique_ptr<NoOp>(new NoOp());
 }
-} // ir
-} // comp
+
+const std::shared_ptr<const DataType> GetOperandType(const Operand &operand) {
+  switch (operand.operand_type) {
+    case Operand::Type::Variable: {
+      return static_cast<const VariableOperand &>(operand).variable->GetDataType();
+    }
+    case Operand::Type::Indirect: {
+      std::shared_ptr<const DataType> base_type = GetOperandType(*static_cast<const IndirectOperand &>(operand).address);
+      switch (base_type->GetType()) {
+        case DataType::Type::Array: {
+          return std::static_pointer_cast<const ArrayDataType>(base_type)->GetItemType();
+        }
+        case DataType::Type::Pointer: {
+          return std::static_pointer_cast<const PointerDataType>(base_type)->GetItemType();
+        }
+        default: {
+          throw std::domain_error("Unexpected value for `base_type->GetType()` in `GetOperandType`");
+        }
+      }
+    }
+    case Operand::Type::Constant: {
+      return GetInt64Type();
+    }
+    default: {
+      throw std::domain_error("Unexpected value for `operand.operand_type` in `GetOperandType`");
+    }
+  }
+}
+}  // ir
+}  // comp

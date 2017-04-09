@@ -24,6 +24,7 @@ static const std::shared_ptr<ast::Mnemonic>
   IMULQ = ast::Mnemonic::Create("imulq"),
   JE = ast::Mnemonic::Create("je"),
   JMP = ast::Mnemonic::Create("jmp"),
+  LEA = ast::Mnemonic::Create("lea"),
   LEAVEQ = ast::Mnemonic::Create("leaveq"),
   MOVQ = ast::Mnemonic::Create("movq"),
   MOVZBQ = ast::Mnemonic::Create("movzbq"),
@@ -151,7 +152,16 @@ void BuildFunction(
       continue;
     }
     //stack += GetDataTypeSize(variable->GetDataType());  TODO(Lyrositor) Use the right data type size
-    stack += kRegisterQSize;
+
+    // Allocate more memory for arrays
+    if (variable->GetDataType()->GetType() == ir::DataType::Type::Array) {
+      auto array = std::static_pointer_cast<const ir::ArrayDataType>(
+        variable->GetDataType());
+      //stack += GetDataTypeSize(array->GetItemType()) * array->GetSize();  TODO(Lyrositor) Use the right data type size
+      stack += kRegisterQSize * array->GetSize();
+    } else {
+      stack += kRegisterQSize;
+    }
     variables_table.Register(
       variable,
       ast::MemoryReference::Create(
@@ -289,14 +299,38 @@ void BuildBinOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   const VariablesTable &variables_table
 ) {
-  auto source1 = BuildOperand(op->in1, variables_table);
-  auto source2 = BuildOperand(op->in2, variables_table);
-  auto destination = BuildOperand(op->out, variables_table);
+  auto source1 = BuildOperand(op->in1, body, variables_table);
+  auto source2 = BuildOperand(op->in2, body, variables_table);
+  auto destination = BuildOperand(op->out, body, variables_table);
   body.push_back(INSTR(MOVQ, {source1, RAX}));
   switch (op->binary_operator) {
-    case ir::BinOp::BinaryOperator::Addition:
-      body.push_back(INSTR(ADDQ, {source2, RAX}));
+    case ir::BinOp::BinaryOperator::Addition: {
+      // Check if this is actually an indexing operation
+      // TODO(Lyrositor) Make this its own operation?
+      auto in_data_type = ir::GetOperandType(*op->in1);
+      auto out_data_type = ir::GetOperandType(*op->out);
+      if (in_data_type->GetType() == ir::DataType::Type::Array &&
+        out_data_type->GetType() == ir::DataType::Type::Pointer) {
+        auto array = std::static_pointer_cast<const ir::ArrayDataType>(
+          in_data_type);
+        auto pointer = std::static_pointer_cast<const ir::PointerDataType>(
+          out_data_type);
+        body.insert(body.end(), {
+          INSTR(MOVQ, {source2, RAX}),
+          INSTR(IMULQ, {
+            ast::ImmediateOperand::Create(
+              GetDataTypeSize(array->GetItemType())),
+            RAX
+          }),
+          INSTR(LEA, {source1, RCX}),
+          INSTR(ADDQ, {RCX, RAX})
+        });
+      } else {
+        // Otherwise, this is just a normal addition
+        body.push_back(INSTR(ADDQ, {source2, RAX}));
+      }
       break;
+    }
     case ir::BinOp::BinaryOperator::BitwiseAnd:
       body.push_back(INSTR(ANDQ, {source2, RAX}));
       break;
@@ -378,26 +412,10 @@ void BuildCallOp(
   int64_t stack_size = 0;
   for (size_t idx = 0; idx < op->args.size(); idx++) {
     // Get the source of the parameter
-    std::shared_ptr<ast::Operand> source;
-    // int64_t data_type_size;
-    switch (op->args[idx]->operand_type) {
-      case ir::Operand::Type::Constant: {
-        source = ast::ImmediateOperand::Create(
-          std::static_pointer_cast<ir::ConstantOperand>(
-            op->args[idx])->value);
-        // data_type_size = GetDataTypeSize(ir::GetInt64Type());
-        break;
-      }
-      case ir::Operand::Type::Indirect:
-        throw Exception("indirect operand not supported yet");
-      case ir::Operand::Type::Variable: {
-        auto variable = std::static_pointer_cast<ir::VariableOperand>(
-          op->args[idx])->variable;
-        // data_type_size = GetDataTypeSize(variable->GetDataType());
-        source = variables_table.Get(variable);
-        break;
-      }
-    }
+    std::shared_ptr<ast::Operand> source = BuildOperand(
+      op->args[idx],
+      body,
+      variables_table);
 
     if (idx < kParameterRegisters.size()) {
       // Copy the parameter's value to its destination register
@@ -441,7 +459,7 @@ void BuildCallOp(
   }
 
   // Store the return value
-  auto destination = BuildOperand(op->out, variables_table);
+  auto destination = BuildOperand(op->out, body, variables_table);
   body.push_back(INSTR(MOVQ, {RAX, destination}));
 }
 
@@ -450,10 +468,10 @@ void BuildCastOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   const VariablesTable &variables_table
 ) {
-  // TODO(Lyrositor) This is a simple CopyOp for now; change this once different
+  // TODO(Lyrositor) This is simple CopyOp for now; change this once different
   // types are properly handled
-  auto source = BuildOperand(op->in, variables_table);
-  auto destination = BuildOperand(op->out, variables_table);
+  auto source = BuildOperand(op->in, body, variables_table);
+  auto destination = BuildOperand(op->out, body, variables_table);
 
   // Introduce an intermediary register if this is a copy from memory to memory
   if (source->node_type == ast::Node::Type::MemoryReference &&
@@ -470,8 +488,8 @@ void BuildCopyOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   const VariablesTable &variables_table
 ) {
-  auto source = BuildOperand(op->in, variables_table);
-  auto destination = BuildOperand(op->out, variables_table);
+  auto source = BuildOperand(op->in, body, variables_table);
+  auto destination = BuildOperand(op->out, body, variables_table);
 
   // Introduce an intermediary register if this is a copy from memory to memory
   if (source->node_type == ast::Node::Type::MemoryReference &&
@@ -501,7 +519,8 @@ void BuildReturnOp(
 ) {
   // Return the value if this is a typed return
   if (op->in != nullptr) {
-    body.push_back(INSTR(MOVQ, {BuildOperand(op->in, variables_table), RAX}));
+    body.push_back(
+      INSTR(MOVQ, {BuildOperand(op->in, body, variables_table), RAX}));
   }
 
   // Epilog
@@ -520,7 +539,7 @@ void BuildTestOp(
 ) {
   // Jump to the `true` branch if the test is not equal to zero; otherwise,
   // jump to the `false` branch
-  auto test = BuildOperand(op->test, variables_table);
+  auto test = BuildOperand(op->test, body, variables_table);
   body.push_back(INSTR(MOVQ, {test, RAX}));
   body.push_back(INSTR(CMPQ, 0, RAX));
   body.push_back(
@@ -540,8 +559,8 @@ void BuildUnaryOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   const VariablesTable &variables_table
 ) {
-  auto source = BuildOperand(op->in1, variables_table);
-  auto destination = BuildOperand(op->out, variables_table);
+  auto source = BuildOperand(op->in1, body, variables_table);
+  auto destination = BuildOperand(op->out, body, variables_table);
   switch (op->unary_operator) {
     case ir::UnaryOp::UnaryOperator::AddressOf:
       throw std::runtime_error("Not implemented: `AddressOf` operation");
@@ -573,6 +592,7 @@ void BuildUnaryOp(
 
 std::shared_ptr<ast::Operand> BuildOperand(
   std::shared_ptr<ir::Operand> op,
+  std::vector<std::shared_ptr<ast::Statement>> &body,
   const VariablesTable &variables_table
 ) {
   switch (op->operand_type) {
@@ -580,8 +600,13 @@ std::shared_ptr<ast::Operand> BuildOperand(
       return variables_table.Get(
         std::static_pointer_cast<ir::VariableOperand>(op)->variable);
     }
-    case ir::Operand::Type::Indirect:
-      throw Exception("indirect operand not supported yet");
+    case ir::Operand::Type::Indirect: {
+      std::shared_ptr<ir::Operand> address_op = std::static_pointer_cast<
+        ir::IndirectOperand>(op)->address;
+      body.push_back(
+        INSTR(MOVQ, {BuildOperand(address_op, body, variables_table), RDX}));
+      return ast::MemoryReference::Create(RDX);
+    }
     case ir::Operand::Type::Constant: {
       return ast::ImmediateOperand::Create(
         std::static_pointer_cast<ir::ConstantOperand>(op)->value);

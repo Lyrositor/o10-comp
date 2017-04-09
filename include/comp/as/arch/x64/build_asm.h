@@ -75,6 +75,7 @@ void BuildUnaryOp(
 
 std::shared_ptr<ast::Operand> BuildOperand(
   std::shared_ptr<ir::Operand> op,
+  std::vector<std::shared_ptr<ast::Statement>> &body,
   const VariablesTable &variables_table);
 }  // namespace x64
 }  // namespace arch

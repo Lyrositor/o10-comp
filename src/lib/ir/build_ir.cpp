@@ -347,34 +347,6 @@ void BuildVariableDeclarationIR(
   }
 }
 
-const std::shared_ptr<const DataType> GetOperandType(const Operand &operand) {
-  switch (operand.operand_type) {
-    case Operand::Type::Variable: {
-      return static_cast<const VariableOperand &>(operand).variable->GetDataType();
-    }
-    case Operand::Type::Indirect: {
-      std::shared_ptr<const DataType> base_type = GetOperandType(*static_cast<const IndirectOperand &>(operand).address);
-        switch(base_type->GetType()){
-          case DataType::Type::Array: {
-            return std::static_pointer_cast<const ArrayDataType>(base_type)->GetItemType();
-          }
-          case DataType::Type::Pointer: {
-            return std::static_pointer_cast<const PointerDataType>(base_type)->GetItemType();
-          }
-          default: {
-            throw std::domain_error("Unexpected value for `base_type->GetType()` in `GetOperandType`");
-          }
-        }
-    }
-    case Operand::Type::Constant: {
-      return GetInt64Type();
-    }
-    default: {
-      throw std::domain_error("Unexpected value for `operand.operand_type` in `GetOperandType`");
-    }
-  }
-}
-
 std::shared_ptr<Operand> BuildRExpressionIR(
   const std::shared_ptr<ast::RExpression> node,
   Context &context,
@@ -936,9 +908,9 @@ std::shared_ptr<IndirectOperand> BuildSubscriptExpressionIR(
   std::shared_ptr<const DataType> pointer_type = PointerDataType::Create(item_type);
   if (*base_type != *pointer_type) {
     if(base_type->IsCastableTo(*pointer_type)) {
-      const std::shared_ptr<VariableOperand> casted_base = VariableOperand::Create(context.CreateVariable(pointer_type));
-      current_block->Push(CastOp::Create(casted_base, base_operand));
-      base_operand = casted_base;
+      //const std::shared_ptr<VariableOperand> casted_base = VariableOperand::Create(context.CreateVariable(pointer_type));
+      //current_block->Push(CastOp::Create(casted_base, base_operand));
+      //base_operand = casted_base;
     } else {
       throw std::runtime_error("Unable to cast to valid pointer");
     }

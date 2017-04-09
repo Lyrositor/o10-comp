@@ -48,11 +48,11 @@ struct ConstantOperand final: Operand {
  */
 struct IndirectOperand final: WritableOperand {
   static std::unique_ptr<IndirectOperand> Create(
-    const std::shared_ptr<const Operand> address);
+    const std::shared_ptr<Operand> address);
   IndirectOperand(
-    const std::shared_ptr<const Operand> address);
+    const std::shared_ptr<Operand> address);
   ~IndirectOperand();
-  const std::shared_ptr<const Operand> address;
+  const std::shared_ptr<Operand> address;
 };
 
 struct Op {
@@ -201,5 +201,7 @@ struct NoOp final : public Op {
   NoOp();
   virtual ~NoOp();
 };
+
+const std::shared_ptr<const DataType> GetOperandType(const Operand &operand);
 }  // namespace ir
 }  // namespace comp
