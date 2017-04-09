@@ -31,7 +31,9 @@ std::unique_ptr<ir::FunctionSymbol> OptimizeFunctionSymbol(
   const std::unordered_set<Optimization> &optimizations
 ) {
   std::shared_ptr<ControlFlowGraph> body = OptimizeControlFlowGraph(*function.GetBody(), optimizations);
-  return FunctionSymbol::Create(function.GetName(), function.GetParameters(), function.GetReturnType(), body);
+  std::unique_ptr<ir::FunctionSymbol> result = FunctionSymbol::Create(function.GetName(), function.GetParameters(), function.GetReturnType(), body);
+  result->SetLocalVariables(function.GetLocalVariables());
+  return result;
 }
 
 std::unique_ptr<ir::ControlFlowGraph> OptimizeControlFlowGraph(
