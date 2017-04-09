@@ -49,7 +49,9 @@ To do so, specify the `BISON_EXECUTABLE` and `FLEX_EXECUTABLE` variables when ru
 # Run as a normal user
 # Install the dependencies
 make prepare
+
 # Build all the targets of the project
+# (Use `make-insa` at INSA)
 make
 ```
 
@@ -63,6 +65,8 @@ You will get the following artifacts:
 
 ## Run
 
+### Full compilation
+
 To run the compiler, run the `build/o10c` executable from the command-line. You can use the `-h` flag for information about its usage.
 
 If you only want to compile an executable and have GCC installed, run the `o10c.sh` script instead. It takes two parameters:
@@ -70,6 +74,38 @@ If you only want to compile an executable and have GCC installed, run the `o10c.
 - the name of the executable file to produce
 
 Example: `./o10c.sh my_program.c my_program`
+
+### Emit the AST
+
+Generate a JSOn view of the IR:
+
+```
+./build/o10c --ast main.c
+```
+
+### Emit the IR
+
+Generate a Dot representation of the IR:
+
+```
+./build/o10c --ir main.c
+```
+
+You can then render it:
+
+```
+./build/o10c --ir main.c > main.dot
+dot -Tpng -o main.png main.dot
+```
+
+### Emit the assembly
+
+```
+# Standard
+./build/o10c -c --output="main.asm" main.c
+# Optimized
+./build/o10c -co --output="main.asm" main.c
+```
 
 ## Test
 
@@ -97,6 +133,144 @@ make coverage
 ```
 
 Note: on INSA machines, replace all uses of `make` with `./make-insa` (the parameters are unchanged).
+
+## Example
+
+**main.c**
+
+```c
+void main() {
+  for (int64_t cur = 'A'; cur <= 'Z'; cur++) {
+    putchar(cur & 1 ? cur : cur | 32);
+  }
+  putchar('\n');
+}
+```
+
+**main.ast.json**
+
+```json
+{
+"node_type": "Program",
+"body": [{
+  "node_type": "Function",
+  "identifier": {"node_type": "Identifier", "name": "main"},
+  "return_type": { "node_type": "IdentifierDataType",
+    "identifier": {"node_type": "Identifier", "name": "void"}},
+  "parameters": [],
+  "body": {
+    "node_type": "BlockStatement",
+    "body": [
+      {
+        "node_type": "ForStatement",
+        "initializer": {"node_type": "DeclarationForInitializer",
+          "declaration": {"node_type": "VariableDeclaration",
+            "data_type": {"node_type": "IdentifierDataType",
+              "identifier": {"node_type": "Identifier", "name": "int64_t"}},
+            "declarators": [{
+              "node_type": "VariableDeclarator",
+              "declarator": {"node_type": "IdentifierDeclarator",
+                "identifier": {"node_type": "Identifier", "name": "cur"}},
+                "initial_value": {"node_type": "Uint8Literal", "value": 65}}]}},
+        "test": {"node_type": "BinaryExpression",
+          "op": "<=",
+          "left": {"node_type": "Identifier", "name": "cur"},
+          "right": {"node_type": "Uint8Literal", "value": 90}},
+        "update": {"node_type": "UnaryExpression",
+          "op": "PostfixIncrement",
+          "expression": {"node_type": "Identifier", "name": "cur"}},
+        "body": {"node_type": "BlockStatement",
+          "body": [{"node_type": "ExpressionStatement",
+            "expression": {"node_type": "CallExpression",
+              "callee": {"node_type": "Identifier", "name": "putchar"},
+              "arguments": [{"node_type": "ConditionalExpression",
+                "test": {"node_type": "BinaryExpression",
+                  "op": "&",
+                  "left": {"node_type": "Identifier", "name": "cur"},
+                  "right": {"node_type": "Int64Literal", "value": 1}},
+                "consequence": {"node_type": "Identifier", "name": "cur"},
+                "alternative": {"node_type": "BinaryExpression",
+                  "op": "|",
+                  "left": {"node_type": "Identifier", "name": "cur"},
+                  "right": {"node_type": "Int64Literal", "value": 32}}}]}}]}},
+      {
+        "node_type": "ExpressionStatement",
+        "expression": { "node_type": "CallExpression",
+          "callee": {"node_type": "Identifier", "name": "putchar"},
+          "arguments": [{"node_type": "Uint8Literal", "value": 10}]}}]}}]}
+```
+
+IR (normal)
+
+![IR](./media/ir.png)
+
+
+IR (optimized)
+
+![IR opt](./media/ir-opt.png)
+
+ASM
+
+```asm
+	.text
+	.global main
+main:
+	pushq %rbp
+	movq %rsp, %rbp
+	subq $80, %rsp
+	movq $65, (-8)(%rbp)
+	jmp .L1
+.L1:
+	movq (-8)(%rbp), %rax
+	cmpq $90, %rax
+	setle %al
+	movzbq %al, %rax
+	movq %rax, (-64)(%rbp)
+	movq (-64)(%rbp), %rax
+	cmpq $0, %rax
+	je .L4
+	jmp .L3
+.L2:
+	movq (-8)(%rbp), %rax
+	movq %rax, (-16)(%rbp)
+	movq (-8)(%rbp), %rax
+	incq %rax
+	movq %rax, (-8)(%rbp)
+	jmp .L1
+.L3:
+	movq (-8)(%rbp), %rax
+	andq $1, %rax
+	movq %rax, (-32)(%rbp)
+	movq (-32)(%rbp), %rax
+	cmpq $0, %rax
+	je .L6
+	jmp .L5
+.L4:
+	movq $10, (-80)(%rbp)
+	movq (-80)(%rbp), %rdi
+	callq putchar
+	movq %rax, (-72)(%rbp)
+	leaveq
+	retq
+.L5:
+	movq (-8)(%rbp), %rax
+	movq %rax, (-48)(%rbp)
+	jmp .L7
+.L6:
+	movq (-8)(%rbp), %rax
+	orq $32, %rax
+	movq %rax, (-40)(%rbp)
+	movq (-40)(%rbp), %rax
+	movq %rax, (-48)(%rbp)
+	jmp .L7
+.L7:
+	movq (-48)(%rbp), %rax
+	movq %rax, (-56)(%rbp)
+	movq (-56)(%rbp), %rdi
+	callq putchar
+	movq %rax, (-24)(%rbp)
+	jmp .L2
+```
 
 ## License
 

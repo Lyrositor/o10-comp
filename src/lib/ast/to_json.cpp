@@ -67,9 +67,6 @@ std::string serialializeAssignmentOperator(const AssignmentOperator op) {
     case AssignmentOperator::RightShift: return ">>=";
     case AssignmentOperator::Simple: return "=";
     case AssignmentOperator::Subtraction: return "-=";
-    default: {
-      throw std::domain_error("Unexpected value for `op`");
-    }
   }
 }
 
@@ -103,9 +100,6 @@ std::string serialializeBinaryOperator(const BinaryOperator op) {
     case BinaryOperator::Remainder: return "%";
     case BinaryOperator::RightShift: return ">>";
     case BinaryOperator::Subtraction: return "-";
-    default: {
-      throw std::domain_error("Unexpected value for `op`");
-    }
   }
 }
 
@@ -113,9 +107,6 @@ std::string serialializeLogicalOperator(const LogicalOperator op) {
   switch (op) {
     case LogicalOperator::LogicalAnd: return "&&";
     case LogicalOperator::LogicalOr: return "||";
-    default: {
-      throw std::domain_error("Unexpected value for `op`");
-    }
   }
 }
 
@@ -141,6 +132,7 @@ std::unique_ptr<rapidjson::Value> BlockStatementToJson(const BlockStatement &nod
   result->AddMember("body", body, allocator);
   return result;
 }
+
 std::unique_ptr<rapidjson::Value> CallExpressionToJson(const CallExpression &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "CallExpression", allocator);
@@ -153,6 +145,16 @@ std::unique_ptr<rapidjson::Value> CallExpressionToJson(const CallExpression &nod
   result->AddMember("arguments", arguments, allocator);
   return result;
 }
+
+std::unique_ptr<rapidjson::Value> ConditionalExpressionToJson(const ConditionalExpression &node, rapidjson::Document::AllocatorType &allocator) {
+  std::unique_ptr<rapidjson::Value> result = create_object_value();
+  result->AddMember("node_type", "ConditionalExpression", allocator);
+  result->AddMember("test", *RExpressionToJson(*node.test, allocator), allocator);
+  result->AddMember("consequence", *RExpressionToJson(*node.consequence, allocator), allocator);
+  result->AddMember("alternative", *RExpressionToJson(*node.alternative, allocator), allocator);
+  return result;
+}
+
 std::unique_ptr<rapidjson::Value> DataTypeToJson(const DataType &node, rapidjson::Document::AllocatorType &allocator) {
   return NodeToJson(node, allocator);
 }
@@ -247,6 +249,7 @@ std::unique_ptr<rapidjson::Value> ForStatementToJson(const ForStatement &node, r
 std::unique_ptr<rapidjson::Value> FunctionToJson(const Function &node, rapidjson::Document::AllocatorType &allocator) {
   std::unique_ptr<rapidjson::Value> result = create_object_value();
   result->AddMember("node_type", "Function", allocator);
+//  result->AddMember("identifier", *NodeToJson(*node.identifier, allocator), allocator);
   result->AddMember("return_type", *DataTypeToJson(*node.return_type, allocator), allocator);
   rapidjson::Value parameters = rapidjson::Value();
   parameters.SetArray();
@@ -360,6 +363,9 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
     case Node::Type::CallExpression: {
       return CallExpressionToJson(static_cast<const CallExpression &>(node), allocator);
     }
+    case Node::Type::ConditionalExpression: {
+      return ConditionalExpressionToJson(static_cast<const ConditionalExpression &>(node), allocator);
+    }
     case Node::Type::DeclarationForInitializer : {
       return DeclarationForInitializerToJson(static_cast<const DeclarationForInitializer &>(node), allocator);
     }
@@ -399,9 +405,10 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
     case Node::Type::NamedParameter: {
       return NamedParameterToJson(static_cast<const NamedParameter &>(node), allocator);
     }
-//    case Node::Type::Program: {
+    case Node::Type::Program: {
+      throw std::domain_error("Not implemented: nested Program Node");
 //      return ProgramToJson(static_cast<const Program &>(node), allocator);
-//    }
+    }
     case Node::Type::ReturnStatement: {
       return ReturnStatementToJson(static_cast<const ReturnStatement &>(node), allocator);
     }
@@ -422,9 +429,6 @@ std::unique_ptr<rapidjson::Value> NodeToJson(const Node &node, rapidjson::Docume
     }
     case Node::Type::WhileStatement: {
       return WhileStatementToJson(static_cast<const WhileStatement &>(node), allocator);
-    }
-    default: {
-      throw std::domain_error("Unexpected value for `node.node_type`");
     }
   }
 }

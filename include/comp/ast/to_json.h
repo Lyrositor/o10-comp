@@ -13,6 +13,7 @@ std::unique_ptr<rapidjson::Value> AssignmentExpressionToJson(const AssignmentExp
 std::unique_ptr<rapidjson::Value> BinaryExpressionToJson(const BinaryExpression &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> BlockStatementToJson(const BlockStatement &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> CallExpressionToJson(const CallExpression &node, rapidjson::Document::AllocatorType &allocator);
+std::unique_ptr<rapidjson::Value> ConditionalExpressionToJson(const ConditionalExpression &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> DataTypeToJson(const DataType &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> DeclarationToJson(const Declaration &node, rapidjson::Document::AllocatorType &allocator);
 std::unique_ptr<rapidjson::Value> DeclarationForInitializerToJson(const DeclarationForInitializer &node, rapidjson::Document::AllocatorType &allocator);
