@@ -959,10 +959,11 @@ void BuildWhileStatementIR(
   std::shared_ptr<BasicBlock> next_block = cfg->CreateBasicBlock();
 
   std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.condition, context, cfg, test_block);
+  std::shared_ptr<BasicBlock> body_block_head = body_block;
   BuildStatementIR(*node.body, context, cfg, body_block);
 
   current_block->SetJump(test_block);
-  test_block->SetConditionalJump(test_operand, body_block, next_block);
+  test_block->SetConditionalJump(test_operand, body_block_head, next_block);
   if (body_block->GetType() == BasicBlock::Type::Incomplete) {
     body_block->SetJump(test_block);
   }
@@ -1002,6 +1003,7 @@ void BuildForStatementIR(
   if (node.update != nullptr) {
     BuildRExpressionIR(node.update, context, cfg, update_block);
   }
+  std::shared_ptr<BasicBlock> body_block_head = body_block;
   BuildStatementIR(*node.body, context, cfg, body_block);
 
   current_block->SetJump(test_block);
@@ -1011,10 +1013,10 @@ void BuildForStatementIR(
   }
 
   if(node.test == nullptr) {
-    test_block->SetJump(body_block);
+    test_block->SetJump(body_block_head);
   } else {
     std::shared_ptr<Operand> test_operand = BuildRExpressionIR(node.test, context, cfg, test_block);
-    test_block->SetConditionalJump(test_operand, body_block, next_block);
+    test_block->SetConditionalJump(test_operand, body_block_head, next_block);
     current_block = next_block;
   }
 }
@@ -1030,6 +1032,7 @@ void BuildIfStatementIR(
   bool is_next_block_reachable = false;
 
   std::shared_ptr<BasicBlock> consequence = cfg->CreateBasicBlock();
+  std::shared_ptr<BasicBlock> consequence_head = consequence;
   BuildStatementIR(*node.consequence, context, cfg, consequence);
   if (consequence->GetType() == BasicBlock::Type::Incomplete) {
     consequence->SetJump(next_block);
@@ -1037,16 +1040,17 @@ void BuildIfStatementIR(
   }
 
   if (node.alternative == nullptr) {
-    current_block->SetConditionalJump(test_operand, consequence, next_block);
+    current_block->SetConditionalJump(test_operand, consequence_head, next_block);
     is_next_block_reachable = true;
   } else {
     std::shared_ptr<BasicBlock> alternative = cfg->CreateBasicBlock();
+    std::shared_ptr<BasicBlock> alternative_head = alternative;
     BuildStatementIR(*node.alternative, context, cfg, alternative);
     if (alternative->GetType() == BasicBlock::Type::Incomplete) {
       alternative->SetJump(next_block);
       is_next_block_reachable = true;
     }
-    current_block->SetConditionalJump(test_operand, consequence, alternative);
+    current_block->SetConditionalJump(test_operand, consequence_head, alternative_head);
   }
 
   if (is_next_block_reachable) {
