@@ -1,4 +1,13 @@
-# TP COMP
+# o10c
+
+The **o10 compiler** (o10c for short) is a compiler for a subset of the C programming language. Features include:
+
+* Compilation to GNU Assembler (GAS) files, with support for the following architectures:
+  * x86-64
+* Graphviz intermediate representation graph generation
+* Abstract syntax tree export to JSON format
+* Optional IR optimization
+* Linux and Windows compilation support (OS X should also be supported, but has not been tested)
 
 ## Requirements
 
