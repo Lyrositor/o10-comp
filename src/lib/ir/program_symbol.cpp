@@ -1,3 +1,4 @@
+#include <cassert>
 #include <comp/ir/program_symbol.h>
 
 namespace comp {
@@ -59,19 +60,19 @@ std::shared_ptr<const DataType> FunctionSymbol::GetReturnType() const {
   return return_type_;
 }
 
-std::set<std::shared_ptr<const Variable>> FunctionSymbol::GetLocalVariables()
+std::vector<std::shared_ptr<const Variable>> FunctionSymbol::GetLocalVariables()
 const {
-  return local_variables_;
+  assert(std::set<std::shared_ptr<const Variable>>(this->local_variables_.begin(), this->local_variables_.end()).size() == this->local_variables_.size());
+  return this->local_variables_;
 }
 
 void FunctionSymbol::SetBody(std::shared_ptr<ControlFlowGraph> body) {
-  body_ = body;
+  this->body_ = body;
 }
 
-void FunctionSymbol::SetLocalVariables(
-  std::set<std::shared_ptr<const Variable>> local_variables) {
-  local_variables_ = local_variables;
+void FunctionSymbol::SetLocalVariables(std::vector<std::shared_ptr<const Variable>> local_variables) {
+  this->local_variables_ = local_variables;
+  assert(std::set<std::shared_ptr<const Variable>>(this->local_variables_.begin(), this->local_variables_.end()).size() == this->local_variables_.size());
 }
 }  // namespace ir
 }  // namespace comp
-

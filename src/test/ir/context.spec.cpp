@@ -113,14 +113,13 @@ TEST(comp__ir__context, forkAndJoin) {
     comp::ir::Variable::Create(comp::ir::GetInt32Type());
   parentContext->RegisterVariable(parentVarName, parentVariable2);
 
-  std::set<std::shared_ptr<const comp::ir::Variable>> expectedVariables;
-  expectedVariables.insert(parentVariable1);
-  expectedVariables.insert(childVariable);
-  expectedVariables.insert(anonymousVar);
-  expectedVariables.insert(parentVariable2);
+  std::vector<std::shared_ptr<const comp::ir::Variable>> expectedVariables;
+  expectedVariables.push_back(parentVariable1);
+  expectedVariables.push_back(childVariable);
+  expectedVariables.push_back(anonymousVar);
+  expectedVariables.push_back(parentVariable2);
 
-  std::set<std::shared_ptr<const comp::ir::Variable>> actualVariables =
-    parentContext->GetVariables();
+  std::vector<std::shared_ptr<const comp::ir::Variable>> actualVariables = parentContext->GetVariables();
 
   EXPECT_THAT(actualVariables, testing::ContainerEq(expectedVariables));
 }

@@ -1,7 +1,5 @@
+#include <cassert>
 #include <comp/ir/context.h>
-
-#include <cstddef>
-
 #include <comp/utils.h>
 
 namespace comp {
@@ -9,13 +7,14 @@ namespace ir {
 // Context
 Context::Context() :
   symbols_(std::move(SymbolTable())),
-  variables_(std::move(std::set<std::shared_ptr<const Variable>>())) {
+  variables_(std::move(std::vector<std::shared_ptr<const Variable>>())) {
 }
 
 Context::Context(
   SymbolTable symbols,
-  std::set<std::shared_ptr<const Variable>> variables
+  std::vector<std::shared_ptr<const Variable>> variables
 ) : symbols_(std::move(symbols)), variables_(std::move(variables)) {
+  assert(std::set<std::shared_ptr<const Variable>>(this->variables_.begin(), this->variables_.end()).size() == this->variables_.size());
 }
 
 Context::~Context() {
@@ -31,7 +30,7 @@ void Context::RegisterVariable(
   const std::string name, std::shared_ptr<const Variable> variable
 ) {
   symbols_.variables[name] = variable;
-  variables_.insert(variable);
+  variables_.push_back(variable);
 }
 
 void Context::RegisterFunction(
@@ -46,12 +45,13 @@ std::shared_ptr<const Variable> Context::CreateVariable(
 ) {
   std::shared_ptr<const Variable> result = Variable::Create(
     data_type, node);
-  variables_.insert(result);
+  this->variables_.push_back(result);
   return result;
 }
 
-std::set<std::shared_ptr<const Variable>> Context::GetVariables() const {
-  return std::set<std::shared_ptr<const Variable>>(variables_);
+std::vector<std::shared_ptr<const Variable>> Context::GetVariables() const {
+  assert(std::set<std::shared_ptr<const Variable>>(this->variables_.begin(), this->variables_.end()).size() == this->variables_.size());
+  return std::vector<std::shared_ptr<const Variable>>(this->variables_);
 }
 
 std::unique_ptr<ChildContext> Context::Fork() {
@@ -62,10 +62,10 @@ void Context::Join(std::unique_ptr<ChildContext> child_context) {
   /*if (&child_context->GetParentContext() != this) {
     throw std::runtime_error("Not a child context");
   }*/
-  variables_.insert(
-    child_context->variables_.begin(),
-    child_context->variables_.end()
-  );
+  for(auto v : child_context->variables_) {
+    this->variables_.push_back(v);
+  }
+  assert(std::set<std::shared_ptr<const Variable>>(this->variables_.begin(), this->variables_.end()).size() == this->variables_.size());
 }
 
 // RootContext
@@ -75,7 +75,7 @@ std::unique_ptr<RootContext> RootContext::Create() {
 
 std::unique_ptr<RootContext> RootContext::Create(
   SymbolTable symbols,
-  std::set<std::shared_ptr<const Variable>> variables
+  std::vector<std::shared_ptr<const Variable>> variables
 ) {
   return std::unique_ptr<RootContext>(
     new RootContext(std::move(symbols), std::move(variables))
@@ -87,7 +87,7 @@ RootContext::RootContext() : Context() {
 
 RootContext::RootContext(
   SymbolTable symbols,
-  std::set<std::shared_ptr<const Variable>> variables
+  std::vector<std::shared_ptr<const Variable>> variables
 ) : Context(std::move(symbols), std::move(variables)) {
 }
 
@@ -153,7 +153,7 @@ std::unique_ptr<ChildContext> ChildContext::Create(Context &parentContext) {
 std::unique_ptr<ChildContext> ChildContext::Create(
   Context &parent_context,
   SymbolTable symbols,
-  std::set<std::shared_ptr<const Variable>> variables
+  std::vector<std::shared_ptr<const Variable>> variables
 ) {
   return std::unique_ptr<ChildContext>(
     new ChildContext(
@@ -171,7 +171,7 @@ ChildContext::ChildContext(Context &parentContext)
 ChildContext::ChildContext(
   Context &parentContext,
   SymbolTable symbols,
-  std::set<std::shared_ptr<const Variable>> variables
+  std::vector<std::shared_ptr<const Variable>> variables
 ) :
   Context(std::move(symbols), std::move(variables)),
   parent_context_(parentContext) {

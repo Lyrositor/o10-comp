@@ -17,12 +17,12 @@ std::shared_ptr<BasicBlock> ControlFlowGraph::CreateBasicBlock(
   std::vector<std::shared_ptr<Op>> ops
 ) {
   std::shared_ptr<BasicBlock> block = BasicBlock::Create(ops);
-  blocks_.insert(block);
+  this->blocks_.push_back(block);
   return block;
 }
 
-std::set<std::shared_ptr<BasicBlock>> ControlFlowGraph::GetBasicBlocks() const {
-  return blocks_;
+std::vector<std::shared_ptr<BasicBlock>> ControlFlowGraph::GetBasicBlocks() const {
+  return std::vector<std::shared_ptr<BasicBlock>>(this->blocks_.begin(), this->blocks_.end());
 }
 
 std::shared_ptr<BasicBlock> ControlFlowGraph::GetSource() const {

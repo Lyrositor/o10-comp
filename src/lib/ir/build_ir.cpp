@@ -90,13 +90,13 @@ std::shared_ptr<FunctionSymbol> BuildFunctionIR(
   }
   // Create the child context
   VariablesTable variables_table;
-  std::set<std::shared_ptr<const Variable>> variables_set;
+  std::vector<std::shared_ptr<const Variable>> variables_set;
   for (size_t i = 0; i < node.parameters.size(); i++) {
     std::string parameter_name = ResolveParameterName(*node.parameters[i]);
     if (parameter_name != "") {
       variables_table[parameter_name] = parameters[i];
     }
-    variables_set.insert(parameters[i]);
+    variables_set.push_back(parameters[i]);
   }
   ChildContext function_context(context, SymbolTable({}, variables_table, {}), variables_set);
 
@@ -623,9 +623,6 @@ std::shared_ptr<Operand> BuildBinaryExpressionIR(
       current_block->Push(BinOp::Create(result_operand, BinOp::BinaryOperator::Subtraction, left_operand, right_operand));
       break;
     }
-    default: {
-      throw UnexpectedNodeTypeError(*node);
-    }
   }
 
   return result_operand;
@@ -715,9 +712,6 @@ std::shared_ptr<Operand> BuildLogicalExpressionIR(
     case ast::LogicalOperator ::LogicalAnd: {
       current_block->SetConditionalJump(result_operand, right_block_head, next_block);
       break;
-    }
-    default: {
-      throw std::runtime_error("Unexpected value for `node->op` in `BuildLogicalExpressionIR`");
     }
   }
 

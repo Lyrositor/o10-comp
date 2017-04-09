@@ -23,7 +23,7 @@ class Context {
   Context();
   Context(
     SymbolTable symbols,
-    std::set<std::shared_ptr<const Variable>> variables);
+    std::vector<std::shared_ptr<const Variable>> variables);
 
   virtual ~Context() = 0;
 
@@ -43,7 +43,7 @@ class Context {
   /**
    * @return The set of allocated variables
    */
-  std::set<std::shared_ptr<const Variable>> GetVariables() const;
+  std::vector<std::shared_ptr<const Variable>> GetVariables() const;
 
   /**
    * Resolve the `DataType` instance named `name` in the current context.
@@ -102,7 +102,7 @@ class Context {
   /**
    * Shadowed and anonymous variables.
    */
-  std::set<std::shared_ptr<const Variable>> variables_;
+  std::vector<std::shared_ptr<const Variable>> variables_;
 };
 
 class RootContext final : public Context {
@@ -110,12 +110,12 @@ class RootContext final : public Context {
   static std::unique_ptr<RootContext> Create();
   static std::unique_ptr<RootContext> Create(
     SymbolTable symbols,
-    std::set<std::shared_ptr<const Variable>> variables);
+    std::vector<std::shared_ptr<const Variable>> variables);
 
   RootContext();
   RootContext(
     SymbolTable symbols,
-    std::set<std::shared_ptr<const Variable>> variables);
+    std::vector<std::shared_ptr<const Variable>> variables);
 
   ~RootContext();
 
@@ -137,13 +137,13 @@ class ChildContext final : public Context {
   static std::unique_ptr<ChildContext> Create(
     Context &parent_context,
     SymbolTable symbols,
-    std::set<std::shared_ptr<const Variable>> variables);
+    std::vector<std::shared_ptr<const Variable>> variables);
 
   ChildContext(Context &parentContext);
   ChildContext(
     Context &parentContext,
     SymbolTable symbols,
-    std::set<std::shared_ptr<const Variable>> variables);
+    std::vector<std::shared_ptr<const Variable>> variables);
 
   ~ChildContext();
 

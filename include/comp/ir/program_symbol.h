@@ -61,19 +61,19 @@ class FunctionSymbol final : public ProgramSymbol {
 
   std::shared_ptr<const DataType> GetReturnType() const;
 
-  std::set<std::shared_ptr<const Variable>> GetLocalVariables() const;
+  std::vector<std::shared_ptr<const Variable>> GetLocalVariables() const;
 
   void SetBody(std::shared_ptr<ControlFlowGraph> body);
 
   void SetLocalVariables(
-    std::set<std::shared_ptr<const Variable>> local_variables);
+    std::vector<std::shared_ptr<const Variable>> local_variables);
 
  private:
   const std::string name_;
   std::vector<std::shared_ptr<const Variable>> parameters_;
   const std::shared_ptr<const DataType> return_type_;
   std::shared_ptr<ControlFlowGraph> body_;
-  std::set<std::shared_ptr<const Variable>> local_variables_;
+  std::vector<std::shared_ptr<const Variable>> local_variables_;
 };
 }  // namespace ir
 }  // namespace comp

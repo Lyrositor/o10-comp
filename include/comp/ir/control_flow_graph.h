@@ -18,13 +18,13 @@ class ControlFlowGraph {
   std::shared_ptr<BasicBlock> CreateBasicBlock(
     std::vector<std::shared_ptr<Op>> ops = std::vector<std::shared_ptr<Op>>());
 
-  std::set<std::shared_ptr<BasicBlock>> GetBasicBlocks() const;
+  std::vector<std::shared_ptr<BasicBlock>> GetBasicBlocks() const;
 
   std::shared_ptr<BasicBlock> GetSource() const;
 
  private:
   const std::shared_ptr<BasicBlock> source_;
-  std::set<std::shared_ptr<BasicBlock>> blocks_;
+  std::vector<std::shared_ptr<BasicBlock>> blocks_;
 };
 }
 }

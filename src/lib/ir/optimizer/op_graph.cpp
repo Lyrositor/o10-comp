@@ -12,7 +12,7 @@ std::unique_ptr<OpGraph> OpGraph::Create() {
 
 std::unique_ptr<OpGraph> OpGraph::FromControlFlowGraph(const ControlFlowGraph &cfg) {
   std::unique_ptr<OpGraph> result = OpGraph::Create();
-  std::set<std::shared_ptr<BasicBlock>> basic_blocks = cfg.GetBasicBlocks();
+  std::vector<std::shared_ptr<BasicBlock>> basic_blocks = cfg.GetBasicBlocks();
   for (auto basic_block : basic_blocks) {
     if (basic_block->GetType() == BasicBlock::Type::Incomplete) {
       throw std::runtime_error("Cannot build operations graph from control flow containing incomplete basic blocks");

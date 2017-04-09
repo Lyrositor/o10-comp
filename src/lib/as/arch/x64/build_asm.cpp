@@ -194,8 +194,7 @@ void BuildFunction(
   }
 
   // Generate the labels for every block
-  std::set<std::shared_ptr<ir::BasicBlock>>
-    blocks = node->GetBody()->GetBasicBlocks();
+  std::vector<std::shared_ptr<ir::BasicBlock>> blocks = node->GetBody()->GetBasicBlocks();
   size_t label = 0;
   for (auto block : blocks) {
     block_table.Register(
@@ -206,12 +205,11 @@ void BuildFunction(
   // Generate the function body
   // The epilog will be generated when a return statement is encountered; this
   // is a guarantee by the IR
-  BuildBasicBlock(
-    node->GetBody()->GetSource(), body, block_table, variables_table);
+  BuildBasicBlock(node->GetBody()->GetSource(), body, block_table, variables_table);
 
   // Generate every subsequent block
-  blocks.erase(node->GetBody()->GetSource());
-  for (auto block : blocks) {
+  for (size_t i = 1; i < blocks.size(); i++) {
+    auto block = blocks[i];
     body.push_back(ast::EmptyStatement::Create({block_table.Get(block)}));
     BuildBasicBlock(block, body, block_table, variables_table);
   }

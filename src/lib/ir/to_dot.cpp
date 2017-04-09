@@ -269,8 +269,7 @@ std::vector<std::shared_ptr<dot::ast::Statement>> BasicBlockToDot(const BasicBlo
 
 std::vector<std::shared_ptr<dot::ast::Statement>> ControlFlowGraphToDot(const ControlFlowGraph &node, IdentifiersTable &it) {
   std::vector<std::shared_ptr<dot::ast::Statement>> result;
-  std::set<std::shared_ptr<BasicBlock>> basic_blocks = node.GetBasicBlocks();
-  for (auto basic_block : basic_blocks) {
+  for (auto basic_block : node.GetBasicBlocks()) {
     for (auto statement : BasicBlockToDot(*basic_block,it)) {
       result.push_back(statement);
     }
