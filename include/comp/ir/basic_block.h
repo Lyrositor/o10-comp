@@ -82,6 +82,8 @@ class BasicBlock final {
   /**
    * Changes the type to `Jump`
    *
+   * This adds a `NoOp` if the operations list is empty.
+   *
    * Requires the `Incomplete` type, otherwise throws a runtine error.
    *
    * @param branch The next basic block

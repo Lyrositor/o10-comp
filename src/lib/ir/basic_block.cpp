@@ -45,6 +45,9 @@ void BasicBlock::SetJump(std::shared_ptr<BasicBlock> branch) {
   if (this->type_ != Type::Incomplete) {
     throw std::runtime_error("Invalid `type` for the current `BasicBlock`, required `Incomplete` for `SetJump`");
   }
+  if (this->ops_.size() == 0) {
+    this->ops_.push_back(NoOp::Create());
+  }
   this->type_ = Type::Jump;
   this->branch_if_true_ = branch;
 }
