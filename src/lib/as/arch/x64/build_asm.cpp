@@ -50,7 +50,7 @@ static const std::shared_ptr<ast::Mnemonic>
 static const std::shared_ptr<ast::RegisterOperand>
   R8 = ast::RegisterOperand::Create("r8"),
   R9 = ast::RegisterOperand::Create("r9"),
-  R10 = ast::RegisterOperand::Create("r9"),
+  R10 = ast::RegisterOperand::Create("r10"),
   R11 = ast::RegisterOperand::Create("r11"),
   R12 = ast::RegisterOperand::Create("r12"),
   R13 = ast::RegisterOperand::Create("r13"),
@@ -141,6 +141,7 @@ void BuildFunction(
       //param_stack += GetDataTypeSize(params[idx]->GetDataType()); TODO(Lyrositor) Use the right data type size
       param_stack += kRegisterQSize;
     }
+
     variables_table.Register(params[idx], address);
   }
 
@@ -417,6 +418,18 @@ void BuildCallOp(
       body,
       variables_table);
 
+    // Pass the array pointer instead of trying to copy by value
+    if (op->args[idx]->operand_type == ir::Operand::Type::Variable) {
+      auto variable = std::static_pointer_cast<ir::VariableOperand>(
+        op->args[idx])->variable;
+      if (variable->GetDataType()->GetType() == ir::DataType::Type::Array) {
+        body.push_back(
+          INSTR(
+            LEA, {BuildOperand(op->args[idx], body, variables_table), R10}));
+        source = R10;
+      }
+    }
+
     if (idx < kParameterRegisters.size()) {
       // Copy the parameter's value to its destination register
       std::shared_ptr<ast::Operand> destination = kParameterRegisters[idx];
@@ -604,8 +617,8 @@ std::shared_ptr<ast::Operand> BuildOperand(
       std::shared_ptr<ir::Operand> address_op = std::static_pointer_cast<
         ir::IndirectOperand>(op)->address;
       body.push_back(
-        INSTR(MOVQ, {BuildOperand(address_op, body, variables_table), RDX}));
-      return ast::MemoryReference::Create(RDX);
+        INSTR(MOVQ, {BuildOperand(address_op, body, variables_table), R10}));
+      return ast::MemoryReference::Create(R10);
     }
     case ir::Operand::Type::Constant: {
       return ast::ImmediateOperand::Create(
