@@ -908,9 +908,9 @@ std::shared_ptr<IndirectOperand> BuildSubscriptExpressionIR(
   std::shared_ptr<const DataType> pointer_type = PointerDataType::Create(item_type);
   if (*base_type != *pointer_type) {
     if(base_type->IsCastableTo(*pointer_type)) {
-      //const std::shared_ptr<VariableOperand> casted_base = VariableOperand::Create(context.CreateVariable(pointer_type));
-      //current_block->Push(CastOp::Create(casted_base, base_operand));
-      //base_operand = casted_base;
+      const std::shared_ptr<VariableOperand> casted_base = VariableOperand::Create(context.CreateVariable(pointer_type));
+      current_block->Push(CastOp::Create(casted_base, base_operand));
+      base_operand = casted_base;
     } else {
       throw std::runtime_error("Unable to cast to valid pointer");
     }

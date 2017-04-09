@@ -307,24 +307,25 @@ void BuildBinOp(
   switch (op->binary_operator) {
     case ir::BinOp::BinaryOperator::Addition: {
       // Check if this is actually an indexing operation
-      // TODO(Lyrositor) Make this its own operation?
-      auto in_data_type = ir::GetOperandType(*op->in1);
+      // TODO(Lyrositor) Make this its own operation
+      auto in1_data_type = ir::GetOperandType(*op->in1);
+      auto in2_data_type = ir::GetOperandType(*op->in2);
       auto out_data_type = ir::GetOperandType(*op->out);
-      if (in_data_type->GetType() == ir::DataType::Type::Array &&
+      if (in1_data_type->GetType() == ir::DataType::Type::Pointer &&
+        in2_data_type->GetType() == ir::DataType::Type::Int64 &&
         out_data_type->GetType() == ir::DataType::Type::Pointer) {
-        auto array = std::static_pointer_cast<const ir::ArrayDataType>(
-          in_data_type);
+        auto array = std::static_pointer_cast<const ir::PointerDataType>(
+          in1_data_type);
         auto pointer = std::static_pointer_cast<const ir::PointerDataType>(
           out_data_type);
         body.insert(body.end(), {
-          INSTR(MOVQ, {source2, RAX}),
+          INSTR(MOVQ, {source2, R10}),
           INSTR(IMULQ, {
             ast::ImmediateOperand::Create(
               GetDataTypeSize(array->GetItemType())),
-            RAX
+            R10
           }),
-          INSTR(LEA, {source1, RCX}),
-          INSTR(ADDQ, {RCX, RAX})
+          INSTR(ADDQ, {R10, RAX})
         });
       } else {
         // Otherwise, this is just a normal addition
@@ -418,18 +419,6 @@ void BuildCallOp(
       body,
       variables_table);
 
-    // Pass the array pointer instead of trying to copy by value
-    if (op->args[idx]->operand_type == ir::Operand::Type::Variable) {
-      auto variable = std::static_pointer_cast<ir::VariableOperand>(
-        op->args[idx])->variable;
-      if (variable->GetDataType()->GetType() == ir::DataType::Type::Array) {
-        body.push_back(
-          INSTR(
-            LEA, {BuildOperand(op->args[idx], body, variables_table), R10}));
-        source = R10;
-      }
-    }
-
     if (idx < kParameterRegisters.size()) {
       // Copy the parameter's value to its destination register
       std::shared_ptr<ast::Operand> destination = kParameterRegisters[idx];
@@ -481,13 +470,24 @@ void BuildCastOp(
   std::vector<std::shared_ptr<ast::Statement>> &body,
   const VariablesTable &variables_table
 ) {
-  // TODO(Lyrositor) This is simple CopyOp for now; change this once different
-  // types are properly handled
+  // TODO(Lyrositor) This is mostly a simple CopyOp for now; change this once
+  // different types are properly handled
   auto source = BuildOperand(op->in, body, variables_table);
   auto destination = BuildOperand(op->out, body, variables_table);
+  auto in_data_type = ir::GetOperandType(*op->in);
+  auto out_data_type = ir::GetOperandType(*op->out);
+
+  // If this is an array, store its address instead of its first value
+  if (in_data_type->GetType() == ir::DataType::Type::Array &&
+    out_data_type->GetType() == ir::DataType::Type::Pointer) {
+    body.insert(body.end(), {
+      INSTR(LEA, {source, R10}),
+      INSTR(MOVQ, {R10, destination})
+    });
+  }
 
   // Introduce an intermediary register if this is a copy from memory to memory
-  if (source->node_type == ast::Node::Type::MemoryReference &&
+  else if (source->node_type == ast::Node::Type::MemoryReference &&
     destination->node_type == ast::Node::Type::MemoryReference) {
     body.push_back(INSTR(MOVQ, {source, RAX}));
     body.push_back(INSTR(MOVQ, {RAX, destination}));
