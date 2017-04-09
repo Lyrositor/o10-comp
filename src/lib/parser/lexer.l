@@ -109,7 +109,7 @@
 <charLiteral>{
   [^\\'\n]                        {yylval->uint8 = yytext[0]; return CHAR_ATOM;}
   (\\([1-7]?[0-7]|[1-3][0-7]{2})) {std::sscanf(yytext + 1, "%o", &(yylval->uint8)); return CHAR_ATOM;}
-  (\\x[1-9a-fA-F]?[0-9a-fA-F])    {std::sscanf(yytext + 2, "%x", &(yylval->uint8)); return CHAR_ATOM;}
+  (\\x[0-9a-fA-F]{1,2})           {std::sscanf(yytext + 2, "%x", &(yylval->uint8)); return CHAR_ATOM;}
   "\\a"                           {yylval->uint8 = 0x07; return CHAR_ATOM;}
   "\\b"                           {yylval->uint8 = 0x08; return CHAR_ATOM;}
   "\\f"                           {yylval->uint8 = 0x0c; return CHAR_ATOM;}
