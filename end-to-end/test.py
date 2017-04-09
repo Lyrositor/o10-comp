@@ -99,7 +99,7 @@ class IrTestConfig():
         self.expected_return_code = 0
 
     @staticmethod
-    def from_json(doc, test_dir):
+    def from_json(doc, test_dir, optimized=False):
         config = IrTestConfig()
         if "skip" in doc and doc["skip"]:
             config.skip = True
@@ -108,17 +108,19 @@ class IrTestConfig():
             config.hidden = True
             return config
 
+        prefix = "optimized__" if optimized else ""
+
         if "return-code" in doc:
             config.expected_return_code = doc["return-code"]
 
         if "actual-dot" in doc:
-            config.actual_dot_path = os.path.join(test_dir, doc["actual-dot"])
+            config.actual_dot_path = os.path.join(test_dir, prefix + doc["actual-dot"])
 
         if "actual-png" in doc:
-            config.actual_png_path = os.path.join(test_dir, doc["actual-png"])
+            config.actual_png_path = os.path.join(test_dir, prefix + doc["actual-png"])
 
         if "expected-dot" in doc:
-            config.expected_ir_path = os.path.join(test_dir, doc["expected-dot"])
+            config.expected_ir_path = os.path.join(test_dir, prefix + doc["expected-dot"])
 
         return config
 
@@ -139,7 +141,7 @@ class RunTestConfig():
 
 
     @staticmethod
-    def from_json(doc, test_dir):
+    def from_json(doc, test_dir, optimized=False):
         config = RunTestConfig()
         if "skip" in doc and doc["skip"]:
             config.skip = True
@@ -148,29 +150,31 @@ class RunTestConfig():
             config.hidden = True
             return config
 
-        config.actual_assembly_path = os.path.join(test_dir, doc["actual-assembly"])
-        config.executable_path = os.path.join(test_dir, doc["executable"])
+        prefix = "optimized__" if optimized else ""
+
+        config.actual_assembly_path = os.path.join(test_dir, prefix + doc["actual-assembly"])
+        config.executable_path = os.path.join(test_dir, prefix + doc["executable"])
 
         if "return-code" in doc:
             config.expected_return_code = doc["return-code"]
 
         if "actual-stdout" in doc:
-            config.actual_stdout_path = os.path.join(test_dir, doc["actual-stdout"])
+            config.actual_stdout_path = os.path.join(test_dir, prefix + doc["actual-stdout"])
 
         if "actual-stderr" in doc:
-            config.actual_stderr_path = os.path.join(test_dir, doc["actual-stderr"])
+            config.actual_stderr_path = os.path.join(test_dir, prefix + doc["actual-stderr"])
 
         if "expected-assembly" in doc:
-            config.expected_assembly_path = os.path.join(test_dir, doc["expected-assembly"])
+            config.expected_assembly_path = os.path.join(test_dir, prefix + doc["expected-assembly"])
+
+        if "expected-stderr" in doc:
+            config.expected_stderr_path = os.path.join(test_dir, prefix + doc["expected-stderr"])
 
         if "expected-stdout" in doc:
-            config.expected_stdout_path = os.path.join(test_dir, doc["expected-stdout"])
-
-        if "return-code" in doc:
-            config.expected_return_code = doc["return-code"]
+            config.expected_stdout_path = os.path.join(test_dir, prefix + doc["expected-stdout"])
 
         if "stdin" in doc:
-            config.stdin_path = os.path.join(test_dir, doc["stdin"])
+            config.stdin_path = os.path.join(test_dir, prefix + doc["stdin"])
 
         return config
 
@@ -182,7 +186,9 @@ class TestConfig():
         self.source_path = None  # type: str
         self.ast = None  # type: AstTestConfig
         self.ir = None  # type: IrTestConfig
+        self.ir_optimized = None  # type: IrTestConfig
         self.run = None  # type: RunTestConfig
+        self.run_optimized = None  # type: RunTestConfig
 
     @staticmethod
     def from_json(doc, test_dir):
@@ -204,9 +210,11 @@ class TestConfig():
 
         if "ir" in doc:
             config.ir = IrTestConfig.from_json(doc["ir"], test_dir)
+            config.ir_optimized = IrTestConfig.from_json(doc["ir"], test_dir, optimized=True)
 
         if "run" in doc:
             config.run = RunTestConfig.from_json(doc["run"], test_dir)
+            config.run_optimized = RunTestConfig.from_json(doc["run"], test_dir, optimized=True)
 
         return config
 
@@ -246,7 +254,9 @@ class TestCase:
             return {
                 "ast": self.test_ast(),
                 "ir": self.test_ir(),
-                "run": self.test_run()
+                "ir-optimized": self.test_ir(optimized=True),
+                "run": self.test_run(),
+                "run-optimized": self.test_run(optimized=True)
             }
 
     def test_ast(self):
@@ -312,14 +322,20 @@ class TestCase:
 
         return "ok", None
 
-    def test_ir(self):
-        if self.config.ir is None or self.config.ir.hidden:
+    def test_ir(self, optimized=False):
+        ir_config = self.config.ir_optimized if optimized else self.config.ir
+        if ir_config is None or ir_config.hidden:
             return "hidden", None
-        elif self.config.ir.skip:
+        elif ir_config.skip:
             return "skipped", None
 
+        compiler_options = [GLOBAL_OPTIONS.o10c_path]
+        if optimized:
+            compiler_options.append("-o")
+        compiler_options += ["--ir", self.config.source_path]
+
         process = subprocess.Popen(
-            [GLOBAL_OPTIONS.o10c_path, "--ir", self.config.source_path],
+            compiler_options,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -328,24 +344,24 @@ class TestCase:
         utf8_stdout = stdout.decode("UTF-8")
         utf8_stderr = stderr.decode("UTF-8")
 
-        if process.returncode != self.config.ir.expected_return_code:
+        if process.returncode != ir_config.expected_return_code:
             msg = ("Unexpected return code. Actual: {}, Expected: {}\n"
                    "stdout:\n"
                    "{}\n"
                    "stderr:\n"
                    "{}"
-                   ).format(process.returncode, self.config.ir.expected_return_code, utf8_stdout, utf8_stderr)
+                   ).format(process.returncode, ir_config.expected_return_code, utf8_stdout, utf8_stderr)
             return "failed", msg
 
         if process.returncode == 0:
-            if self.config.ir.actual_dot_path is not None:
-                with open(self.config.ir.actual_dot_path, "w") as actual_ir_file:
+            if ir_config.actual_dot_path is not None:
+                with open(ir_config.actual_dot_path, "w") as actual_ir_file:
                     actual_ir_file.buffer.write(stdout)
 
-                if self.config.ir.actual_png_path is not None and not GLOBAL_OPTIONS.no_dot:
+                if ir_config.actual_png_path is not None and not GLOBAL_OPTIONS.no_dot:
                     # TODO: Pipe to stdin
                     dot_process = subprocess.Popen(
-                        [GLOBAL_OPTIONS.dot_path, "-Tpng", self.config.ir.actual_dot_path, "-o", self.config.ir.actual_png_path],
+                        [GLOBAL_OPTIONS.dot_path, "-Tpng", ir_config.actual_dot_path, "-o", ir_config.actual_png_path],
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE
                     )
@@ -362,17 +378,17 @@ class TestCase:
                                ).format(utf8_dot_stdout, utf8_dot_stderr)
                         return "failed", msg
 
-
         return "ok", None
 
-    def test_run(self):
-        if self.config.run is None or self.config.run.hidden:
+    def test_run(self, optimized=False):
+        run_config = self.config.run_optimized if optimized else self.config.run
+        if run_config is None or run_config.hidden:
             return "hidden", None
-        elif self.config.run.skip:
+        elif run_config.skip:
             return "skipped", None
 
         compiler_process = subprocess.Popen(
-            [GLOBAL_OPTIONS.o10c_path, "-c", "--output={}".format(self.config.run.actual_assembly_path), self.config.source_path],
+            [GLOBAL_OPTIONS.o10c_path, "-co" if optimized else "-c", "--output={}".format(run_config.actual_assembly_path), self.config.source_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -389,7 +405,7 @@ class TestCase:
             return "failed", msg
 
         compiler_process = subprocess.Popen(
-            [GLOBAL_OPTIONS.gcc_path, "-ggdb", "-x", "assembler", "-s", self.config.run.actual_assembly_path, "-o", self.config.run.executable_path],
+            [GLOBAL_OPTIONS.gcc_path, "-ggdb", "-x", "assembler", "-s", run_config.actual_assembly_path, "-o", run_config.executable_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -406,7 +422,7 @@ class TestCase:
             return "failed", msg
 
         process = subprocess.Popen(
-            [self.config.run.executable_path],
+            [run_config.executable_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
@@ -415,27 +431,27 @@ class TestCase:
         stdout = stdout.replace(b"\r\n", b"\n")
         stderr = stderr.replace(b"\r\n", b"\n")
 
-        if self.config.run.actual_stdout_path is not None:
-            with open(self.config.run.actual_stdout_path, "w") as actual_stdout_file:
+        if run_config.actual_stdout_path is not None:
+            with open(run_config.actual_stdout_path, "w") as actual_stdout_file:
                 actual_stdout_file.buffer.write(stdout)
 
-        if self.config.run.actual_stderr_path is not None:
-            with open(self.config.run.actual_stderr_path, "w") as actual_stderr_file:
+        if run_config.actual_stderr_path is not None:
+            with open(run_config.actual_stderr_path, "w") as actual_stderr_file:
                 actual_stderr_file.buffer.write(stderr)
 
-        if self.config.run.expected_return_code is not None:
-            if process.returncode != self.config.run.expected_return_code:
+        if run_config.expected_return_code is not None:
+            if process.returncode != run_config.expected_return_code:
                 msg = ("Unexpected return code. Actual: {}, Expected: {}\n"
                        "stdout:\n"
                        "{}\n"
                        "stderr:\n"
                        "{}"
-                       ).format(process.returncode, self.config.run.expected_return_code, repr(stdout), repr(stderr))
+                       ).format(process.returncode, run_config.expected_return_code, repr(stdout), repr(stderr))
                 return "failed", msg
 
-        if self.config.run.expected_stdout_path is not None:
+        if run_config.expected_stdout_path is not None:
             try:
-                with open(self.config.run.expected_stdout_path, "rb") as expected_stdout_file:
+                with open(run_config.expected_stdout_path, "rb") as expected_stdout_file:
                     expected_stdout = expected_stdout_file.read()
                     if expected_stdout != stdout:
                         msg = ("Actual STDOUT does not match the expected STDOUT:\n"
@@ -446,11 +462,11 @@ class TestCase:
                                ).format(repr(expected_stdout), repr(stdout))
                         return "failed", msg
             except:
-                return "failed", "Unable to read file: {}".format(self.config.run.expected_stdout_path)
+                return "failed", "Unable to read file: {}".format(run_config.expected_stdout_path)
 
-        if self.config.run.expected_stderr_path is not None:
+        if run_config.expected_stderr_path is not None:
             try:
-                with open(self.config.run.expected_stderr_path, "rb") as expected_stderr_file:
+                with open(run_config.expected_stderr_path, "rb") as expected_stderr_file:
                     expected_stderr = expected_stderr_file.read()
                     if expected_stderr != stderr:
                         msg = ("Actual STDERR does not match the expected STDERR:\n"
@@ -461,7 +477,7 @@ class TestCase:
                                ).format(repr(expected_stderr), repr(stderr))
                         return "failed", msg
             except:
-                return "failed", "Unable to read file: {}".format(self.config.run.expected_stderr_path)
+                return "failed", "Unable to read file: {}".format(run_config.expected_stderr_path)
 
         return "ok", None
 
@@ -532,30 +548,42 @@ class TestReport:
             raise RuntimeError("Unexpected test status: {}".format(status))
 
         if message is None:
-            self.results.append((status, full_name, None))
+            result = (status, full_name, None)
+            self.results.append(result)
+            return result
         else:
-            self.results.append((status, full_name, len(self.messages)))
+            result = (status, full_name, len(self.messages))
+            self.results.append(result)
             self.messages.append(message)
+            return result
 
-    def print(self):
+    @staticmethod
+    def print_result(result):
+        if result is None:
+            return
+        status, name, msg_id = result
+        if status == "skipped":
+            status_str = "SKIPPED"
+        elif status == "failed":
+            status_str = "FAILED "
+        elif status == "ok":
+            status_str = "OK     "
+        else:
+            raise RuntimeError("Unexpected test status: {}".format(status))
+        if msg_id is None:
+            msg_id_str = "       "
+        else:
+            msg_id_str = "< {0: 3d} >".format(msg_id)
+        print("[{}] {} {}".format(status_str, msg_id_str, name))
+
+    def print(self, skip_details=False):
         """
         Print the report
         """
-        print("====================================")
-        for status, name, msg_id in self.results:
-            if status == "skipped":
-                status_str = "SKIPPED"
-            elif status == "failed":
-                status_str = "FAILED "
-            elif status == "ok":
-                status_str = "OK     "
-            else:
-                raise RuntimeError("Unexpected test status: {}".format(status))
-            if msg_id is None:
-                msg_id_str = "       "
-            else:
-                msg_id_str = "< {0: 3d} >".format(msg_id)
-            print("[{}] {} {}".format(status_str, msg_id_str, name))
+        if not skip_details:
+            print("====================================")
+            for result in self.results:
+                TestReport.print_result(result)
 
         if len(self.messages) > 0:
             print("====================================")
@@ -590,9 +618,9 @@ def main():
     for test_case in sorted(test_suites, key=lambda x: x.dir):
         for name, (status, message) in test_case.test().items():
             full_name = "{} + {}".format(test_case.dir[len(END_TO_END_ROOT):], name)
-            test_report.add(status, full_name, message)
+            TestReport.print_result(test_report.add(status, full_name, message))
 
-    test_report.print()
+    test_report.print(skip_details=True)
 
     return 0 if test_report.failed == 0 else 1
 
