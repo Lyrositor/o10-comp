@@ -9,8 +9,8 @@ namespace comp {
 namespace ir {
 IdentifiersTable::IdentifiersTable() :
   basic_blocks_counter(0), basic_blocks_map(),
-  variables_counter(0),  variables_map(),
-  functions_counter(0), functions_map() {
+  functions_counter(0), functions_map(),
+  variables_counter(0),  variables_map() {
 }
 
 IdentifiersTable::~IdentifiersTable() {

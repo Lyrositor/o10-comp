@@ -101,10 +101,10 @@
 %type <function> functionDeclaration functionDefinition
 %type <for_initializer> forInitializer
 %type <identifier> identifier
-%type <lExpression> lExpression LValue
+%type <lExpression> /*lExpression*/ LValue
 %type <identifierDataType> identifierDataType
 %type <program> program root
-%type <rExpression> assignmentExpression additiveExpression charLiteral conditionalExpression expression equalityExpression hexIntegerLiteral multiplicativeExpression optionalExpression primaryExpression relationalExpression shiftExpression unaryExpression ANDExpression exclusiveORExpression inclusiveORExpression logicalANDExpression logicalORExpression  varUpdate literalExpr
+%type <rExpression> assignmentExpression additiveExpression charLiteral conditionalExpression expression equalityExpression /*hexIntegerLiteral*/ multiplicativeExpression optionalExpression primaryExpression relationalExpression shiftExpression unaryExpression ANDExpression exclusiveORExpression inclusiveORExpression logicalANDExpression logicalORExpression  varUpdate literalExpr
 %type <statement> forStatement ifStatement returnStatement statement whileStatement
 %type <expressionStatement> expressionStatement
 %type <parameter> parameter
