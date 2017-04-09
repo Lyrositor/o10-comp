@@ -146,11 +146,11 @@ struct UnaryOp final : public Op {
  * Copy the value from `in` to `out`, perform a cast during the copy.
  */
 struct CastOp final : public Op {
-  static std::unique_ptr<CastOp> Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
-  CastOp(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in);
+  static std::unique_ptr<CastOp> Create(std::shared_ptr<WritableOperand> out, std::shared_ptr<Operand> in);
+  CastOp(std::shared_ptr<WritableOperand> out, std::shared_ptr<Operand> in);
   virtual ~CastOp();
 
-  std::shared_ptr<VariableOperand> out;
+  std::shared_ptr<WritableOperand> out;
   std::shared_ptr<Operand> in;
 };
 

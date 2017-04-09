@@ -337,12 +337,16 @@ void BuildVariableDeclarationIR(
     std::shared_ptr<const Variable> variable = Variable::Create(variable_type);
     context.RegisterVariable(variable_name, variable);
     if (variable_declarator->initial_value != nullptr) {
-      std::shared_ptr<Operand>
-        initial_value = BuildRExpressionIR(variable_declarator->initial_value, context, cfg, current_block);
-      current_block->Push(CopyOp::Create(
-        VariableOperand::Create(variable),
-        initial_value
-      ));
+      std::shared_ptr<Operand> initial_value = BuildRExpressionIR(variable_declarator->initial_value, context, cfg, current_block);
+      std::shared_ptr<VariableOperand> variable_operand = VariableOperand::Create(variable);
+      std::shared_ptr<const DataType> initial_value_type = GetOperandType(*initial_value);
+      if (*initial_value_type == *variable_type) {
+        current_block->Push(CopyOp::Create(variable_operand, initial_value));
+      } else if (initial_value_type->IsCastableTo(*variable_type)) {
+        current_block->Push(CastOp::Create(variable_operand, initial_value));
+      } else {
+        throw std::runtime_error("Invalid initial value: incompatible type");
+      }
     }
   }
 }
@@ -648,15 +652,29 @@ std::shared_ptr<Operand> BuildCallExpressionIR(
   }
 
   // Create the return variable
-  const std::shared_ptr<const Variable>
-    tmp_var = context.CreateVariable(function->GetReturnType(), node);
-  std::shared_ptr<VariableOperand>
-    tmp_operand = VariableOperand::Create(tmp_var);
+  const std::shared_ptr<const Variable> tmp_var = context.CreateVariable(function->GetReturnType(), node);
+  std::shared_ptr<VariableOperand> tmp_operand = VariableOperand::Create(tmp_var);
+
+  // Parameters (for type conversions)
+  std::vector<std::shared_ptr<const Variable>> parameters = function->GetParameters();
 
   // Add the parameters
   std::vector<std::shared_ptr<Operand>> args;
-  for (auto arg_node : node->arguments) {
-    args.push_back(BuildRExpressionIR(arg_node, context, cfg, current_block));
+  for (size_t i = 0, l = node->arguments.size(); i < l; i++) {
+    auto arg_node = node->arguments[i];
+    std::shared_ptr<Operand> arg_operand = BuildRExpressionIR(arg_node, context, cfg, current_block);
+    std::shared_ptr<const DataType> arg_type = GetOperandType(*arg_operand);
+    std::shared_ptr<const DataType> parameter_type = parameters[i]->GetDataType();
+    if (*arg_type != *parameter_type) {
+      if (arg_type->IsCastableTo(*parameter_type)) {
+        std::shared_ptr<VariableOperand> casted_arg = VariableOperand::Create(context.CreateVariable(parameter_type, arg_node));
+        current_block->Push(CastOp::Create(casted_arg, arg_operand));
+        arg_operand = casted_arg;
+      } else {
+        throw std::runtime_error("Invalid call: argument types don't match");
+      }
+    }
+    args.push_back(arg_operand);
   }
 
   // Add the call operation to the current basic block

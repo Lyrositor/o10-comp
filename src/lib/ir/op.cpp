@@ -124,12 +124,12 @@ UnaryOp::UnaryOp(std::shared_ptr<WritableOperand> out,
 UnaryOp::~UnaryOp() {
 }
 
-std::unique_ptr<CastOp> CastOp::Create(std::shared_ptr<VariableOperand> out, std::shared_ptr<Operand> in) {
+std::unique_ptr<CastOp> CastOp::Create(std::shared_ptr<WritableOperand> out, std::shared_ptr<Operand> in) {
   return std::unique_ptr<CastOp>(new CastOp(out, in));
 }
 
 CastOp::CastOp(
-  std::shared_ptr<VariableOperand> out,
+  std::shared_ptr<WritableOperand> out,
   std::shared_ptr<Operand> in
 ) :
   Op(Op::Type::CastOp),

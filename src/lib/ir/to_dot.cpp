@@ -100,7 +100,7 @@ void EmitBinOp(const BinOp &node, std::ostream &out, IdentifiersTable &it) {
 }
 
 void EmitCastOp(const CastOp &node, std::ostream &out, IdentifiersTable &it) {
-  EmitVariableOperand(*node.out, out, it);
+  EmitOperand(*node.out, out, it);
   out << " := Cast(";
   EmitOperand(*node.in, out, it);
   out << ");";

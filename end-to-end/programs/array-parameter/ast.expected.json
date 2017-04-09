@@ -1,0 +1,240 @@
+{
+  "node_type": "Program",
+  "body": [
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [
+        {
+          "node_type": "NamedParameter",
+          "data_type": {
+            "node_type": "IdentifierDataType",
+            "identifier": {
+              "node_type": "Identifier",
+              "name": "char"
+            }
+          },
+          "declarator": {
+            "node_type": "ArrayDeclarator",
+            "declarator": {
+              "node_type": "IdentifierDeclarator",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "msg"
+              }
+            },
+            "size": null
+          }
+        }
+      ],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "SubscriptExpression",
+                "array": {
+                  "node_type": "Identifier",
+                  "name": "msg"
+                },
+                "index": {
+                  "node_type": "Int64Literal",
+                  "value": 0
+                }
+              },
+              "rvalue": {
+                "node_type": "Uint8Literal",
+                "value": 79
+              }
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "SubscriptExpression",
+                "array": {
+                  "node_type": "Identifier",
+                  "name": "msg"
+                },
+                "index": {
+                  "node_type": "Int64Literal",
+                  "value": 1
+                }
+              },
+              "rvalue": {
+                "node_type": "Uint8Literal",
+                "value": 75
+              }
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "AssignmentExpression",
+              "op": "=",
+              "lvalue": {
+                "node_type": "SubscriptExpression",
+                "array": {
+                  "node_type": "Identifier",
+                  "name": "msg"
+                },
+                "index": {
+                  "node_type": "Int64Literal",
+                  "value": 2
+                }
+              },
+              "rvalue": {
+                "node_type": "Uint8Literal",
+                "value": 10
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "node_type": "Function",
+      "return_type": {
+        "node_type": "IdentifierDataType",
+        "identifier": {
+          "node_type": "Identifier",
+          "name": "void"
+        }
+      },
+      "parameters": [],
+      "body": {
+        "node_type": "BlockStatement",
+        "body": [
+          {
+            "node_type": "VariableDeclaration",
+            "data_type": {
+              "node_type": "IdentifierDataType",
+              "identifier": {
+                "node_type": "Identifier",
+                "name": "char"
+              }
+            },
+            "declarators": [
+              {
+                "node_type": "VariableDeclarator",
+                "declarator": {
+                  "node_type": "ArrayDeclarator",
+                  "declarator": {
+                    "node_type": "IdentifierDeclarator",
+                    "identifier": {
+                      "node_type": "Identifier",
+                      "name": "msg"
+                    }
+                  },
+                  "size": {
+                    "node_type": "Int64Literal",
+                    "value": 3
+                  }
+                },
+                "initial_value": null
+              }
+            ]
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "write_ok"
+              },
+              "arguments": [
+                {
+                  "node_type": "Identifier",
+                  "name": "msg"
+                }
+              ]
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "SubscriptExpression",
+                  "array": {
+                    "node_type": "Identifier",
+                    "name": "msg"
+                  },
+                  "index": {
+                    "node_type": "Int64Literal",
+                    "value": 0
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "SubscriptExpression",
+                  "array": {
+                    "node_type": "Identifier",
+                    "name": "msg"
+                  },
+                  "index": {
+                    "node_type": "Int64Literal",
+                    "value": 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node_type": "ExpressionStatement",
+            "expression": {
+              "node_type": "CallExpression",
+              "callee": {
+                "node_type": "Identifier",
+                "name": "putchar"
+              },
+              "arguments": [
+                {
+                  "node_type": "SubscriptExpression",
+                  "array": {
+                    "node_type": "Identifier",
+                    "name": "msg"
+                  },
+                  "index": {
+                    "node_type": "Int64Literal",
+                    "value": 2
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
